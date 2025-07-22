@@ -63,11 +63,15 @@ EX:
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> 0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A "transfer(address, uint256)" "0x0000000000000000000000000000000000000001" "50" --private-key <key you funded with Sepolia ETH>
 ```
 
-Save the transaction hash of your token burn transaction for later use:
+Save the transaction hash of your token burn transaction for later use
+
 EX:
 transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
 
-## 4. Submit Bridging Query to CCNext Prover
+## 4. Fund a CCNext Testnet Address from Faucet
+TODO: Add faucet step here once faucet exists. Then replace any mention of testing key 0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b
+
+## 5. Submit Bridging Query to CCNext Prover
 Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the CCNext Testnet. We do so by creating a "bridging query".
 
 ```sh
@@ -83,11 +87,14 @@ TODO: Replace this well known testing key with instructions to use testnet fauce
 Proving should take ~8 minutes and no more than 30 minutes.
 
 Once the proving process completes, save the QueryId printed for later:
+
 EX:
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
 
-## 5. Use Bridged Data to Mint Tokens on CCNext Testnet
-We need to call `uscBridgeCompleteMint` in our bridge smart contract instance from step 5. 
+## 6. Use Bridged Data to Mint Tokens on CCNext Testnet
+We need to call `uscBridgeCompleteMint` in the pre-existing bridge contract at address 0xB85f7EFC53246468693d993558c36Be284FE8995 on CCNext Testnet. 
+
+We also supply the address of a pre-existing mintable contract in which our bridged tokens will be minted, 0xF87960561ac3331f3492523fEf5F6096A460A413
 
 TODO: Replace shared testing private key with instructions to use CCNext faucet once set up
 ```sh
@@ -100,6 +107,10 @@ yarn complete_mint.js \
 ```
 
 ## 6. Check Balance in CCNext Test ERC20 Contract
+As a final check, we take a look at the balance in our account within the ERC20 contract where we minted our tokens.
+
+Again, that contract lives at address 0xF87960561ac3331f3492523fEf5F6096A460A413 on CCNext Testnet
+
 ```sh
 yarn check_balance 0xF87960561ac3331f3492523fEf5F6096A460A413 <Your account address from Sepolia>
 ```
