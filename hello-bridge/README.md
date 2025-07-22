@@ -53,13 +53,6 @@ Then you can access your api key from the dashboard here https://developer.metam
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> 0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A "transfer(address, uint256)" "0x0000000000000000000000000000000000000001" "50" --private-key <private key you funded with Sepolia ETH>
 ```
 
-```sh
-cast send --rpc-url https://sepolia.infura.io/v3/c5bff627d3274bb3bcaf7733cc427320 \
-0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A \
-"mint(uint256)" 50000 \
---private-key 0xa9b3538dc2b9fc0b520616adeb9e4baf96223e67e9dd80f41afc4a468833a180
-```
-
 ## 3. Burn Funds on Sepolia Contract
 The first step of bridging tokens is to burn those tokens on the sending chain (Sepolia). 
 
@@ -68,10 +61,6 @@ We burn funds by transferring them to an address for which the private key is un
 EX:
 ```sh
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> 0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A "transfer(address, uint256)" "0x0000000000000000000000000000000000000001" "50" --private-key <key you funded with Sepolia ETH>
-```
-
-```sh
-cast send --rpc-url https://sepolia.infura.io/v3/c5bff627d3274bb3bcaf7733cc427320 0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A "transfer(address, uint256)" "0x0000000000000000000000000000000000000001" "50" --private-key 0xa9b3538dc2b9fc0b520616adeb9e4baf96223e67e9dd80f41afc4a468833a180
 ```
 
 Save the transaction hash of your token burn transaction for later use:
@@ -97,9 +86,6 @@ Once the proving process completes, save the QueryId printed for later:
 EX:
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
 
-Transaction hash: 0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
-Private key: 0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b
-
 ## 5. Use Bridged Data to Mint Tokens on CCNext Testnet
 We need to call `uscBridgeCompleteMint` in our bridge smart contract instance from step 5. 
 
@@ -110,15 +96,6 @@ yarn complete_mint.js \
 <bridge-contract_address> \
 <prover_address> \
 <query_id> \
-0xF87960561ac3331f3492523fEf5F6096A460A413
-```
-
-```sh
-yarn complete_mint \
-0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b \
-0xB85f7EFC53246468693d993558c36Be284FE8995 \
-0xc1af0939ad5c9c193de0d64873736f09a53b4a92 \
-0xe2150be194ac27b0bc773a53b3c04ec53f7d2b3f56f054023296d9702aeaaebf \
 0xF87960561ac3331f3492523fEf5F6096A460A413
 ```
 
