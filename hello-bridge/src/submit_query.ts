@@ -1,7 +1,6 @@
 import { createPublicClient, createWalletClient, decodeEventLog, http } from "viem";
-import { sepolia } from "viem/chains";
 import { Chain } from "viem";
-import dotenv from "dotenv";
+import readlineSync from 'readline-sync';
 import { privateKeyToAccount } from "viem/accounts";
 import { ethers } from "ethers";
 import { QueryBuilder } from "./ethers-query-builder/query-builder/abi/QueryBuilder";
@@ -11,27 +10,28 @@ import { PROVER_ABI } from "./constants/abi";
 import { ChainQuery } from "./ethers-query-builder/models/ChainQuery";
 
 async function main() {
-  console.log('Starting main function');
-  // Load environment variables
-  dotenv.config();
-  console.log('Loading environment variables');
+  console.log('CCNext Query Builder:');
   // Setup
   // 1. Setup your source chain rpc
-  const source_chain = {
-    id: sepolia.id,
-    name: sepolia.name,
-    nativeCurrency: sepolia.nativeCurrency,
-    rpcUrls: {
-      default: {
-        http: [process.env.SOURCE_CHAIN_RPC_URL || 'https://sepolia-test-proxy-rpc.creditcoin.network/'],
-      },
-    },
-  };
-  const sourceChainPublicClient = createPublicClient({
-    chain: source_chain,
-    transport: http(),
-  });
-  const provider = new ethers.JsonRpcProvider(process.env.SOURCE_CHAIN_RPC_URL || 'https://sepolia-test-proxy-rpc.creditcoin.network/');
+  // Prompt for RPC URL
+  const rpcUrl = readlineSync.question('Enter Sepolia RPC URL (e.g., https://sepolia.infura.io/v3/<Your Infura API Key>): ').trim();
+  if (!rpcUrl.startsWith('http://') && !rpcUrl.startsWith('https://')) {
+    throw new Error('Invalid URL: must start with http:// or https://');
+  }
+
+  // Prompt for transaction hash
+  const transactionHash = readlineSync.question('Enter the transaction hash (0x...): ');
+  if (!transactionHash || !transactionHash.startsWith('0x') || transactionHash.length !== 66) {
+    throw new Error('Invalid transaction hash provided');
+  }
+
+  // Prompt for CCNext Private Key
+  const ccNextPrivateKey = readlineSync.question('Enter your CCNEXT account private key (0x...): ');
+  if (!ccNextPrivateKey || !ccNextPrivateKey.startsWith('0x')) {
+    throw new Error("Invalid private key provided");
+  }
+
+  const provider = new ethers.JsonRpcProvider(rpcUrl);
 
   // 2. Setup your CCNext rpc and addresses
   const cc_next_local = {
@@ -40,12 +40,11 @@ async function main() {
     nativeCurrency: { name: 'Creditcoin', symbol: 'CTC', decimals: 18 },
     rpcUrls: {
       default: {  
-        http: [process.env.CCNEXT_RPC_URL || 'https://rpc.ccnext-devnet.creditcoin.network']
+        http: ['https://rpc.ccnext-devnet.creditcoin.network']
       }
     },
     testnet: true
   } as const satisfies Chain;
-  const ccNextPrivateKey = process.env.CCNEXT_PRIVATE_KEY;
   if (!ccNextPrivateKey) {
     throw new Error("CCNEXT_PRIVATE_KEY is not set");
   }
@@ -59,24 +58,10 @@ async function main() {
     account: privateKeyToAccount(ccNextPrivateKey as `0x${string}`),
   });
 
-  // 3. Mint some ERC20 tokens and make a transfer
-  // In this example, we're using a simple erc20 transfer transaction and we're querying the values in the function call as well as the events
-  
-  
-
   // Proving process
   // 1. Choose a transaction to query
-  // Note that once a query is made of a transaction, you can't query it again unless it's been timed out
-  // Because of this, to allow for multiple queries in this example
-  // Please use a different ERC20 transfer transaction
-
-  // Set your ERC20 transfer transaction hash
-  const transactionHash = "0xf8330cbfd46840beb0e66b8a50010fc2d9464623020e0a3ab7944b2caec88f4b"; // <--- This is the transaction hash of the transfer
-  console.log('Source chain transaction hash to query: ', transactionHash);
-  const erc20Address = "0x296077f69435a073f7A6E0CBAEf8C1877633832E";
   // Set your abi here
-  const myErc20Abi = [{"type":"constructor","inputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"allowance","inputs":[{"name":"owner","type":"address","internalType":"address"},{"name":"spender","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"approve","inputs":[{"name":"spender","type":"address","internalType":"address"},{"name":"value","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"nonpayable"},{"type":"function","name":"balanceOf","inputs":[{"name":"account","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"decimals","inputs":[],"outputs":[{"name":"","type":"uint8","internalType":"uint8"}],"stateMutability":"view"},{"type":"function","name":"name","inputs":[],"outputs":[{"name":"","type":"string","internalType":"string"}],"stateMutability":"view"},{"type":"function","name":"symbol","inputs":[],"outputs":[{"name":"","type":"string","internalType":"string"}],"stateMutability":"view"},{"type":"function","name":"totalSupply","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"transfer","inputs":[{"name":"to","type":"address","internalType":"address"},{"name":"value","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"nonpayable"},{"type":"function","name":"transferFrom","inputs":[{"name":"from","type":"address","internalType":"address"},{"name":"to","type":"address","internalType":"address"},{"name":"value","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"nonpayable"},{"type":"event","name":"Approval","inputs":[{"name":"owner","type":"address","indexed":true,"internalType":"address"},{"name":"spender","type":"address","indexed":true,"internalType":"address"},{"name":"value","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false},{"type":"event","name":"Transfer","inputs":[{"name":"from","type":"address","indexed":true,"internalType":"address"},{"name":"to","type":"address","indexed":true,"internalType":"address"},{"name":"value","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false},{"type":"error","name":"ERC20InsufficientAllowance","inputs":[{"name":"spender","type":"address","internalType":"address"},{"name":"allowance","type":"uint256","internalType":"uint256"},{"name":"needed","type":"uint256","internalType":"uint256"}]},{"type":"error","name":"ERC20InsufficientBalance","inputs":[{"name":"sender","type":"address","internalType":"address"},{"name":"balance","type":"uint256","internalType":"uint256"},{"name":"needed","type":"uint256","internalType":"uint256"}]},{"type":"error","name":"ERC20InvalidApprover","inputs":[{"name":"approver","type":"address","internalType":"address"}]},{"type":"error","name":"ERC20InvalidReceiver","inputs":[{"name":"receiver","type":"address","internalType":"address"}]},{"type":"error","name":"ERC20InvalidSender","inputs":[{"name":"sender","type":"address","internalType":"address"}]},{"type":"error","name":"ERC20InvalidSpender","inputs":[{"name":"spender","type":"address","internalType":"address"}]}] as const;
-
+  const myErc20Abi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"allowance","type":"uint256"},{"internalType":"uint256","name":"needed","type":"uint256"}],"name":"ERC20InsufficientAllowance","type":"error"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"uint256","name":"balance","type":"uint256"},{"internalType":"uint256","name":"needed","type":"uint256"}],"name":"ERC20InsufficientBalance","type":"error"},{"inputs":[{"internalType":"address","name":"approver","type":"address"}],"name":"ERC20InvalidApprover","type":"error"},{"inputs":[{"internalType":"address","name":"receiver","type":"address"}],"name":"ERC20InvalidReceiver","type":"error"},{"inputs":[{"internalType":"address","name":"sender","type":"address"}],"name":"ERC20InvalidSender","type":"error"},{"inputs":[{"internalType":"address","name":"spender","type":"address"}],"name":"ERC20InvalidSpender","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}] as const;
   // 2. Build the query
   // We've developed a package for building queries in a type-safe way
   // That you can access in the ethers-query-builder folder
@@ -118,12 +103,6 @@ async function main() {
   await builder.eventBuilder("Transfer", () => true, b =>
     b.addAddress().addSignature().addArgument("from").addArgument("to").addArgument("value")
   );
-  // 8: Function Calldata - Signature
-  // 9: Function Calldata - from (address sending the tokens)
-  // 10: Function Calldata - to (address receiving the tokens)
-  await builder.functionBuilder("transfer", b => {
-    b.addSignature().addArgument("to").addArgument("value");
-  });
 
   const fields = builder.build();
   // The parameters that the prover contract expects
@@ -145,7 +124,6 @@ async function main() {
       size: BigInt(f.size),
     })),
   };
-  console.log(`Query to submit: ${JSON.stringify(query, (_, v) => typeof v === 'bigint' ? v.toString() : v)}`);
 
   // 3. Calculate the cost of the query
   const proverContractAddress = '0xc1af0939ad5c9c193de0d64873736f09a53b4a92';
@@ -183,7 +161,6 @@ async function main() {
 
   
   const computedQueryId = computeQueryId(query);
-  console.log('Waiting for query submitted event');
   let stopListening = false;
   let startBlock = await ccNextPublicClient.getBlockNumber();
   console.log('===============================================')
@@ -216,7 +193,8 @@ async function main() {
         // But you can also do that offchain
         // So that you know what queryId to expect from the incoming events
         if (decodedLog.args.queryId === computedQueryId) {
-          console.log(`Caught the query we submitted earlier: ${decodedLog.args.queryId}`);
+          console.log(`Detected query submission event. Query processing underway. QueryId: ${decodedLog.args.queryId}`);
+          this.queryId = decodedLog.args.queryId;
         }
       }
       if (decodedLog.eventName === 'QueryProofVerified') {
@@ -227,15 +205,15 @@ async function main() {
         // Once the query is proven, the prover contract will emit a QueryProofVerified event
         // We just need to listen and catch the event with our queryId
         if (decodedLog.args.queryId === computedQueryId) {
-          console.log(`Caught the query proof verified event: ${decodedLog.args.queryId}`);
+          console.log(`Query proving complete. QueryId: ${decodedLog.args.queryId}`);
           console.log(`Value return in event: ${JSON.stringify(decodedLog, (_, v) => typeof v === 'bigint' ? v.toString() : v)}`);
-          const queryDetails = await ccNextPublicClient.readContract({
-            address: proverContractAddress as `0x${string}`,
-            abi: PROVER_ABI,
-            functionName: 'getQueryDetails',
-            args: [computedQueryId],
-          });
-          console.log(`Query details requested on demand: ${JSON.stringify(queryDetails, (_, v) => typeof v === 'bigint' ? v.toString() : v)}`);
+          //const queryDetails = await ccNextPublicClient.readContract({
+          //  address: proverContractAddress as `0x${string}`,
+          //  abi: PROVER_ABI,
+          //  functionName: 'getQueryDetails',
+          //  args: [computedQueryId],
+          //});
+          //console.log(`Query details requested on demand: ${JSON.stringify(queryDetails, (_, v) => typeof v === 'bigint' ? v.toString() : v)}`);
           stopListening = true;
         }
       }
@@ -250,19 +228,17 @@ async function main() {
     // Update block tracking and wait before next iteration
     console.log(`Listened from block ${startBlock} to ${currentBlock}`);
     startBlock = currentBlock + 1n;
-    console.log(`Waiting for 30 seconds to start listening to prover events`);
+    console.log(`Waiting to listen for more Prover events`);
     const uninstalledFilter = await ccNextPublicClient.uninstallFilter({
       filter: proverFilter,
     });
-    if (uninstalledFilter) {
-      console.log('Uninstalled filter');
-    } else {
+    if (!uninstalledFilter) {
       console.log('Failed to uninstall filter');
     }
     await new Promise(resolve => setTimeout(resolve, 30000));
   }
   console.log('===============================================')
-  console.log('Prover completed')
+  console.log(`Query Proving completed. QueryId: ${this.queryId}`)
   console.log('===============================================')
 }
 main().catch(console.error);

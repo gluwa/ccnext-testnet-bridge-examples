@@ -1,6 +1,9 @@
 {
+  "license": "MIT",
   "scripts": {
-    "start": "tsx src/index.ts"
+    "submit_query": "tsx src/submit_query.ts",
+    "complete_mint": "node src/complete_mint.js",
+    "check_balance": "node src/check_balance.js"
   },
   "devDependencies": {
     "tsx": "^4.20.3"
@@ -9,6 +12,8 @@
     "@types/node": "^24.0.13",
     "dotenv": "^16.4.5",
     "ethers": "^6.15.0",
+    "prompt-sync": "^4.2.0",
+    "readline-sync": "^1.4.10",
     "viem": "^2.31.7"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"

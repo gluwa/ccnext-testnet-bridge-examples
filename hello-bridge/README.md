@@ -26,7 +26,9 @@ Ensure it's configured for Sepolia:
     Currency: ETH
 
 ### 1.2 Use Sepolia Faucet
-Create a new wallet on MetaMask for this proof of concept.
+Create a new wallet on MetaMask for this proof of concept. 
+
+!!DON'T USE A WALLET WHICH HOLDS ANY REAL ASSETS, EVEN ON A DIFFERENT NETWORK!!
 
 Then enter your wallet address here and request Sepolia ETH 
 
@@ -40,16 +42,97 @@ MetaMask -> drop down menu -> Account Details -> Details -> Show Private Key
 
 Save this key for later use.
 
-## Call Mint on Sepolia Contract
-We need to mint ourself tokens on the previously deployed `TestERC20` contract so that we can burn them later. 
+## 2. Call Mint on Sepolia Contract
+We need to mint ourself tokens on the previously deployed `TestERC20` contract (0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A) so that we can burn them later. 
+
+For this step you need an infura api key to add to the end of your `--rpc-url`. You can get an api key by making an account with Infura (Metamask Developer) here https://developer.metamask.io/register
+
+Then you can access your api key from the dashboard here https://developer.metamask.io/
 
 ```sh
-cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> <CONTRACT-ADDRESS> "transfer(address, uint256)" "0x0000000000000000000000000000000000000001" "50" --private-key 0x<key you funded with Sepolia ETH>
+cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> 0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A "transfer(address, uint256)" "0x0000000000000000000000000000000000000001" "50" --private-key <private key you funded with Sepolia ETH>
 ```
 
 ```sh
 cast send --rpc-url https://sepolia.infura.io/v3/c5bff627d3274bb3bcaf7733cc427320 \
-0xAA7b2723d7E104726A2258c4f9Ad8680aaC9d1B1 \
+0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A \
 "mint(uint256)" 50000 \
 --private-key 0xa9b3538dc2b9fc0b520616adeb9e4baf96223e67e9dd80f41afc4a468833a180
 ```
+
+## 3. Burn Funds on Sepolia Contract
+The first step of bridging tokens is to burn those tokens on the sending chain (Sepolia). 
+
+We burn funds by transferring them to an address for which the private key is unknown. Thereby the funds become inaccessable.
+
+EX:
+```sh
+cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> 0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A "transfer(address, uint256)" "0x0000000000000000000000000000000000000001" "50" --private-key <key you funded with Sepolia ETH>
+```
+
+```sh
+cast send --rpc-url https://sepolia.infura.io/v3/c5bff627d3274bb3bcaf7733cc427320 0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A "transfer(address, uint256)" "0x0000000000000000000000000000000000000001" "50" --private-key 0xa9b3538dc2b9fc0b520616adeb9e4baf96223e67e9dd80f41afc4a468833a180
+```
+
+Save the transaction hash of your token burn transaction for later use:
+EX:
+transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
+
+## 4. Submit Bridging Query to CCNext Prover
+Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the CCNext Testnet. We do so by creating a "bridging query".
+
+```sh
+yarn submit_query
+```
+
+When prompted, provide the following:
+- The infura URL you've been using so far, complete with your api key at the end
+- Your transaction hash from step 3
+TODO: Replace this well known testing key with instructions to use testnet faucet and fund an address
+- The private key of the CCNext address we funded in step 4
+
+Proving should take ~8 minutes and no more than 30 minutes.
+
+Once the proving process completes, save the QueryId printed for later:
+EX:
+Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
+
+Transaction hash: 0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
+Private key: 0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b
+
+## 5. Use Bridged Data to Mint Tokens on CCNext Testnet
+We need to call `uscBridgeCompleteMint` in our bridge smart contract instance from step 5. 
+
+TODO: Replace shared testing private key with instructions to use CCNext faucet once set up
+```sh
+yarn complete_mint.js \
+0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b \
+<bridge-contract_address> \
+<prover_address> \
+<query_id> \
+0xF87960561ac3331f3492523fEf5F6096A460A413
+```
+
+```sh
+yarn complete_mint \
+0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b \
+0xB85f7EFC53246468693d993558c36Be284FE8995 \
+0xc1af0939ad5c9c193de0d64873736f09a53b4a92 \
+0xe2150be194ac27b0bc773a53b3c04ec53f7d2b3f56f054023296d9702aeaaebf \
+0xF87960561ac3331f3492523fEf5F6096A460A413
+```
+
+## 6. Check Balance in CCNext Test ERC20 Contract
+```sh
+yarn check_balance 0xF87960561ac3331f3492523fEf5F6096A460A413 <Your account address from Sepolia>
+```
+
+You should see a result like:
+📦 Token: Mintable (MNT)
+🧾 Raw Balance: 50
+💰 Formatted Balance: 0.00000000000000005 MNT
+
+# Conclusion
+Congratulations! You've bridged your first funds using the CCNext Decentralized bridge. This is only one simple example of the cross chain functionality made possible by the novel CCNext bridge. 
+
+The next tutorial will add an additional piece of the puzzle, self hosted smart contracts! In production, the CCNext bridge will almost always be used by teams of DApp builders who will conduct bridging on behalf of their end users. Such teams will want to define and deploy their own contracts as shown next in the `custom-contracts-bridging` tutorial.
