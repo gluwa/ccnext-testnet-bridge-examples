@@ -21,8 +21,8 @@ interface WorkerData {
   ccNextEndBlock: bigint | undefined;
   sourceChainRun: number;
   ccNextRun: number;
-  sourceChainBlockLag: number;
-  ccNextBlockLag: number;
+  sourceChainBlockLag: bigint;
+  ccNextBlockLag: bigint;
   sourceChainContractAddress: string;
   trackedQueryIds: `0x${string}`[];
   completedQueryIds: `0x${string}`[];
@@ -33,18 +33,18 @@ type BlockRangeResult =
   | { shouldListen: false }
   | { shouldListen: true; startBlock: bigint; endBlock: bigint };
 
-const getBlockRangeToProcess = async (startBlock: bigint, blockLag: number, maxBlockRange: number, publicClient: PublicClient): Promise<BlockRangeResult> => {
+const getBlockRangeToProcess = async (startBlock: bigint, blockLag: bigint, maxBlockRange: bigint, publicClient: PublicClient): Promise<BlockRangeResult> => {
   const currentBlock = await publicClient.getBlockNumber();
   // Have to accomodate at least blockLag blocks ahead of the start block
-  if (currentBlock < startBlock + BigInt(blockLag)) {
+  if (currentBlock < startBlock + blockLag) {
     return {
       shouldListen: false,
     }
   }
 
-  const endBlock = currentBlock - BigInt(blockLag) < startBlock + BigInt(maxBlockRange) 
-    ? currentBlock - BigInt(blockLag) 
-    : startBlock + BigInt(maxBlockRange);
+  const endBlock = currentBlock - blockLag < startBlock + maxBlockRange 
+    ? currentBlock - blockLag 
+    : startBlock + maxBlockRange;
   return {
     shouldListen: true,
     startBlock: startBlock,
@@ -107,9 +107,9 @@ const main = async () => {
   // Validate environment variables
   const sourceChainStartBlock = Number(process.env.SOURCE_CHAIN_INITIAL_START_BLOCK);
   const ccNextStartBlock = Number(process.env.CC_NEXT_INITIAL_START_BLOCK);
-  const sourceChainBlockLag = Number(process.env.SOURCE_CHAIN_BLOCK_LAG || '12');
-  const ccNextBlockLag = Number(process.env.CC_NEXT_BLOCK_LAG || '12');
-  const maxBlockRange = Number(process.env.MAX_BLOCK_RANGE || '2000');
+  const sourceChainBlockLag = BigInt(process.env.SOURCE_CHAIN_BLOCK_LAG || '12');
+  const ccNextBlockLag = BigInt(process.env.CC_NEXT_BLOCK_LAG || '12');
+  const maxBlockRange = BigInt(process.env.MAX_BLOCK_RANGE || '2000');
   const sourceChainContractAddress = process.env.SOURCE_CHAIN_CONTRACT_ADDRESS;
   const proverContractAddress = process.env.PROVER_CONTRACT_ADDRESS;
   const uscBridgeContractAddress = process.env.USC_BRIDGE_CONTRACT_ADDRESS;
@@ -117,14 +117,6 @@ const main = async () => {
   const ccNextRpcUrl = process.env.CC_NEXT_RPC_URL;
   const ccNextWalletPrivateKey = process.env.CC_NEXT_WALLET_PRIVATE_KEY;
   const ccNextErc20MintableAddress = process.env.CC_NEXT_ERC20_MINTABLE_ADDRESS;
-
-  if (!process.env.SOURCE_CHAIN_INITIAL_START_BLOCK || isNaN(sourceChainStartBlock)) {
-    throw new Error("SOURCE_CHAIN_INITIAL_START_BLOCK environment variable is not configured or invalid");
-  }
-  
-  if (!process.env.CC_NEXT_INITIAL_START_BLOCK || isNaN(ccNextStartBlock)) {
-    throw new Error("CC_NEXT_INITIAL_START_BLOCK environment variable is not configured or invalid");
-  }
 
   if (!sourceChainContractAddress) {
     throw new Error("SOURCE_CHAIN_CONTRACT_ADDRESS environment variable is not configured or invalid");
@@ -167,10 +159,13 @@ const main = async () => {
 
   const provider = new JsonRpcProvider(process.env.SOURCE_CHAIN_RPC_URL);
 
+  const sourceChainCurrentBlock = await sourceChainPublicClient.getBlockNumber();
+  const ccNextCurrentBlock = await ccNextPublicClient.getBlockNumber();
+
   const data: WorkerData = {
-    sourceChainStartBlock: BigInt(sourceChainStartBlock),
+    sourceChainStartBlock: sourceChainStartBlock ? BigInt(sourceChainStartBlock) : sourceChainCurrentBlock - sourceChainBlockLag,
     sourceChainEndBlock: undefined,
-    ccNextStartBlock: BigInt(ccNextStartBlock),
+    ccNextStartBlock: ccNextStartBlock ? BigInt(ccNextStartBlock) : ccNextCurrentBlock - ccNextBlockLag,
     ccNextEndBlock: undefined,
     sourceChainRun: 0,
     ccNextRun: 0,
