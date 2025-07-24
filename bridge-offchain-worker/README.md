@@ -39,7 +39,7 @@ MAX_BLOCK_RANGE=2000                               # Maximum number of blocks to
 ## 1. Run the worker
 You can start the worker by running this command
 ```sh
-yarn run start
+yarn start_worker
 ```
 
 Once running, the worker should be outputting these console logs

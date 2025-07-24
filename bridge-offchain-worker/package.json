@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "tsx src/index.ts"
+    "start_worker": "tsx src/worker.ts"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
