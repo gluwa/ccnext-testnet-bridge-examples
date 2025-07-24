@@ -178,7 +178,7 @@ const main = async () => {
   const workerJob = new Cron("* * * * *", { context: data, protect: overRunProtectionCallback }, async (self, context) => {
     const contextData = context as WorkerData;
     contextData.sourceChainRun++;
-    console.log(`Worker job ${contextData.sourceChainRun}th run`);
+    console.log(`Worker job run ${contextData.sourceChainRun}`);
     // Source chain listener job
     const blockRange = await getBlockRangeToProcess(contextData.sourceChainStartBlock, contextData.sourceChainBlockLag, maxBlockRange, sourceChainPublicClient);
     if (blockRange.shouldListen) {
