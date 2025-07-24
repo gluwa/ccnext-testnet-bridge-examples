@@ -1,9 +1,9 @@
 {
   "license": "MIT",
   "scripts": {
-    "submit_query": "tsx src/submit_query.ts",
-    "complete_mint": "node src/complete_mint.js",
-    "check_balance": "node src/check_balance.js"
+    "submit_query": "tsx scripts/submit_query.ts",
+    "complete_mint": "node scripts/complete_mint.js",
+    "check_balance": "node scripts/check_balance.js"
   },
   "devDependencies": {
     "tsx": "^4.20.3"

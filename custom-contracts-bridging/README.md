@@ -100,15 +100,13 @@ transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf
 ## 9. Submit Bridging Query to CCNext Prover
 Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the CCNext Testnet. We do so by creating a "bridging query".
 
-```sh
-yarn submit_query
-```
-
-When prompted, provide the following:
-- Your Infura url: https://sepolia.infura.io/v3/<Your Infura API Key>
-- Your transaction hash from step 8
 TODO: Replace this well known testing key with instructions to use testnet faucet and fund an address
-- The private key of the CCNext address we funded in step 2
+```sh
+yarn submit_query \
+https://sepolia.infura.io/v3/<Your Infura API Key> \
+<Transaction hash from step 8> \
+<Private key of address from step 2>
+```
 
 Proving should take ~8 minutes and no more than 30 minutes.
 

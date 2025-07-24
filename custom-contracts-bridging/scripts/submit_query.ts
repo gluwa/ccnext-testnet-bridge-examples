@@ -1,6 +1,5 @@
 import { createPublicClient, createWalletClient, decodeEventLog, http } from "viem";
 import { Chain } from "viem";
-import readlineSync from 'readline-sync';
 import { privateKeyToAccount } from "viem/accounts";
 import { ethers } from "ethers";
 import { QueryBuilder } from "./ethers-query-builder/query-builder/abi/QueryBuilder";
@@ -10,27 +9,37 @@ import { PROVER_ABI } from "./constants/abi";
 import { ChainQuery } from "./ethers-query-builder/models/ChainQuery";
 
 async function main() {
-  console.log('CCNext Query Builder:');
   // Setup
-  // 1. Setup your source chain rpc
-  // Prompt for RPC URL
-  const rpcUrl = readlineSync.question('Enter Sepolia RPC URL (e.g., https://sepolia.infura.io/v3/<Your Infura API Key>): ').trim();
+  const args = process.argv.slice(2);
+
+  if (args.length !== 3) {
+    console.error(`
+  Usage:
+    yarn submit_query <Sepolia_RPC_URL> <Transaction_Hash> <CCNext_Private_Key>
+
+  Example:
+    yarn submit_query https://sepolia.infura.io/v3/YOUR_KEY 0xabc123... 0xYOURPRIVATEKEY
+  `);
+    process.exit(1);
+  }
+
+  const [rpcUrl, transactionHash, ccNextPrivateKey] = args;
+
+  // Validate RPC URL
   if (!rpcUrl.startsWith('http://') && !rpcUrl.startsWith('https://')) {
     throw new Error('Invalid URL: must start with http:// or https://');
   }
 
-  // Prompt for transaction hash
-  const transactionHash = readlineSync.question('Enter the transaction hash (0x...): ');
-  if (!transactionHash || !transactionHash.startsWith('0x') || transactionHash.length !== 66) {
+  // Validate Transaction Hash
+  if (!transactionHash.startsWith('0x') || transactionHash.length !== 66) {
     throw new Error('Invalid transaction hash provided');
   }
 
-  // Prompt for CCNext Private Key
-  const ccNextPrivateKey = readlineSync.question('Enter your CCNEXT account private key (0x...): ');
-  if (!ccNextPrivateKey || !ccNextPrivateKey.startsWith('0x')) {
+  // Validate Private Key
+  if (!ccNextPrivateKey.startsWith('0x')) {
     throw new Error("Invalid private key provided");
   }
-
+  // 1. Setup your source chain rpc
   const provider = new ethers.JsonRpcProvider(rpcUrl);
 
   // 2. Setup your CCNext rpc and addresses
@@ -67,14 +76,13 @@ async function main() {
   // That you can access in the ethers-query-builder folder
   // Once this is deployed officially, we'll remove the folder
   // Note that the query builder is supported for ethers V6 only
-  console.log('Getting transaction and receipt');
   const tx = await provider.getTransaction(transactionHash);
   const receipt = await provider.getTransactionReceipt(transactionHash);
 
   if (!tx || !receipt) {
     throw new Error(`Missing transaction or receipt for ${transactionHash}`);
   }
-  console.log('Building query');
+  console.log('Building CCNext query');
   const builder = QueryBuilder.createFromTransaction(tx, receipt);
   // The idea of an Abi provider is that this will allow the query builder
   // to expect multiple events from different contracts
@@ -164,8 +172,7 @@ async function main() {
   let stopListening = false;
   let startBlock = await ccNextPublicClient.getBlockNumber();
   console.log('===============================================')
-  console.log('Waiting for prover events')
-  console.log('===============================================')
+  console.log('Waiting for proving results');
   while (!stopListening) {
     const currentBlock = await ccNextPublicClient.getBlockNumber();
 
@@ -206,7 +213,7 @@ async function main() {
         // We just need to listen and catch the event with our queryId
         if (decodedLog.args.queryId === computedQueryId) {
           console.log(`Query proving complete. QueryId: ${decodedLog.args.queryId}`);
-          console.log(`Value return in event: ${JSON.stringify(decodedLog, (_, v) => typeof v === 'bigint' ? v.toString() : v)}`);
+          //console.log(`Value return in event: ${JSON.stringify(decodedLog, (_, v) => typeof v === 'bigint' ? v.toString() : v)}`);
           //const queryDetails = await ccNextPublicClient.readContract({
           //  address: proverContractAddress as `0x${string}`,
           //  abi: PROVER_ABI,
@@ -226,19 +233,19 @@ async function main() {
     }
     
     // Update block tracking and wait before next iteration
-    console.log(`Listened from block ${startBlock} to ${currentBlock}`);
     startBlock = currentBlock + 1n;
-    console.log(`Waiting to listen for more Prover events`);
+    console.log(`Still waiting on prover events. Current block: ${currentBlock}`);
     const uninstalledFilter = await ccNextPublicClient.uninstallFilter({
       filter: proverFilter,
     });
     if (!uninstalledFilter) {
       console.log('Failed to uninstall filter');
     }
-    await new Promise(resolve => setTimeout(resolve, 30000));
+    if (stopListening == false) {
+      await new Promise(resolve => setTimeout(resolve, 30000));
+    }
   }
   console.log('===============================================')
   console.log(`Query Proving completed. QueryId: ${this.queryId}`)
-  console.log('===============================================')
 }
 main().catch(console.error);
