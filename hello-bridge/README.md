@@ -56,7 +56,7 @@ Then you can access your api key from the dashboard [here](https://developer.met
 We need to mint ourself tokens on the previously deployed `TestERC20` contract (0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A) so that we can burn them later. 
 
 ```sh
-cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> 0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A "transfer(address, uint256)" "0x0000000000000000000000000000000000000001" "50" --private-key <private key you funded with Sepolia ETH>
+cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> 0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A "mint(uint256)" 50000 --private-key <private key you funded with Sepolia ETH>
 ```
 
 ## 5. Burn Funds on Sepolia Contract

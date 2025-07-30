@@ -232,13 +232,12 @@ const main = async () => {
           ],
           value: queryCost,
         });
-      
+        
         // This is the actual transaction that will be submitted to the CCNext prover
         const txHash = await ccNextWalletClient.writeContract(request);
         console.log(`Transaction submitted to the CCNext prover: ${txHash}`);
       }
 
-      console.log("Source chain listener part has finished");
       contextData.sourceChainStartBlock = blockRange.endBlock + BigInt(1);
     } else {
       console.log("Source chain listener has caught up. Job is not listening");
@@ -273,7 +272,7 @@ const main = async () => {
         });
         if (decodedLog.eventName === 'QuerySubmitted') {
           if (contextData.trackedQueryIds.includes(decodedLog.args.queryId)) {
-            console.log(`Caught the query we submitted earlier: ${decodedLog.args.queryId}`);
+            console.log(`Query we submitted earlier is now in CCNext block: ${decodedLog.args.queryId}`);
           }
         }
         if (decodedLog.eventName === 'QueryProofVerified') {
