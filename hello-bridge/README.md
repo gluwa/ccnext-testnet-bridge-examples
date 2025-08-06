@@ -74,8 +74,8 @@ Save the transaction hash of your token burn transaction for later use
 EX:
 transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
 
-## 6. Submit Bridging Query to CCNext Prover
-Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the CCNext Testnet. We do so by creating a "bridging query".
+## 6. Submit Oracle Query to CCNext Prover
+Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the CCNext Testnet. We do so by creating a "oracle query".
 
 TODO: Replace this well known testing key with instructions to use testnet faucet and fund an address
 ```sh
@@ -127,4 +127,4 @@ You should see a result like:
 # Conclusion
 Congratulations! You've bridged your first funds using the CCNext Decentralized oracle. This is only one simple example of the cross chain functionality made possible by the novel CCNext oracle. 
 
-The next tutorial will add an additional piece of the puzzle, self hosted smart contracts! In production, the CCNext oracle will almost always be used by teams of DApp builders who will conduct bridging on behalf of their end users. Such teams will want to define and deploy their own contracts as shown next in the `custom-contracts-bridging` tutorial.
+The next tutorial will add an additional piece of the puzzle, self hosted smart contracts! In production, the CCNext oracle will almost always be used by teams of DApp builders who will conduct data provisioning on behalf of their end users. Such teams will want to define and deploy their own contracts as shown next in the `custom-contracts-bridging` tutorial.

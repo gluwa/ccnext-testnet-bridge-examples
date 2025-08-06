@@ -2,8 +2,8 @@
 
 This example extends the `custom-contracts-bridging` tutorial by introducing a bridge offchain worker. The worker automates the query building and submitting process that we manually performed in our first 2 examples. The worker listens to events from three sources:
 
-1. "burn" transfer events from our TestERC20 contract on Sepolia. A CCNext our worker needs to create a bridging query for each token burn detected.
-2. "queryProofVerified" events from the query prover contract. Each of these events signals that a query has completed the bridging process. When our worker detects that a query is done bridging, the worker submits a mint request to the bridge proxy contract we deployed on CCNext. 
+1. "burn" transfer events from our TestERC20 contract on Sepolia. A CCNext our worker needs to create an oracle query for each token burn detected.
+2. "queryProofVerified" events from the query prover contract. Each of these events signals that a query has completed the oracle data provisioning process. When our worker detects that the query data has been provisioned, the worker submits a mint request to the bridge proxy contract we deployed on CCNext. 
 3. "mint" events from our bridge proxy contract, which tell us that the minting step is completed and we can drop any local records corresponding to the completed query.
 
 # Running the Worker

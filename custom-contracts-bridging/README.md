@@ -97,8 +97,8 @@ Save the transaction hash of your token burn transaction for later use
 EX:
 transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
 
-## 9. Submit Bridging Query to CCNext Prover
-Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the CCNext Testnet. We do so by creating a "bridging query".
+## 9. Submit Oracle Query to CCNext Prover
+Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the CCNext Testnet. We do so by creating an "oracle query".
 
 TODO: Replace this well known testing key with instructions to use testnet faucet and fund an address
 ```sh
