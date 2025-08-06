@@ -43,7 +43,7 @@ MetaMask -> drop down menu -> Account Details -> Details -> Show Private Key
 Save this key for later use.
 
 ## 2. Fund a CCNext Testnet Address from Faucet
-TODO: Add faucet step here once faucet exists. Then replace any mention of testing key 0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b
+TODO: Add faucet step here once faucet exists. Then replace any mention of testing key 0x45fbbc5105365822a75e09844a560445cbccf172da3087a94b5812e1871ef591
 
 ## 3. Obtain Infura API Key
 The easiest way to submit transactions to Sepolia is to use Infura with your own api key.
@@ -80,9 +80,9 @@ Now that we've burnt funds on Sepolia, we need to make proof of that token burn 
 TODO: Replace this well known testing key with instructions to use testnet faucet and fund an address
 ```sh
 yarn submit_query \
-https://sepolia.infura.io/v3/<Your Infura API Key> \
-<Transaction hash from step 5> \
-<Private key of address from step 2>
+https://sepolia.infura.io/v3/<your_infura_api_key> \
+<transaction_hash_from_step_5> \
+<private_key_of_address_from_step_2>
 ```
 
 Proving should take ~8 minutes and no more than 30 minutes.
@@ -93,21 +93,19 @@ EX:
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
 
 ## 7. Use Oracle Provisioned Data to Mint Tokens on CCNext Testnet
-We need to call `uscBridgeCompleteMint` in the pre-existing bridge contract at address 0xB85f7EFC53246468693d993558c36Be284FE8995 on CCNext Testnet. 
+TODO: pre-fill the prover contract address, bridge contract address, and Mintable contract addresses once we have final addresses on testnet.
 
-We also supply the address of a pre-existing mintable contract in which our bridged tokens will be minted, 0xF87960561ac3331f3492523fEf5F6096A460A413
+We need to call `uscBridgeCompleteMint` in the pre-existing bridge contract at address 0xB85f7EFC53246468693d993558c36Be284FE8995 on CCNext Testnet. 
 
 Finally, we provide the QueryId we saved in step 6.
 
-TODO: Replace shared testing private key with instructions to use CCNext faucet once set up
-TODO: Hard code prover contract address on testnet here once it exists
 ```sh
 yarn complete_mint.js \
-0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b \
+<private_key_of_address_from_step_2> \
 <bridge_contract_address> \
 <prover_address> \
 <query_id> \
-0xF87960561ac3331f3492523fEf5F6096A460A413
+<mintable_contract_address>
 ```
 
 ## 8. Check Balance in CCNext Test ERC20 Contract
@@ -116,7 +114,9 @@ As a final check, we take a look at the balance in our account within the ERC20 
 Again, that contract lives at address 0xF87960561ac3331f3492523fEf5F6096A460A413 on CCNext Testnet
 
 ```sh
-yarn check_balance 0xF87960561ac3331f3492523fEf5F6096A460A413 <Your account address from Sepolia>
+yarn check_balance \
+<mintable_contract_address> \
+<your_account_address_from_sepolia>
 ```
 
 You should see a result like:
