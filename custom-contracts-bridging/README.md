@@ -50,9 +50,9 @@ This repository contains templates for two smart contracts we need to launch for
 1. UniversalBridgeProxy.sol
 2. ERC20Mintable.sol
 
-Bridge proxy contract instances are intended to be deployed by teams of DApp builders. Each bridge proxy contract interprets bridging outputs relevant to the DApp it serves. 
+Oracle proxy contract instances are intended to be deployed by teams of DApp builders. Our particular oracle proxy contract is used only for bridging tokens, so we call it `UniversalBridgeProxy`. Each oracle proxy contract interprets oracle data provisioning outputs relevant to the DApp it serves. 
 
-For instance, a bridge proxy contract enabling token minting would look for fields like `from`, `to`, and `amount` in bridging outputs. With those fields the contract can determine whether a token burn took place, how many tokens to mint, and which address to mint them in.
+For instance, a `UniversalBridgeProxy` enabling token minting would look for fields like `from`, `to`, and `amount` in oracle outputs. With those fields the contract can determine whether a token burn took place, how many tokens to mint, and which address to mint them in.
 
 The ERC20Mintable contract is just a place to mint our newly bridged tokens in. The ERC20Mintable contract is modified so that its _mint() function can be called by the UniversalBridgeProxy contract.
 
@@ -116,7 +116,7 @@ EX:
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
 
 ## 10. Use Bridged Data to Mint Tokens on CCNext Testnet
-We need to call `uscBridgeCompleteMint` in the bridge contract we deployed to CCNext Testnet in step 7.
+We need to call `uscBridgeCompleteMint` in the bridge proxy contract we deployed to CCNext Testnet in step 7.
 
 We also supply the address of the mintable contract we deployed in step 7. This is the contract in which our bridged tokens will be minted.
 
@@ -146,9 +146,9 @@ You should see a result like:
 💰 Formatted Balance: 0.0000000000000001 MNT
 
 # Conclusion
-Congratulations! You've launched your first custom smart contracts making use of the CCNext Decentralized bridge!
+Congratulations! You've launched your first custom smart contracts making use of the CCNext Decentralized Oracle!
 
-The next tutorial will add a `Bridge Offchain Worker` which automates two key bridging steps we've been triggering manually thus far. In practice, DApp builders will want to conduct all bridging via an offchain worker in order to ensure security and reduce hassle for end users. Take a look at the `bridge-offchain-worker` tutorial to learn more.
+The next tutorial will add a `Bridge Offchain Worker` which automates two key oracle use steps we've been triggering manually thus far. In practice, DApp builders will want to conduct all oracle use via an offchain worker in order to ensure security and reduce hassle for end users. Take a look at the `bridge-offchain-worker` tutorial to learn more.
 
 
 

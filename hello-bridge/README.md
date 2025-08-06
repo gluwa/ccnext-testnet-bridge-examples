@@ -1,14 +1,14 @@
-# Hello Bridge
-Hello bridge simulates one of the most common uses for a cross chain bridge, cross chain token transfers! Each transfer has a few parts:
+# Hello Oracle
+Hello bridge simulates one of the most common uses for a cross chain oracle, cross chain bridging! Each transfer has a few parts:
 1. Burn ERC20 tokens in a smart contract on Sepolia
-2. Trigger the CCNext token bridging process
-3. Use the bridging outputs to mint tokens in the CCNext EVM
+2. Trigger the CCNext oracle process to bridge tokens
+3. Use the oracle outputs to mint tokens in the CCNext EVM
 
 # Tutorial Steps
 
 ## 0. Get Script Dependencies
 ```sh
-cd hello-bridge
+cd hello-oracle
 yarn
 ```
 
@@ -92,7 +92,7 @@ Once the proving process completes, save the QueryId printed for later:
 EX:
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
 
-## 7. Use Bridged Data to Mint Tokens on CCNext Testnet
+## 7. Use Oracle Provisioned Data to Mint Tokens on CCNext Testnet
 We need to call `uscBridgeCompleteMint` in the pre-existing bridge contract at address 0xB85f7EFC53246468693d993558c36Be284FE8995 on CCNext Testnet. 
 
 We also supply the address of a pre-existing mintable contract in which our bridged tokens will be minted, 0xF87960561ac3331f3492523fEf5F6096A460A413
@@ -125,6 +125,6 @@ You should see a result like:
 💰 Formatted Balance: 0.00000000000000005 MNT
 
 # Conclusion
-Congratulations! You've bridged your first funds using the CCNext Decentralized bridge. This is only one simple example of the cross chain functionality made possible by the novel CCNext bridge. 
+Congratulations! You've bridged your first funds using the CCNext Decentralized oracle. This is only one simple example of the cross chain functionality made possible by the novel CCNext oracle. 
 
-The next tutorial will add an additional piece of the puzzle, self hosted smart contracts! In production, the CCNext bridge will almost always be used by teams of DApp builders who will conduct bridging on behalf of their end users. Such teams will want to define and deploy their own contracts as shown next in the `custom-contracts-bridging` tutorial.
+The next tutorial will add an additional piece of the puzzle, self hosted smart contracts! In production, the CCNext oracle will almost always be used by teams of DApp builders who will conduct bridging on behalf of their end users. Such teams will want to define and deploy their own contracts as shown next in the `custom-contracts-bridging` tutorial.
