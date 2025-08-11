@@ -29,16 +29,7 @@ We want to deploy a TestERC20 smart contract on Sepolia. The contract contains l
 Run the following to deploy your contract:
 
 ```sh
-cd custom-contracts-bridging
 forge create --rpc-url https://sepolia.infura.io/v3/<Your infura API Key> --private-key 0x<key you funded with Sepolia ETH> TestERC20
-```
-
-```sh
-cd custom-contracts-bridging
-forge create \
-  --rpc-url https://sepolia.infura.io/v3/c5bff627d3274bb3bcaf7733cc427320 \
-  --private-key 0xa9b3538dc2b9fc0b520616adeb9e4baf96223e67e9dd80f41afc4a468833a180 \
-  TestERC20
 ```
 
 Upon successful contract creation, the resulting logs will contain your TestERC20 contract address. We will need this in the next step.
@@ -57,7 +48,7 @@ For instance, a `UniversalBridgeProxy` enabling token minting would look for fie
 The ERC20Mintable contract is just a place to mint our newly bridged tokens in. The ERC20Mintable contract is modified so that its _mint() function can be called by the UniversalBridgeProxy contract.
 
 ```sh
-cd custom-contracts-bridging
+cd ../..
 git clone git@github.com:gluwa/CCNext-smart-contracts.git
 ```
 
@@ -100,7 +91,6 @@ transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf
 ## 9. Submit Oracle Query to CCNext Prover
 Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the CCNext Testnet. We do so by creating an "oracle query".
 
-TODO: Replace this well known testing key with instructions to use testnet faucet and fund an address
 ```sh
 yarn submit_query \
 https://sepolia.infura.io/v3/<Your Infura API Key> \
@@ -122,11 +112,9 @@ We also supply the address of the mintable contract we deployed in step 7. This 
 
 Finally, we provide the QueryId we saved in step 9.
 
-TODO: Replace shared testing private key with instructions to use CCNext faucet once set up
-TODO: Add in contract address for prover contract on testnet once it exists
 ```sh
-yarn complete_mint.js \
-0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b \
+yarn complete_mint \
+<private_key_of_address_from_step_2> \
 <bridge_contract_address> \
 <prover_contract_address> \
 <query_id> \

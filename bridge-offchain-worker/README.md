@@ -6,7 +6,7 @@ This example extends the `custom-contracts-bridging` tutorial by introducing a b
 2. "queryProofVerified" events from the query prover contract. Each of these events signals that a query has completed the oracle data provisioning process. When our worker detects that the query data has been provisioned, the worker submits a mint request to the bridge proxy contract we deployed on CCNext. 
 3. "mint" events from our bridge proxy contract, which tell us that the minting step is completed and we can drop any local records corresponding to the completed query.
 
-# Running the Worker
+# Tutorial Steps
 
 ## 0. Setup
 Install the required packages and then add a .env file to configure the worker. For the contracts, you can put in the contract address you deployed by following this [tutorial](../custom-contracts-bridging/README.md)
@@ -16,13 +16,13 @@ yarn install
 
 ```env
 # Source Chain Configuration
-SOURCE_CHAIN_INITIAL_START_BLOCK=<block_number>    # The starting block number to begin listening for burn events. If not provided, the worker will get the latest source chain block number
+# SOURCE_CHAIN_INITIAL_START_BLOCK=<block_number>    # The starting block number to begin listening for burn events. If not provided, the worker will get the latest source chain block number
 SOURCE_CHAIN_BLOCK_LAG=12                          # Number of blocks to wait before processing
 SOURCE_CHAIN_CONTRACT_ADDRESS=<contract_address>   # Address of the ERC20 token contract on source chain
 SOURCE_CHAIN_RPC_URL=<rpc_url>                     # RPC endpoint for the source chain. Following our previous example, this will be the Sepolia urls
 
 # CCNext Configuration
-CC_NEXT_INITIAL_START_BLOCK=<block_number>         # The starting block number to begin listening for prover events. If not provided, the worker will get the latest CC Next block number
+#CC_NEXT_INITIAL_START_BLOCK=<block_number>         # The starting block number to begin listening for prover events. If not provided, the worker will get the latest CC Next block number
 CC_NEXT_BLOCK_LAG=12                               # Number of blocks to wait before processing
 CC_NEXT_RPC_URL=<rpc_url>                          # RPC endpoint for the CCNext chain
 CC_NEXT_ERC20_MINTABLE_ADDRESS=<contract_address>  # Address of the mintable ERC20 token on CCNext
@@ -64,32 +64,32 @@ At this point, you will see the worker fully in action. First it listens for and
 
 ```
 ...
-Worker job 1th run
-Source chain listener is listening from block 8827111 to 8827396
-Found 1 burn transaction events
-Query cost: 3560 for query 0xca1bb35adb6e35662e57e58ccf4d3fd959b5d93a469caf720736ba99a8ffacf2
-Source chain listener part has finished
+Worker job run 4
+Source chain listener is listening from block 8963101 to 8963105
+Found 1 new burn transaction events
+Query cost: 3560 for query 0xa9c8d38267dcab19e06ff27a04457c07229168b7a9015c8084e16aa2b17d4d58
+Transaction submitted to the CCNext prover: 0x6a9a04b663998d1946846829b9a711c8c7d4c52dedb07c862fa768e96e6da027
 ...
 ```
 
 The worker then waits for the prover contract to emit QueryProofVerified event to submit the mint transaction to the bridge USC:
 ```
 ...
-CCNext listener is listening from block 1298785 to 1299490
-Found 2 prover contract result events
-Caught the query we submitted earlier: 0xca1bb35adb6e35662e57e58ccf4d3fd959b5d93a469caf720736ba99a8ffacf2
-Caught the query proof verified event: 0xca1bb35adb6e35662e57e58ccf4d3fd959b5d93a469caf720736ba99a8ffacf2
-Value return in event: {"eventName":"QueryProofVerified","args":{"queryId":"0xca1bb35adb6e35662e57e58ccf4d3fd959b5d93a469caf720736ba99a8ffacf2","resultSegments":[{"offset":"448","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"192","abiBytes":"0x0000000000000000000000002fabaffc7f6426c1beedec22cc150a7dbe6667fb"},{"offset":"224","abiBytes":"0x000000000000000000000000296077f69435a073f7a6e0cbaef8c1877633832e"},{"offset":"800","abiBytes":"0x000000000000000000000000296077f69435a073f7a6e0cbaef8c1877633832e"},{"offset":"928","abiBytes":"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"},{"offset":"960","abiBytes":"0x0000000000000000000000002fabaffc7f6426c1beedec22cc150a7dbe6667fb"},{"offset":"992","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"1056","abiBytes":"0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"}],"state":2}}
-Query details requested on demand: {"state":2,"query":{"chainId":"6","height":"8827206","index":"12","layoutSegments":[{"offset":"448","size":"32"},{"offset":"192","size":"32"},{"offset":"224","size":"32"},{"offset":"800","size":"32"},{"offset":"928","size":"32"},{"offset":"960","size":"32"},{"offset":"992","size":"32"},{"offset":"1056","size":"32"}]},"escrowedAmount":"0","principal":"0x3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0","estimatedCost":"3560","timestamp":"1753301165","resultSegments":[{"offset":"448","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"192","abiBytes":"0x0000000000000000000000002fabaffc7f6426c1beedec22cc150a7dbe6667fb"},{"offset":"224","abiBytes":"0x000000000000000000000000296077f69435a073f7a6e0cbaef8c1877633832e"},{"offset":"800","abiBytes":"0x000000000000000000000000296077f69435a073f7a6e0cbaef8c1877633832e"},{"offset":"928","abiBytes":"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"},{"offset":"960","abiBytes":"0x0000000000000000000000002fabaffc7f6426c1beedec22cc150a7dbe6667fb"},{"offset":"992","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"1056","abiBytes":"0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"}]}
+CCNext listener is listening from block 1626782 to 1626793
+Found 1 new prover contract result events
+Caught the query proof verified event: 0xa9c8d38267dcab19e06ff27a04457c07229168b7a9015c8084e16aa2b17d4d58
+Value return in event: {"eventName":"QueryProofVerified","args":{"queryId":"0xa9c8d38267dcab19e06ff27a04457c07229168b7a9015c8084e16aa2b17d4d58","resultSegments":[{"offset":"448","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"192","abiBytes":"0x000000000000000000000000016e7bfe4a7213e18516ca0cb84cf2750d360b33"},{"offset":"224","abiBytes":"0x0000000000000000000000008c4eddfea10aead7a29c00ada09e552b1c44af0c"},{"offset":"800","abiBytes":"0x0000000000000000000000008c4eddfea10aead7a29c00ada09e552b1c44af0c"},{"offset":"928","abiBytes":"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"},{"offset":"960","abiBytes":"0x000000000000000000000000016e7bfe4a7213e18516ca0cb84cf2750d360b33"},{"offset":"992","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"1056","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000032"}],"state":2}}
+Transaction submitted to the CCNext bridge USC: 0x21573f3d1f0507525c1bed89cabdd7031bada5c0c269ea226cbe247ca277fcc5
 ...
 ```
 Finally the worker listens for the USC event where the mint is completed
 
 ```
 ...
-Found 1 bridge USC events
-Caught the tokens minted event: 0xca1bb35adb6e35662e57e58ccf4d3fd959b5d93a469caf720736ba99a8ffacf2
-Value return in event: {"eventName":"TokensMinted","args":{"token":"0x4cd9262F0375634c903DF8a8c670F44C401aDB60","recipient":"0x2FabAFfC7F6426C1beEdec22cc150A7dBE6667FB","queryId":"0xca1bb35adb6e35662e57e58ccf4d3fd959b5d93a469caf720736ba99a8ffacf2","amount":"1000000000000000000"}}
+Found 1 new bridge USC events
+Caught the tokens minted event: 0xa9c8d38267dcab19e06ff27a04457c07229168b7a9015c8084e16aa2b17d4d58
+Value return in event: {"eventName":"TokensMinted","args":{"token":"0xF90ae5240Cc4EbA6e96c97994d62874009Ad60F0","recipient":"0x016e7bFE4a7213E18516CA0Cb84Cf2750D360b33","queryId":"0xa9c8d38267dcab19e06ff27a04457c07229168b7a9015c8084e16aa2b17d4d58","amount":"50"}}
+Congratulations! You've successfully bridged the tokens from source chain to CCNext!
 ...
 ```
 

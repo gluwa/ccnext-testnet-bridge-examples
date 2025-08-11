@@ -193,7 +193,9 @@ const main = async () => {
       const logs = await sourceChainPublicClient.getFilterLogs({
         filter: erc20SourceChainFilter,
       });
-      console.log(`Found ${logs.length} burn transaction events`);
+      if (logs.length > 0) {
+        console.log(`Found ${logs.length} new burn transaction events`);
+      }
 
       for (const log of logs) {
         const decodedLog = decodeEventLog({
@@ -262,7 +264,9 @@ const main = async () => {
       const proverLogs = await ccNextPublicClient.getFilterLogs({
         filter: proverFilter,
       })
-      console.log(`Found ${proverLogs.length} prover contract result events`);
+      if (proverLogs.length > 0) {
+        console.log(`Found ${proverLogs.length} new prover contract result events`);
+      }
 
       for (const log of proverLogs) {
         const decodedLog = decodeEventLog({
@@ -285,7 +289,8 @@ const main = async () => {
               functionName: 'getQueryDetails',
               args: [decodedLog.args.queryId],
             });
-            console.log(`Query details requested on demand: ${JSON.stringify(queryDetails, (_, v) => typeof v === 'bigint' ? v.toString() : v)}`);
+            // Full query details can be useful for debugging, but are overkill for tutorial runs
+            //console.log(`Query details requested on demand: ${JSON.stringify(queryDetails, (_, v) => typeof v === 'bigint' ? v.toString() : v)}`);
 
             const { request } = await ccNextPublicClient.simulateContract({
               abi: uscBridgeAbi,
@@ -311,7 +316,9 @@ const main = async () => {
       const uscLogs = await ccNextPublicClient.getFilterLogs({
         filter: uscFilter,
       })
-      console.log(`Found ${uscLogs.length} bridge USC events`);
+      if (uscLogs.length > 0) {
+        console.log(`Found ${uscLogs.length} new bridge USC events`);
+      }
 
       for (const log of uscLogs) {
         const decodedLog = decodeEventLog({
@@ -323,8 +330,7 @@ const main = async () => {
           console.log(`Caught the tokens minted event: ${decodedLog.args.queryId}`);
           console.log(`Value return in event: ${JSON.stringify(decodedLog, (_, v) => typeof v === 'bigint' ? v.toString() : v)}`);
           contextData.completedQueryIds.push(decodedLog.args.queryId);
-          console.log(`Congratulations! You've successfully bridged the tokens from source chain to CCNext!`);
-          console.log(`Please check the ERC20 token's balance on CCNext on the address you used in the source chain`);
+          console.log(`Congratulations! You've successfully bridged tokens from your source chain to CCNext!`);
         }
       }
       contextData.ccNextStartBlock = ccNextBlockRange.endBlock + BigInt(1);

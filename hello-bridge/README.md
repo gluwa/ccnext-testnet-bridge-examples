@@ -1,7 +1,7 @@
-# Hello Oracle
+# Hello Bridge
 Hello bridge simulates one of the most common uses for a cross chain oracle, cross chain bridging! Each transfer has a few parts:
 1. Burn ERC20 tokens in a smart contract on Sepolia
-2. Trigger the CCNext oracle process to bridge tokens
+2. Trigger the CCNext oracle to supply proof of our Sepolia token burn
 3. Use the oracle outputs to mint tokens in the CCNext EVM
 
 # Tutorial Steps
@@ -52,7 +52,7 @@ You can get an api key by making an account with Infura (Metamask Developer) [he
 
 Then you can access your api key from the dashboard [here](https://developer.metamask.io/)
 
-## 4. Call Mint on Sepolia Contract
+## 4. Call Mint on Sepolia ERC20 Contract
 We need to mint ourself tokens on the previously deployed `TestERC20` contract (0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A) so that we can burn them later. 
 
 ```sh
@@ -77,7 +77,6 @@ transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf
 ## 6. Submit Oracle Query to CCNext Prover
 Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the CCNext Testnet. We do so by creating a "oracle query".
 
-TODO: Replace this well known testing key with instructions to use testnet faucet and fund an address
 ```sh
 yarn submit_query \
 https://sepolia.infura.io/v3/<your_infura_api_key> \
@@ -100,7 +99,7 @@ We need to call `uscBridgeCompleteMint` in the pre-existing bridge contract at a
 Finally, we provide the QueryId we saved in step 6.
 
 ```sh
-yarn complete_mint.js \
+yarn complete_mint \
 <private_key_of_address_from_step_2> \
 <bridge_contract_address> \
 <prover_address> \
