@@ -9,10 +9,10 @@ export const chainKeyConverter = (chainId: number): bigint => {
   switch(chainId) {
     case 1:
       return 1n;
-    //case 31337:
-    //  return 2n;
-    case 11155111:
+    case 31337:
       return 2n;
+    case 11155111:
+      return 3n;
     default:
       throw new Error("UnsupportedChainId")
   }
