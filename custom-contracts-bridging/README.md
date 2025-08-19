@@ -137,28 +137,3 @@ You should see a result like:
 Congratulations! You've launched your first custom smart contracts making use of the CCNext Decentralized Oracle!
 
 The next tutorial will add a `Bridge Offchain Worker` which automates two key oracle use steps we've been triggering manually thus far. In practice, DApp builders will want to conduct all oracle use via an offchain worker in order to ensure security and reduce hassle for end users. Take a look at the `bridge-offchain-worker` tutorial to learn more.
-
-
-
-
-
-
-
-
-
-
-## 0. Deploy ERC 20 Contract in Which Tokens Will Be Minted
-TODO: Replace shared testing private key with instructions to use CCNext faucet once set up
-```sh
-cd bridge-usage-example
-forge create \
-  --rpc-url https://rpc.ccnext-devnet.creditcoin.network \
-  --private-key 0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b \
-  ERC20Mintable \
-  --constructor-args "Mintable" "MNT"
-```
-
-When you deploy your contract retain the contract address from this log output:
-```sh
-UniversalBridgeProxy deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
-```

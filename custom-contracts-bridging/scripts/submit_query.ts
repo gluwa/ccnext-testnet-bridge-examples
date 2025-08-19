@@ -135,7 +135,7 @@ async function main() {
   };
 
   // 3. Calculate the cost of the query
-  const proverContractAddress = '0x79fa0db2e64c2e0d4debe9f1e4e3b4bf0943651e';
+  const proverContractAddress = '0x8d4f738dd774b88a7309b28fb7cfd92210e1c110';
   // For each query, the prover contract expects us to pay a cost in CCNext native currency
   // This cost is for the heavy computation that the prover contract needs to perform
   // And the cost is calculated based on the query and the size of the query

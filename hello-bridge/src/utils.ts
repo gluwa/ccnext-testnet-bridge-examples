@@ -8,12 +8,13 @@ import { keccak256 } from "viem";
 // So we have to convert the chainId of the source chain to the chainId that the prover contract expects
 export const chainKeyConverter = (chainId: number): bigint => {
   switch(chainId) {
-    case 1:
-      return 1n;
-    case 31337:
-      return 2n;
+    //case 1:
+    //  return 1n;
+    //case 31337:
+    //  return 2n;
+    // Sepolia is the only supported chain key on testnet at the moment
     case 11155111:
-      return 3n;
+      return 1n;
     default:
       throw new Error("UnsupportedChainId")
   }
