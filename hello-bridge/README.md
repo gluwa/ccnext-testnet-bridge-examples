@@ -92,8 +92,6 @@ EX:
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
 
 ## 7. Use Oracle Provisioned Data to Mint Tokens on CCNext Testnet
-TODO: pre-fill the prover contract address, bridge contract address, and Mintable contract addresses once we have final addresses on testnet.
-
 We need to call `uscBridgeCompleteMint` in the pre-existing bridge contract at address 0xB85f7EFC53246468693d993558c36Be284FE8995 on CCNext Testnet. 
 
 Use the following command to complete your token mint. Several contract addresses are already filled in for you, but you'll have to provide your CCNext Testnet private key and the oracle query id from step 6.
