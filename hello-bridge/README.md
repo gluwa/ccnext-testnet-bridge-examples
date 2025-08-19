@@ -96,25 +96,24 @@ TODO: pre-fill the prover contract address, bridge contract address, and Mintabl
 
 We need to call `uscBridgeCompleteMint` in the pre-existing bridge contract at address 0xB85f7EFC53246468693d993558c36Be284FE8995 on CCNext Testnet. 
 
-Finally, we provide the QueryId we saved in step 6.
-
+Use the following command to complete your token mint. Several contract addresses are already filled in for you, but you'll have to provide your CCNext Testnet private key and the oracle query id from step 6.
 ```sh
 yarn complete_mint \
 <private_key_of_address_from_step_2> \
-<bridge_contract_address> \
-<prover_address> \
+0x11578857ECe0Da79F6956282EAF27385F8adcb3f \
+0x8d4f738dd774b88a7309b28fb7cfd92210e1c110 \
 <query_id> \
-<mintable_contract_address>
+0x9D7F90ddD8BeA908FD0528778db57Fa1e0214083
 ```
 
 ## 8. Check Balance in CCNext Test ERC20 Contract
 As a final check, we take a look at the balance in our account within the ERC20 contract where we minted our tokens.
 
-Again, that contract lives at address 0xF87960561ac3331f3492523fEf5F6096A460A413 on CCNext Testnet
+The ERC20 contract for this tutorial lives at address 0x9D7F90ddD8BeA908FD0528778db57Fa1e0214083 on CCNext Testnet
 
 ```sh
 yarn check_balance \
-<mintable_contract_address> \
+0x9D7F90ddD8BeA908FD0528778db57Fa1e0214083 \
 <your_account_address_from_sepolia>
 ```
 
