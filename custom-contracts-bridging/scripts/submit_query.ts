@@ -44,13 +44,13 @@ async function main() {
   const provider = new ethers.JsonRpcProvider(rpcUrl);
 
   // 2. Setup your CCNext rpc and addresses
-  const cc_next_local = {
+  const cc_next_testnet = {
     id: 42,
-    name: 'CCNext-Devnet',
+    name: 'CCNext-Testnet',
     nativeCurrency: { name: 'Creditcoin', symbol: 'CTC', decimals: 18 },
     rpcUrls: {
       default: {  
-        http: ['https://rpc.ccnext-devnet.creditcoin.network']
+        http: ['https://rpc.ccnext-testnet.creditcoin.network']
       }
     },
     testnet: true
@@ -59,11 +59,11 @@ async function main() {
     throw new Error("CCNEXT_PRIVATE_KEY is not set");
   }
   const ccNextPublicClient = createPublicClient({
-    chain: cc_next_local,
+    chain: cc_next_testnet,
     transport: http(),
   });
   const ccNextWalletClient = createWalletClient({
-    chain: cc_next_local,
+    chain: cc_next_testnet,
     transport: http(),
     account: privateKeyToAccount(ccNextPrivateKey as `0x${string}`),
   });

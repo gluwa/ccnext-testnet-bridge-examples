@@ -21,7 +21,7 @@ const QUERY_ID = process.argv[5];
 const ERC20_ADDRESS = process.argv[6];
 
 // === RPC and signer setup ===
-const RPC_URL = "https://rpc.ccnext-devnet.creditcoin.network";
+const RPC_URL = "https://rpc.ccnext-testnet.creditcoin.network";
 
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 const signer = new ethers.Wallet(PRIVATE_KEY, provider);
@@ -50,7 +50,8 @@ async function main() {
         const queryDetails = await fetchQueryDetails(PROVER_ADDRESS, QUERY_ID);
         console.log("ℹ️ Query Principal:", queryDetails.principal);
         // Check that primary in query details == bridge contract authority
-        checkAdmin(queryDetails.principal, contract);
+        // We skip this check in hello-bridge, since this safeguard is disabled in the tutorial smart contract.
+        //checkAdmin(queryDetails.principal, contract);
         // Check that the query has at least 8 result segments
         const segments = queryDetails.resultSegments;
         // Check that the query hasn't been used yet in our Universal Smart Contract
@@ -82,18 +83,6 @@ async function main() {
 }
 
 main();
-
-// Role ID of default admin role
-const DEFAULT_ADMIN_ROLE = ethers.ZeroHash;
-
-async function checkAdmin(primaryAddress, contract) {
-    const isAdmin = await contract.hasRole(DEFAULT_ADMIN_ROLE, primaryAddress);
-    if (isAdmin) {
-        console.log(`✅ ${primaryAddress} HAS DEFAULT_ADMIN_ROLE`);
-    } else {
-        console.log(`❌ ${primaryAddress} does NOT have DEFAULT_ADMIN_ROLE`);
-    }
-}
 
 async function fetchQueryDetails(proverAddress, queryId) {
     const prover = new ethers.Contract(proverAddress, ProverABI, provider);
