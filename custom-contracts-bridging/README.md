@@ -13,7 +13,7 @@ Skip this step if you already completed the `hello-bridge` tutorial.
 
 Otherwise, you can find directions in steps 1.1, 1.2, and 1.3 [here](../hello-bridge/README.md)
 
-## 2. Create Funded CCNext Testnet Account
+## 2. Create Funded Creditcoin USC Testnet Account
 Skip this step if you already completed the `hello-bridge` tutorial.
 
 Otherwise, see step 2 [here](../hello-bridge/README.md)
@@ -24,7 +24,7 @@ Skip this step if you already completed the `hello-bridge` tutorial.
 Otherwise, see step 3 [here](../hello-bridge/README.md)
 
 ## 4. Deploy TestERC20 Smart Contract on Sepolia
-We want to deploy a TestERC20 smart contract on Sepolia. The contract contains logic for tracking balances of a coin called TEST. The contract also automatically funds its creator's address with 1000 TEST coins. It is these coins which we will burn and then mint on CCNext Testnet.
+We want to deploy a TestERC20 smart contract on Sepolia. The contract contains logic for tracking balances of a coin called TEST. The contract also automatically funds its creator's address with 1000 TEST coins. It is these coins which we will burn and then mint on Creditcoin USC Testnet.
 
 Run the following to deploy your contract:
 
@@ -53,7 +53,7 @@ git clone git@github.com:gluwa/CCNext-smart-contracts.git
 ```
 
 ## 6. Modify Your Own Bridge Smart Contract Instance
-Imagine for example that we want to mint 2 MNT tokens on CCNext Testnet for every TEST token burned on Sepolia. Then we need to modify our bridge proxy contract to multiply the burned amount by 2 before minting.
+Imagine for example that we want to mint 2 MNT tokens on Creditcoin USC Testnet for every TEST token burned on Sepolia. Then we need to modify our bridge proxy contract to multiply the burned amount by 2 before minting.
 
 In your freshly cloned `CCNext-smart-contracts` repository, open the file `eth/contracts/UniversalBridgeProxy.sol`
 
@@ -65,7 +65,7 @@ _mintTokens(ERC20Address, fromAddress, amount * 2, queryId);
 ```
 
 ## 7. Deploy Your Bridge and ERC20Mintable Contracts
-See the section `Deploying UniversalBridgeProxy and ERC20Mintable Contracts on CCNext` [here](https://github.com/gluwa/CCNext-smart-contracts/blob/main/README.md)
+See the section `Deploying UniversalBridgeProxy and ERC20Mintable Contracts on Creditcoin USC Testnet` [here](https://github.com/gluwa/CCNext-smart-contracts/blob/main/README.md)
 
 When you deploy your contracts retain the contract addresses from this log output:
 ```sh
@@ -88,8 +88,8 @@ Save the transaction hash of your token burn transaction for later use
 EX:
 transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
 
-## 9. Submit Oracle Query to CCNext Prover
-Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the CCNext Testnet. We do so by creating an "oracle query".
+## 9. Submit Oracle Query to Creditcoin Prover
+Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the Creditcoin USC Testnet. We do so by creating an "oracle query".
 
 ```sh
 yarn submit_query \
@@ -105,8 +105,8 @@ Once the proving process completes, save the QueryId printed for later:
 EX:
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
 
-## 10. Use Bridged Data to Mint Tokens on CCNext Testnet
-We need to call `uscBridgeCompleteMint` in the bridge proxy contract we deployed to CCNext Testnet in step 7.
+## 10. Use Bridged Data to Mint Tokens on Creditcoin USC Testnet
+We need to call `uscBridgeCompleteMint` in the bridge proxy contract we deployed to USC Testnet in step 7.
 
 We also supply the address of the mintable contract we deployed in step 7. This is the contract in which our bridged tokens will be minted.
 
@@ -121,7 +121,7 @@ yarn complete_mint \
 <mintable_contract_address>
 ```
 
-## 11. Check Balance in CCNext Test ERC20 Contract
+## 11. Check Balance in USC Testnet ERC20 Contract
 As a final check, we take a look at the balance in our account within the ERC20Mintable contract where we minted our tokens.
 
 ```sh
@@ -134,6 +134,6 @@ You should see a result like:
 💰 Formatted Balance: 0.0000000000000001 MNT
 
 # Conclusion
-Congratulations! You've launched your first custom smart contracts making use of the CCNext Decentralized Oracle!
+Congratulations! You've launched your first custom smart contracts making use of the Creditcoin Decentralized Oracle!
 
 The next tutorial will add a `Bridge Offchain Worker` which automates two key oracle use steps we've been triggering manually thus far. In practice, DApp builders will want to conduct all oracle use via an offchain worker in order to ensure security and reduce hassle for end users. Take a look at the `bridge-offchain-worker` tutorial to learn more.

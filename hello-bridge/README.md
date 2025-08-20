@@ -1,8 +1,8 @@
 # Hello Bridge
 Hello bridge simulates one of the most common uses for a cross chain oracle, cross chain bridging! Each transfer has a few parts:
 1. Burn ERC20 tokens in a smart contract on Sepolia
-2. Trigger the CCNext oracle to supply proof of our Sepolia token burn
-3. Use the oracle outputs to mint tokens in the CCNext EVM
+2. Trigger the Creditcoin oracle to supply proof of our Sepolia token burn
+3. Use the oracle outputs to mint tokens in the Creditcoin USC Testnet EVM
 
 # Tutorial Steps
 
@@ -42,7 +42,7 @@ MetaMask -> drop down menu -> Account Details -> Details -> Show Private Key
 
 Save this key for later use.
 
-## 2. Fund a CCNext Testnet Address from Faucet
+## 2. Fund a Creditcoin USC Testnet Address from Faucet
 TODO: Add faucet step here once faucet exists. Then replace any mention of testing key 0x45fbbc5105365822a75e09844a560445cbccf172da3087a94b5812e1871ef591
 
 ## 3. Obtain Infura API Key
@@ -74,8 +74,8 @@ Save the transaction hash of your token burn transaction for later use
 EX:
 transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
 
-## 6. Submit Oracle Query to CCNext Prover
-Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the CCNext Testnet. We do so by creating a "oracle query".
+## 6. Submit Oracle Query to Creditcoin Oracle
+Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the Creditcoin USC Testnet. We do so by creating a "oracle query".
 
 ```sh
 yarn submit_query \
@@ -91,10 +91,10 @@ Once the proving process completes, save the QueryId printed for later:
 EX:
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
 
-## 7. Use Oracle Provisioned Data to Mint Tokens on CCNext Testnet
-We need to call `uscBridgeCompleteMint` in the pre-existing bridge contract at address 0xB85f7EFC53246468693d993558c36Be284FE8995 on CCNext Testnet. 
+## 7. Use Oracle Provisioned Data to Mint Tokens on Creditcoin USC Testnet
+We need to call `uscBridgeCompleteMint` in the pre-existing bridge contract at address 0x11578857ECe0Da79F6956282EAF27385F8adcb3f on Creditcoin USC Testnet. 
 
-Use the following command to complete your token mint. Several contract addresses are already filled in for you, but you'll have to provide your CCNext Testnet private key and the oracle query id from step 6.
+Use the following command to complete your token mint. Several contract addresses are already filled in for you, but you'll have to provide your Creditcoin USC Testnet private key and the oracle query id from step 6.
 ```sh
 yarn complete_mint \
 <private_key_of_address_from_step_2> \
@@ -104,10 +104,10 @@ yarn complete_mint \
 0x9D7F90ddD8BeA908FD0528778db57Fa1e0214083
 ```
 
-## 8. Check Balance in CCNext Test ERC20 Contract
+## 8. Check Balance in USC Testnet ERC20 Contract
 As a final check, we take a look at the balance in our account within the ERC20 contract where we minted our tokens.
 
-The ERC20 contract for this tutorial lives at address 0x9D7F90ddD8BeA908FD0528778db57Fa1e0214083 on CCNext Testnet
+The ERC20 contract for this tutorial lives at address 0x9D7F90ddD8BeA908FD0528778db57Fa1e0214083 on USC Testnet
 
 ```sh
 yarn check_balance \
@@ -121,6 +121,6 @@ You should see a result like:
 💰 Formatted Balance: 0.00000000000000005 MNT
 
 # Conclusion
-Congratulations! You've bridged your first funds using the CCNext Decentralized oracle. This is only one simple example of the cross chain functionality made possible by the novel CCNext oracle. 
+Congratulations! You've bridged your first funds using the Creditcoin Decentralized oracle. This is only one simple example of the cross chain functionality made possible by the novel Creditcoin oracle. 
 
-The next tutorial will add an additional piece of the puzzle, self hosted smart contracts! In production, the CCNext oracle will almost always be used by teams of DApp builders who will conduct data provisioning on behalf of their end users. Such teams will want to define and deploy their own contracts as shown next in the `custom-contracts-bridging` tutorial.
+The next tutorial will add an additional piece of the puzzle, self hosted smart contracts! In production, the Creditcoin oracle will almost always be used by teams of DApp builders who will conduct data provisioning on behalf of their end users. Such teams will want to define and deploy their own contracts as shown next in the `custom-contracts-bridging` tutorial.

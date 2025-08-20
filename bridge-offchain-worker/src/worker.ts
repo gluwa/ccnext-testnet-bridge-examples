@@ -66,7 +66,7 @@ const burnTransactionQueryBuilder = async (transactionHash: string, sourceChainP
   });
 
   // The format of the query can be customized
-  // This query format is necessary since this will be what the USC sees when it fetches the query result from the prover contract on CCNext
+  // This query format is necessary since this will be what the USC sees when it fetches the query result from the prover contract on Creditcoin USC chain
   // In this case, here's the format of the query that the builder is setup
   // 0: Rx - Status (from addStaticField(RxStatus))
   // 1: Tx - From (from addStaticField(TxFrom))
@@ -214,7 +214,7 @@ const main = async () => {
         const { query, queryId } = await burnTransactionQueryBuilder(log.transactionHash, provider);
         contextData.trackedQueryIds.push(queryId);
 
-        // Send query to CCNext
+        // Send query to Creditcoin USC Chain
         const queryCost = await ccNextPublicClient.readContract({
           address: proverContractAddress as `0x${string}`,
           abi: PROVER_ABI,
@@ -235,9 +235,9 @@ const main = async () => {
           value: queryCost,
         });
         
-        // This is the actual transaction that will be submitted to the CCNext prover
+        // This is the actual transaction that will be submitted to the Creditcoin oracle/prover
         const txHash = await ccNextWalletClient.writeContract(request);
-        console.log(`Transaction submitted to the CCNext prover: ${txHash}`);
+        console.log(`Query submitted to the Creditcoin oracle: ${txHash}`);
       }
 
       contextData.sourceChainStartBlock = blockRange.endBlock + BigInt(1);
@@ -252,7 +252,7 @@ const main = async () => {
     const viemProverAbi = Abi.parse(proverAbi);
     const ccNextBlockRange = await getBlockRangeToProcess(contextData.ccNextStartBlock, contextData.ccNextBlockLag, maxBlockRange, ccNextPublicClient);  
     if (ccNextBlockRange.shouldListen) {
-      console.log(`CCNext listener is listening from block ${ccNextBlockRange.startBlock} to ${ccNextBlockRange.endBlock}`);
+      console.log(`Creditcoin USC chain listener is listening from block ${ccNextBlockRange.startBlock} to ${ccNextBlockRange.endBlock}`);
       const querySubmittedEvent = viemProverAbi.find((abiElement) => abiElement.type === 'event' && abiElement.name === 'QuerySubmitted');
       const queryProofVerifiedEvent = viemProverAbi.find((abiElement) => abiElement.type === 'event' && abiElement.name === 'QueryProofVerified');
       const proverFilter = await ccNextPublicClient.createEventFilter({
@@ -276,7 +276,7 @@ const main = async () => {
         });
         if (decodedLog.eventName === 'QuerySubmitted') {
           if (contextData.trackedQueryIds.includes(decodedLog.args.queryId)) {
-            console.log(`Query we submitted earlier is now in CCNext block: ${decodedLog.args.queryId}`);
+            console.log(`Query we submitted earlier is now in Creditcoin block: ${decodedLog.args.queryId}`);
           }
         }
         if (decodedLog.eventName === 'QueryProofVerified') {
@@ -300,7 +300,7 @@ const main = async () => {
               args: [proverContractAddress, decodedLog.args.queryId, ccNextErc20MintableAddress as `0x${string}`],
             });
             const txHash = await ccNextWalletClient.writeContract(request);
-            console.log(`Transaction submitted to the CCNext bridge USC: ${txHash}`);
+            console.log(`Transaction submitted to the Creditcoin bridge USC: ${txHash}`);
           }
         }
       }
@@ -330,12 +330,12 @@ const main = async () => {
           console.log(`Caught the tokens minted event: ${decodedLog.args.queryId}`);
           console.log(`Value return in event: ${JSON.stringify(decodedLog, (_, v) => typeof v === 'bigint' ? v.toString() : v)}`);
           contextData.completedQueryIds.push(decodedLog.args.queryId);
-          console.log(`Congratulations! You've successfully bridged tokens from your source chain to CCNext!`);
+          console.log(`Congratulations! You've successfully bridged tokens from your source chain to your Creditcoin chain!`);
         }
       }
       contextData.ccNextStartBlock = ccNextBlockRange.endBlock + BigInt(1);
     } else {
-      console.log("CCNext listener has caught up. Job is not listening");
+      console.log("Creditcoin chain listener has caught up. Job is not listening");
     }
   });
 }

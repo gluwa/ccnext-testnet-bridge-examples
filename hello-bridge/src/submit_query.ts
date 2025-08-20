@@ -16,7 +16,7 @@ async function main() {
   if (args.length !== 3) {
     console.error(`
   Usage:
-    yarn submit_query <Sepolia_RPC_URL> <Transaction_Hash> <CCNext_Private_Key>
+    yarn submit_query <Sepolia_RPC_URL> <Transaction_Hash> <Creditcoin_Private_Key>
 
   Example:
     yarn submit_query https://sepolia.infura.io/v3/YOUR_KEY 0xabc123... 0xYOURPRIVATEKEY
@@ -56,7 +56,7 @@ async function main() {
     testnet: true
   } as const satisfies Chain;
   if (!ccNextPrivateKey) {
-    throw new Error("CCNEXT_PRIVATE_KEY is not set");
+    throw new Error("Creditcoin_Private_Key is not set");
   }
   const ccNextPublicClient = createPublicClient({
     chain: cc_next_testnet,
@@ -83,7 +83,7 @@ async function main() {
   if (!tx || !receipt) {
     throw new Error(`Missing transaction or receipt for ${transactionHash}`);
   }
-  console.log('Building CCNext query');
+  console.log('Building Creditcoin Oracle query');
   const builder = QueryBuilder.createFromTransaction(tx, receipt);
   // The idea of an Abi provider is that this will allow the query builder
   // to expect multiple events from different contracts
@@ -94,7 +94,7 @@ async function main() {
     return JSON.stringify(myErc20Abi);
   });
   // The format of the query can be customized
-  // This query format is necessary since this will be what the USC sees when it fetches the query result from the prover contract on CCNext
+  // This query format is necessary since this will be what the USC sees when it fetches the query result from the prover contract on Creditcoin USC Testnet
   // In this case, here's the format of the query that the builder is setup
   // 0: Rx - Status (from addStaticField(RxStatus))
   // 1: Tx - From (from addStaticField(TxFrom))
@@ -128,7 +128,7 @@ async function main() {
     chainId: chainKeyConverter(Number(tx.chainId)),
     height: BigInt(tx.blockNumber ?? (() => { throw new Error('Block number is null') })()),
     index: BigInt(receipt.index),
-    layoutSegments: fields.map(f => ({
+    layoutSegments: builder.build().map(f => ({
       offset: BigInt(f.offset),
       size: BigInt(f.size),
     })),
@@ -136,7 +136,7 @@ async function main() {
 
   // 3. Calculate the cost of the query
   const proverContractAddress = '0x8d4f738dd774b88a7309b28fb7cfd92210e1c110';
-  // For each query, the prover contract expects us to pay a cost in CCNext native currency
+  // For each query, the prover contract expects us to pay a cost in Creditcoin native currency
   // This cost is for the heavy computation that the prover contract needs to perform
   // And the cost is calculated based on the query and the size of the query
   const computedQueryCost = await ccNextPublicClient.readContract({
@@ -147,7 +147,7 @@ async function main() {
   });
   console.log(`Computed query cost: ${computedQueryCost}`);
 
-  // 4. Submit the query to the CCNext prover
+  // 4. Submit the query to the Creditcoin Oracle
   // Simulating the transaction before submitting it
   // This is to check if the transaction is valid
   // And to get the gas cost of the transaction
@@ -163,17 +163,17 @@ async function main() {
     value: computedQueryCost,
   });
 
-  // This is the actual transaction that will be submitted to the CCNext prover
-  // And the transaction will be submitted to the CCNext prover
+  // This is the actual transaction that will be submitted to the Creditcoin oracle
+  // And the transaction will be submitted to the Creditcoin oracle
   const txHash = await ccNextWalletClient.writeContract(request);
-  console.log(`Transaction submitted to the CCNext prover: ${txHash}`);
+  console.log(`Transaction submitted to the Creditcoin oracle: ${txHash}`);
 
   
   const computedQueryId = computeQueryId(query);
   let stopListening = false;
   let startBlock = await ccNextPublicClient.getBlockNumber();
   console.log('===============================================')
-  console.log('Waiting for proving results');
+  console.log('Waiting for oracle proving results');
   while (!stopListening) {
     const currentBlock = await ccNextPublicClient.getBlockNumber();
 
