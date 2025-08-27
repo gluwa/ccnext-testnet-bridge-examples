@@ -1,9 +1,6 @@
 import dotenv from "dotenv";
 import { Cron } from "croner";
 import { JsonRpcProvider } from "ethers";
-import { QueryBuilder } from "./ethers-query-builder/query-builder/abi/QueryBuilder";
-import { QueryableFields } from "./ethers-query-builder/query-builder/abi/models";
-import { ChainQuery } from "./ethers-query-builder/models/ChainQuery";
 import { chainKeyConverter, computeQueryId } from "./utils";
 import proverAbi from "./contract-abis/prover.json";
 import uscBridgeAbi from "./contract-abis/USCBridge.json";
@@ -11,6 +8,7 @@ import { createPublicClient, createWalletClient, decodeEventLog, erc20Abi, http,
 import { PROVER_ABI } from "../../hello-bridge/src/constants/abi";
 import { Abi } from 'abitype/zod';
 import { privateKeyToAccount } from "viem/accounts";
+import { QueryBuilder, QueryableFields, ChainQuery } from "@gluwa/cc-next-query-builder";
 
 dotenv.config();
 
