@@ -8,7 +8,7 @@ Hello bridge simulates one of the most common uses for a cross chain oracle, cro
 
 ## 0. Get Script Dependencies
 ```sh
-cd hello-oracle
+cd hello-bridge
 foundryup --version v1.2.3
 yarn
 ```
