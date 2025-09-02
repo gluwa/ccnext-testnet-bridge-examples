@@ -100,7 +100,7 @@ Use the following command to complete your token mint. Several contract addresse
 yarn complete_mint \
 <private_key_of_address_from_step_2> \
 0x11578857ECe0Da79F6956282EAF27385F8adcb3f \
-0x8d4f738dd774b88a7309b28fb7cfd92210e1c110 \
+0x5768012415bac3592c8a12fc38e84cb85d159246 \
 <query_id> \
 0x9D7F90ddD8BeA908FD0528778db57Fa1e0214083
 ```

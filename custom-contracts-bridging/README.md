@@ -117,7 +117,7 @@ Finally, we provide the QueryId we saved in step 9.
 yarn complete_mint \
 <private_key_of_address_from_step_2> \
 <bridge_contract_address> \
-<prover_contract_address> \
+0x5768012415bac3592c8a12fc38e84cb85d159246 \
 <query_id> \
 <mintable_contract_address>
 ```
