@@ -93,26 +93,26 @@ EX:
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
 
 ## 7. Use Oracle Provisioned Data to Mint Tokens on Creditcoin USC Testnet
-We need to call `uscBridgeCompleteMint` in the pre-existing bridge contract at address 0x11578857ECe0Da79F6956282EAF27385F8adcb3f on Creditcoin USC Testnet. 
+We need to call `uscBridgeCompleteMint` in the pre-existing bridge contract at address 0x441726D6821B2009147F0FA96E1Ee09D412cCb38 on Creditcoin USC Testnet. 
 
 Use the following command to complete your token mint. Several contract addresses are already filled in for you, but you'll have to provide your Creditcoin USC Testnet private key and the oracle query id from step 6.
 ```sh
 yarn complete_mint \
 <private_key_of_address_from_step_2> \
-0x11578857ECe0Da79F6956282EAF27385F8adcb3f \
+0x441726D6821B2009147F0FA96E1Ee09D412cCb38 \
 0x5768012415bac3592c8a12fc38e84cb85d159246 \
 <query_id> \
-0x9D7F90ddD8BeA908FD0528778db57Fa1e0214083
+0xb0fb0b182f774266b1c7183535A41D69255937a3
 ```
 
 ## 8. Check Balance in USC Testnet ERC20 Contract
 As a final check, we take a look at the balance in our account within the ERC20 contract where we minted our tokens.
 
-The ERC20 contract for this tutorial lives at address 0x9D7F90ddD8BeA908FD0528778db57Fa1e0214083 on USC Testnet
+The ERC20 contract for this tutorial lives at address 0xb0fb0b182f774266b1c7183535A41D69255937a3 on USC Testnet
 
 ```sh
 yarn check_balance \
-0x9D7F90ddD8BeA908FD0528778db57Fa1e0214083 \
+0xb0fb0b182f774266b1c7183535A41D69255937a3 \
 <your_account_address_from_sepolia>
 ```
 
