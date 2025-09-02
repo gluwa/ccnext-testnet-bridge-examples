@@ -43,6 +43,7 @@ async function checkBalance() {
     console.log(`📦 Token: ${name} (${symbol})`);
     console.log(`🧾 Raw Balance: ${rawBalance.toString()}`);
     console.log(`💰 Formatted Balance: ${humanReadable} ${symbol}`);
+    console.log(`Decimals for token micro unit: ${decimals}`);
   } catch (err) {
     console.error("❌ Failed to fetch balance:", err);
   }

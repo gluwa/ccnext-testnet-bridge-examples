@@ -5,6 +5,7 @@ Get dependencies and build
 ```sh
 cd custom-contracts-bridging
 yarn
+foundryup --version v1.2.3
 forge build
 ```
 
@@ -29,7 +30,7 @@ We want to deploy a TestERC20 smart contract on Sepolia. The contract contains l
 Run the following to deploy your contract:
 
 ```sh
-forge create --rpc-url https://sepolia.infura.io/v3/<Your infura API Key> --private-key 0x<key you funded with Sepolia ETH> TestERC20
+forge create --broadcast --rpc-url https://sepolia.infura.io/v3/<Your infura API Key> --private-key 0x<key you funded with Sepolia ETH> TestERC20
 ```
 
 Upon successful contract creation, the resulting logs will contain your TestERC20 contract address. We will need this in the next step.
@@ -80,7 +81,7 @@ We burn funds by transferring them to an address for which the private key is un
 
 EX:
 ```sh
-cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> <Contract address from step 4> "transfer(address, uint256)" "0x0000000000000000000000000000000000000001" "50" --private-key <key you funded with Sepolia ETH>
+cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> <Contract address from step 4> "burn(uint256)" "50" --private-key <key you funded with Sepolia ETH>
 ```
 
 Save the transaction hash of your token burn transaction for later use
