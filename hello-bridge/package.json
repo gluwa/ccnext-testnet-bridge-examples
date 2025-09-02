@@ -9,6 +9,7 @@
     "tsx": "^4.20.3"
   },
   "dependencies": {
+    "@gluwa/cc-next-query-builder": "^0.0.1",
     "@types/node": "^24.0.13",
     "dotenv": "^16.4.5",
     "ethers": "^6.15.0",

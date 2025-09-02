@@ -2,12 +2,10 @@ import { createPublicClient, createWalletClient, decodeEventLog, http } from "vi
 import { Chain } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { ethers } from "ethers";
-import { QueryBuilder } from "./ethers-query-builder/query-builder/abi/QueryBuilder";
-import { QueryableFields } from "./ethers-query-builder/query-builder/abi/models";
 import { chainKeyConverter, computeQueryId } from "./utils";
 import { PROVER_ABI } from "./constants/abi";
 import erc20Abi from './contract-abis/TestERC20Abi.json';
-import { ChainQuery } from "./ethers-query-builder/models/ChainQuery";
+import { ChainQuery, QueryBuilder, QueryableFields } from "@gluwa/cc-next-query-builder";
 
 async function main() {
   // Setup
@@ -45,7 +43,7 @@ async function main() {
 
   // 2. Setup your CCNext rpc and addresses
   const cc_next_testnet = {
-    id: 42,
+    id: 102033,
     name: 'CCNext-Testnet',
     nativeCurrency: { name: 'Creditcoin', symbol: 'CTC', decimals: 18 },
     rpcUrls: {
