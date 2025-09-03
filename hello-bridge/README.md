@@ -54,7 +54,7 @@ You can get an api key by making an account with Infura (Metamask Developer) [he
 Then you can access your api key from the dashboard [here](https://developer.metamask.io/)
 
 ## 4. Call Mint on Sepolia ERC20 Contract
-We need to mint ourself tokens on the previously deployed `TestERC20` contract (0x71B0e5C3C157BAe1A9080704358FBDD98194bc5A) so that we can burn them later. 
+We need to mint ourself tokens on the previously deployed `TestERC20` contract (0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8) so that we can burn them later. 
 
 ```sh
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> 0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8 "mint(uint256)" 50000 --private-key <private key you funded with Sepolia ETH>
@@ -85,7 +85,7 @@ https://sepolia.infura.io/v3/<your_infura_api_key> \
 <private_key_of_address_from_step_2>
 ```
 
-Proving should take ~8 minutes and no more than 30 minutes.
+Proving should take ~16 minutes and no more than 30 minutes.
 
 Once the proving process completes, save the QueryId printed for later:
 
