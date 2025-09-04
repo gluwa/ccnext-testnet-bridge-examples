@@ -54,7 +54,7 @@ git clone git@github.com:gluwa/CCNext-smart-contracts.git
 ```
 
 ## 6. Modify Your Own Bridge Smart Contract Instance
-Imagine for example that we want to mint 2 MNT tokens on Creditcoin USC Testnet for every TEST token burned on Sepolia. Then we need to modify our bridge proxy contract to multiply the burned amount by 2 before minting.
+Imagine for example that we want to mint 2 TEST tokens on Creditcoin USC Testnet for every TEST token burned on Sepolia. Then we need to modify our bridge proxy contract to multiply the burned amount by 2 before minting.
 
 In your freshly cloned `CCNext-smart-contracts` repository, open the file `eth/contracts/UniversalBridgeProxy.sol`
 
@@ -99,7 +99,7 @@ https://sepolia.infura.io/v3/<Your Infura API Key> \
 <Private key of address from step 2>
 ```
 
-Proving should take ~8 minutes and no more than 30 minutes.
+Proving should take ~16 minutes and no more than 30 minutes.
 
 Once the proving process completes, save the QueryId printed for later:
 
@@ -117,7 +117,7 @@ Finally, we provide the QueryId we saved in step 9.
 yarn complete_mint \
 <private_key_of_address_from_step_2> \
 <bridge_contract_address> \
-0x5768012415bac3592c8a12fc38e84cb85d159246 \
+0xc43402c66e88f38a5aa6e35113b310e1c19571d4 \
 <query_id> \
 <mintable_contract_address>
 ```

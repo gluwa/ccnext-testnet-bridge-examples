@@ -44,6 +44,10 @@ MetaMask -> drop down menu -> Account Details -> Details -> Show Private Key
 Save this key for later use.
 
 ## 2. Fund a Creditcoin USC Testnet Address from Faucet
+Now that we're done funding an account on Sepolia, we also need to fund an account on Creditcoin USC Testnet. 
+
+Otherwise our oracle query submission will fail due to lack of funds on our sending account on Testnet.
+
 TODO: Add faucet step here once faucet exists. Then replace any mention of testing key 0x45fbbc5105365822a75e09844a560445cbccf172da3087a94b5812e1871ef591
 
 ## 3. Obtain Infura API Key
@@ -100,7 +104,7 @@ Use the following command to complete your token mint. Several contract addresse
 yarn complete_mint \
 <private_key_of_address_from_step_2> \
 0x441726D6821B2009147F0FA96E1Ee09D412cCb38 \
-0x5768012415bac3592c8a12fc38e84cb85d159246 \
+0xc43402c66e88f38a5aa6e35113b310e1c19571d4 \
 <query_id> \
 0xb0fb0b182f774266b1c7183535A41D69255937a3
 ```

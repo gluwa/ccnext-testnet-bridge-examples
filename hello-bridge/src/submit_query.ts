@@ -133,7 +133,7 @@ async function main() {
   };
 
   // 3. Calculate the cost of the query
-  const proverContractAddress = '0x5768012415bac3592c8a12fc38e84cb85d159246';
+  const proverContractAddress = '0xc43402c66e88f38a5aa6e35113b310e1c19571d4';
   // For each query, the prover contract expects us to pay a cost in Creditcoin native currency
   // This cost is for the heavy computation that the prover contract needs to perform
   // And the cost is calculated based on the query and the size of the query
