@@ -11,8 +11,10 @@
     nixpkgs,
     flake-utils,
   }:
-    flake-utils.eachDefaultSystem (system: let
-      pkgs = import nixpkgs;
+    flake-utils.lib.eachDefaultSystem (system: let
+      pkgs = import nixpkgs {
+        inherit system;
+      };
     in {
       devShells.default = pkgs.mkShell {
         # Packages used for development
