@@ -242,4 +242,4 @@ bridging] tutorial.
 [ERC20 contract]: https://explorer.ccnext-testnet.creditcoin.network/token/0xb0fb0b182f774266b1c7183535A41D69255937a3
 [custom contract bridging]: ../custom-contracts-bridging/README.md
 [step 2]: #2-minting-some-tokens-on-sepolia
-[step 4]: #get-a-proof-of-the-token-burn-from-the-creditcoin-oracle
+[step 4]: #4-get-a-proof-of-the-token-burn-from-the-creditcoin-oracle

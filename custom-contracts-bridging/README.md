@@ -269,9 +269,11 @@ order to ensure robustness and streamline UX. Checkout the [bridge offchain work
 for more information on this!
 
 [Hello Bridge]: ../hello-bridge/README.md
-[setup]: ../hello-bridge/README.md#setup
-[step 2]: #2-minting-some-tokens-on-sepolia
-[step 3.2]: #3-2-deploy-your-modified-contracts
-[step 5]: #get-a-proof-of-the-token-burn-from-the-creditcoin-oracle
+[setup]: ../hello-bridge/README.md#1-setup
+[yarn]: https://yarnpkg.com/getting-started/install
+[foundry]: https://getfoundry.sh/
+[step 2]: #2-deploy-a-test-erc20-contract-on-sepolia
+[step 3.2]: #32-deploy-your-modified-contracts
+[step 5]: #5-get-a-proof-of-the-token-burn-from-the-creditcoin-oracle
 [step 6]: #6-mint-tokens-on-creditcoin
 [bridge offchain worker]: ../bridge-offchain-worker/README.md
