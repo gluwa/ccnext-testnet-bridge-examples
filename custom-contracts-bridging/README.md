@@ -150,7 +150,7 @@ ERC20Mintable deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
 UniversalBridgeProxy deployed to: 0x4858Db7F085418301A010c880B98374d83533fa2
 ```
 
-Save the address of each contract. You will be needing them in step 6. Remember to exit the 
+Save the address of each contract. You will be needing them in [step 6]. Remember to exit the 
 `CCNext-smart-contracts` repository:
 
 ```bash
@@ -161,8 +161,8 @@ cd ..
 
 The following few steps are similar to what we did in the [Hello Bridge] example. Start by burning
 the tokens you want to bridge on the _source chain_ (Sepolia in this case). We will be burning the
-`TEST` tokens from the test `ERC20` contract which we deployed in step 2. We do this by transferring
-them to an address for which the private key is unknown, making them inaccessible.
+`TEST` tokens from the test `ERC20` contract which we deployed in [step 2]. We do this by 
+transferring them to an address for which the private key is unknown, making them inaccessible.
 
 Run the following command to initiate the burn:
 
@@ -213,8 +213,8 @@ Save the query id. You will be needing it in the next step.
 
 Now that we have a proof of the token burn on our _source chain_, we can finalize the bridging 
 process by minting the same amount of tokens on the Creditcoin testnet. To do that, we need to call 
-your `UniversalBridgeProxy` contract on Creditcoin. This will _trustlessly_ very the proof from step
-5.
+your `UniversalBridgeProxy` contract on Creditcoin. This will _trustlessly_ very the proof from 
+[step 5].
 
 Run the following command to query the proxy contract:
 
@@ -233,7 +233,7 @@ Congratulations, you've just set up and used your very own _trustless bridge_!
 
 As a final check, we can take a look at the balance of your account on Creditcoin to confirm that 
 the bridging process was successful. This will use the `ERC20Mintable` contract which you deployed
-in step 3.2 
+in [step 3.2].
 
 Run the following command to query the contract:
 
@@ -270,4 +270,8 @@ for more information on this!
 
 [Hello Bridge]: ../hello-bridge/README.md
 [setup]: ../hello-bridge/README.md#setup
+[step 2]: #2-minting-some-tokens-on-sepolia
+[step 3.2]: #3-2-deploy-your-modified-contracts
+[step 5]: #get-a-proof-of-the-token-burn-from-the-creditcoin-oracle
+[step 6]: #6-mint-tokens-on-creditcoin
 [bridge offchain worker]: ../bridge-offchain-worker/README.md

@@ -6,7 +6,7 @@ bridging!** Cross-chain bridging on Creditcoin can be broken down into three bro
 1. To being, the `ERC20` tokens to bridge are burned using a smart contract on our _source chain_ 
    (in this case, Sepolia).
 2. Then, we query the Creditcoin decentralized oracle for a _proof_ of our source chain token burn.
-3. Finally, using the resulting proof from step 2, we mint the same amount of tokens on Creditcoin 
+3. Finally, using the resulting proof from [step 2], we mint the same amount of tokens on Creditcoin
    (in this case, Creditcoin testnet).
 
 
@@ -173,7 +173,7 @@ Save the query id. You will be needing it in the next step.
 
 Now that we have a proof of the token burn on our _source chain_, we can finalize the bridging 
 process by minting the same amount of tokens on the Creditcoin testnet. To do that, we need to call 
-a [bridge contract] on Creditcoin which will _trustlessly_ very the proof from step 4. We have 
+a [bridge contract] on Creditcoin which will _trustlessly_ very the proof from [step 4]. We have 
 already deployed this contract for you, but in a real scenario you would want to use your own custom 
 contracts if you were implementing a bridge from scratch. 
 
@@ -191,7 +191,7 @@ yarn complete_mint                             \
 Congratulations, you've just made your first _trutsless bridge transaction_ using the Creditcoin
 Decentralized Oracle!
 
-## 8. Check Balance in USC Testnet ERC20 Contract
+## 6. Check Balance in USC Testnet ERC20 Contract
 
 As a final check, we can take a look at the balance of your account on Creditcoin to confirm that 
 the bridging process was successful. This will use an [ERC20 contract] which mirrors the test token 
@@ -241,3 +241,5 @@ bridging] tutorial.
 [bridge contract]: https://explorer.ccnext-testnet.creditcoin.network/address/0x441726D6821B2009147F0FA96E1Ee09D412cCb38
 [ERC20 contract]: https://explorer.ccnext-testnet.creditcoin.network/token/0xb0fb0b182f774266b1c7183535A41D69255937a3
 [custom contract bridging]: ../custom-contracts-bridging/README.md
+[step 2]: #2-minting-some-tokens-on-sepolia
+[step 4]: #get-a-proof-of-the-token-burn-from-the-creditcoin-oracle
