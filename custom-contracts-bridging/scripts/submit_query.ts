@@ -126,7 +126,7 @@ async function main() {
     chainId: chainKeyConverter(Number(tx.chainId)),
     height: BigInt(tx.blockNumber ?? (() => { throw new Error('Block number is null') })()),
     index: BigInt(receipt.index),
-    layoutSegments: builder.build().map(f => ({
+    layoutSegments: fields.map(f => ({
       offset: BigInt(f.offset),
       size: BigInt(f.size),
     })),
