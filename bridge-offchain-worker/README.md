@@ -19,13 +19,13 @@ When filling in contract addresses in the .env file, make sure to use the addres
 ```env
 # Source Chain Configuration
 # SOURCE_CHAIN_INITIAL_START_BLOCK=<block_number>    # The starting block number to begin listening for burn events. If not provided, the worker will get the latest source chain block number
-SOURCE_CHAIN_BLOCK_LAG=12                          # Number of blocks to wait before processing
+SOURCE_CHAIN_BLOCK_LAG=3                          # Number of blocks to wait before processing
 SOURCE_CHAIN_CONTRACT_ADDRESS=<contract_address>   # Address of the ERC20 token contract on source chain
 SOURCE_CHAIN_RPC_URL=<rpc_url>                     # RPC endpoint for the source chain. Following our previous example, this will be the Sepolia urls
 
 # Creditcoin USC Chain Configuration
 #CC_NEXT_INITIAL_START_BLOCK=<block_number>         # The starting block number to begin listening for prover events. If not provided, the worker will get the latest CC Next block number
-CC_NEXT_BLOCK_LAG=12                               # Number of blocks to wait before processing
+CC_NEXT_BLOCK_LAG=3                               # Number of blocks to wait before processing
 CC_NEXT_RPC_URL=<rpc_url>                          # RPC endpoint for the Creditcoin USC chain
 CC_NEXT_ERC20_MINTABLE_ADDRESS=<contract_address>  # Address of the mintable ERC20 token on Creditcoin USC chain
 CC_NEXT_WALLET_PRIVATE_KEY=<private_key>           # Private key of the wallet that will submit mint requests
