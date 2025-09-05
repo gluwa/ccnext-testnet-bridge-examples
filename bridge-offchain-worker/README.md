@@ -31,7 +31,7 @@ CC_NEXT_ERC20_MINTABLE_ADDRESS=<contract_address>  # Address of the mintable ERC
 CC_NEXT_WALLET_PRIVATE_KEY=<private_key>           # Private key of the wallet that will submit mint requests
 
 # Contract Addresses
-PROVER_CONTRACT_ADDRESS=<contract_address>         # Address of the prover contract on Creditcoin USC chain
+PROVER_CONTRACT_ADDRESS=0xc43402c66e88f38a5aa6e35113b310e1c19571d4         # Address of the prover contract on Creditcoin USC chain
 USC_BRIDGE_CONTRACT_ADDRESS=<contract_address>     # Address of the bridge USC contract on Creditcoin USC chain
 
 # Block Processing Configuration
@@ -94,6 +94,10 @@ Value return in event: {"eventName":"TokensMinted","args":{"token":"0xF90ae5240C
 Congratulations! You've successfully bridged the tokens from source chain to your Creditcoin Chain!
 ...
 ```
+
+## 4. Further reading
+For design considerations and further explanation of this worker, see the Oracle Worker page in our official Universal Smart Contracts Gitbook: 
+https://app.gitbook.com/o/-LjFKFsSaSJudznvwK-5/s/Vp3bVdljVxZuwysnIzZ1/dapp-builder-infrastructure/offchain-oracle-workers
 
 ## 4. Notes
 If you configure these values SOURCE_CHAIN_INITIAL_START_BLOCK and CC_NEXT_INITIAL_START_BLOCK to blocks in the past, chances are you're going to revisit transactions and events that have been processed. The issue with this light worker is that it will always build and submit the queries as if the queries are first submitted. This will fail on the prover since the prover doesn't allow resubmission unless the query has failed or timed out on the prover contract.
