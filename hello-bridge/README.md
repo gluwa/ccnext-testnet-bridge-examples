@@ -20,7 +20,7 @@ locally:
 
 > [!TIP]
 > This project provides a `flake.nix` you can use to download all the dependencies you will need for 
-> this tutorial inside of a sandboxed environment. Just keep in mind you will have to**[enable 
+> this tutorial inside of a sandboxed environment. Just keep in mind you will have to **[enable 
 > flakes]** for this to work. To start you development environment, simply run:
 >
 > ```bash
@@ -31,7 +31,7 @@ Once you have all your dependencies setup, you will need to download some packag
 
 ```sh
 cd hello-bridge
-foundryup --version v1.2.3 # If you are using nix you can skip this command
+foundryup --version v1.2.3 # Skip this command if you are using nix!
 yarn
 ```
 
@@ -110,7 +110,7 @@ use to mint some dummy tokens. Run the following command:
 ```bash
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
-    "mint(uint256" 50000                                               \
+    "mint(uint256)" 50000                                              \
     --private-key <Your private key>
 ```
 
@@ -153,7 +153,7 @@ command:
 yarn submit_query                                      \
     https://sepolia.infura.io/v3/<Your infura API key> \
     <Transaction hash from step 3>                     \
-    <Your private key>
+    0x<Your private key>
 ```
 
 > [!TIP]
@@ -173,7 +173,7 @@ Save the query id. You will be needing it in the next step.
 
 Now that we have a proof of the token burn on our _source chain_, we can finalize the bridging 
 process by minting the same amount of tokens on the Creditcoin testnet. To do that, we need to call 
-a [bridge contract] on Creditcoin which will _trustlessly very the proof from step four_. We have 
+a [bridge contract] on Creditcoin which will _trustlessly_ very the proof from step 4. We have 
 already deployed this contract for you, but in a real scenario you would want to use your own custom 
 contracts if you were implementing a bridge from scratch. 
 
@@ -208,7 +208,7 @@ yarn check_balance                             \
     <You Sepolia wallet address>
 ```
 
-You should get some output showing you wallet's balance:
+You should get some output showing your wallet's balance on Creditcoin:
 
 ```bash
 📦 Token: Mintable (TEST)
