@@ -30,7 +30,7 @@ We want to deploy a TestERC20 smart contract on Sepolia. The contract contains l
 Run the following to deploy your contract:
 
 ```sh
-forge create --broadcast --rpc-url https://sepolia.infura.io/v3/<Your infura API Key> --private-key 0x<key you funded with Sepolia ETH> TestERC20
+forge create --broadcast --rpc-url https://sepolia.infura.io/v3/<Your infura API Key> --private-key <key you funded with Sepolia ETH> TestERC20
 ```
 
 Upon successful contract creation, the resulting logs will contain your TestERC20 contract address. We will need this in the next step.
