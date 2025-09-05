@@ -14,6 +14,8 @@ Install the required packages and then add a .env file to configure the worker. 
 yarn install
 ```
 
+When filling in contract addresses in the .env file, make sure to use the addresses of the contracts you launched during the custom-contracts-bridging tutorial! The worker may not have the proper abi's available to run against contract addresses from the hello-bridge tutorial.
+
 ```env
 # Source Chain Configuration
 # SOURCE_CHAIN_INITIAL_START_BLOCK=<block_number>    # The starting block number to begin listening for burn events. If not provided, the worker will get the latest source chain block number
