@@ -21,7 +21,17 @@
         packages = with pkgs; [
           foundry
           yarn
+          nodejs
         ];
+
+        shellHook = ''
+          # See https://nixos.wiki/wiki/Node.js
+          export NPM_GLOBAL_PREFIX="$PWD/npm-global"
+          export NODE_PATH="$NPM_GLOBAL_PREFIX/lib/node_modules";
+          export PATH="$NPM_GLOBAL_PREFIX/bin:$PATH"
+          npm config set prefix "$NPM_GLOBAL_PREFIX"
+
+        '';
       };
     });
 }
