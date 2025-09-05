@@ -3,23 +3,14 @@
 This tutorial introduces you to one of the most common uses for a cross chain oracle, **cross chain 
 bridging!** Cross-chain bridging on Creditcoin can be broken down into three broad steps:
 
-1. To being, the ERC20 tokens to bridge are burned using a smart contract on our _source chain_ (in 
-   this case, Sepolia).
-2. Then, we query the Creditcoin decentralized oracle for a proof of our source chain token burn.
+1. To being, the `ERC20` tokens to bridge are burned using a smart contract on our _source chain_ 
+   (in this case, Sepolia).
+2. Then, we query the Creditcoin decentralized oracle for a _proof_ of our source chain token burn.
 3. Finally, using the resulting proof from step 2, we mint the same amount of tokens on Creditcoin 
    (in this case, Creditcoin testnet).
 
 
 ## External dependencies
-
-> [!TIP]
-> This project also provides a `flake.nix` you can use to download all the dependencies you will 
-> need for this tutorial inside of a sandboxed environment. Just keep in mind you will have to 
->  **[enable flakes]** for this to work. Simply run:
->
-> ```bash
-> nix develop
-> ```
 
 To continue with this tutorial, you will first need to have the following dependencies available
 locally:
@@ -27,7 +18,16 @@ locally:
 - [yarn]
 - [foundry]
 
-Then run:
+> [!TIP]
+> This project provides a `flake.nix` you can use to download all the dependencies you will need for 
+> this tutorial inside of a sandboxed environment. Just keep in mind you will have to**[enable 
+> flakes]** for this to work. To start you development environment, simply run:
+>
+> ```bash
+> nix develop
+> ```
+
+Once you have all your dependencies setup, you will need to download some packages with `yarn`:
 
 ```sh
 cd hello-bridge
@@ -38,12 +38,12 @@ yarn
 ## 1. Setup
 
 We will be using Sepolia as our _source chain_ in this tutorial. To make transactions on Sepolia, we 
-will first need a wallet with some funds. To do this, follow the steps below.
+will first need a wallet with some funds.
 
 ### 1.1 Set up a wallet address for testing
 
 > [!CAUTION]
-> Only ever use this wallet for testing and never store significant amount of real-world funds on 
+> Only ever use this wallet for testing and never store significant amount of real-world assets on.
 > it!
 
 Create a new EVM wallet address for testing. In this tutorial, we will be using [🦊 Metamask]. 
@@ -63,29 +63,26 @@ Currency: ETH
 ### 1.2 Get some test funds (`Sepolia`)
 
 Now that you have your new test address ready, you will be needing some funds to make transactions.
-Don't worry, Sepolia is a testnet so you can just request some test token using a [🚰 testnet 
-faucet].
+You can request some Sepolia test token using a [🚰 testnet faucet].
 
 > [!Important]
 > Most tesnet faucets will require you to deposit some small amount of mainnet `ETH` on your wallet 
 > for it to be able to receive testnet funds (something like `0.001 ETH`). This serves as a way to
 > prevent spam. Do this before requesting test funds.
 
-Remember to send a minimum amount of mainnet funds to you wallet, then enter you wallet's public 
-address into the faucet and request your test funds.
-
 ### 1.3 Get some test funds (`Creditcoin`)
 
-You will also be needing some more test funds to make transaction on Creditcoin. Head to the [🚰 
-creditcoin discord faucet] to request some test tokens there. Now that your wallet is ready to make
-transactions on both networks, we will be needing a way to interact with it programatically.
+You will also need to fund your account on the Creditcoin Testnet, otherwise our oracle query 
+submission will fail due to lack of funds. Head to the [🚰 creditcoin discord faucet] to request 
+some test tokens there. Now that your wallet is ready to make transactions on both networks, you 
+will be needing a way to interact with it from the command line.
 
 ### 1.4 Retrieving your private key
 
 > [!CAUTION]
 > In this tutorial, we will be using you wallet's private key to allow some test scripts to act on 
 > your wallet's behalf. _This is only for testing purposes_ and should never be used in any other 
-> scenario. **Never share your private key with anyone, it can be used to steal your funds!**
+> scenario. **Never share your private key, it can be used to steal your funds!**
 
 Here's how you can find your private key in MetaMask: head to `Account Settings -> Private Key`, 
 then follow the on-screen instructions to copy it. You will need to do this several times in the 
@@ -97,7 +94,7 @@ Finally, you will need a way to send requests to the Sepolia test chain. The eas
 is to sign up with an _RPC provider_. [Infura] will work for testing purposes.
 
 Follow the onscreen instructions to create your account and generate your first api key. Make sure
-you are requesting an Ethereum api key. Copy it: you will be needing it in the following steps. You
+you are requesting an Ethereum API key. Copy it: you will be needing it in the following steps. You
 are now ready to go with the rest of the tutorial!
 
 ## 2. Minting some tokens on Sepolia
@@ -107,8 +104,8 @@ Creditcoin are kind of hard to come by, and you are generally limited in the amo
 per day, so we don't want to be burning those. Instead, we will be minting our own (worthless) 
 tokens on Sepolia to then bridge them to Creditcoin.
 
-For your convenience, we have [already deployed] a test contract to Sepolia which you can use to 
-mint some dummy tokens. Run the following command:
+For your convenience, we have [already deployed] a test `ERC20` contract to Sepolia which you can 
+use to mint some dummy tokens. Run the following command:
 
 ```bash
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
@@ -116,8 +113,6 @@ cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     "mint(uint256" 50000                                               \
     --private-key <Your private key>
 ```
-
-This should display some output stating that your transaction was a success.
 
 ## 3. Burning the tokens you want to bridge
 
@@ -142,13 +137,13 @@ transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf
 
 Save the transaction hash. You will be needing it in the next step.
 
-## 4. Get a proof of token the burn from the Creditcoin Oracle
+## 4. Get a proof of the token burn from the Creditcoin Oracle
 
-Great, we've burned our tokens! But how do we prove it? Most cross-chain bridges rely on a
+Great, we've burned some tokens! But how can we prove it? Most cross-chain bridges rely on a
 _centralized_, _trusted_ approach: one service or company handles all the token burns on the _source
 chain_ and is responsible for distributing the same amount of tokens on the target chain. This can
 be an issue, since nothing is preventing that company from censoring certain transactions or even
-stealing funds. Web3 was made to be _trustless_ and _decentralized_, let's make it that way 😎.
+stealing funds! Web3 was made to be _trustless_ and _decentralized_, let's make it that way 😎.
 
 Now that we've burnt funds on Sepolia, we need to create a proof of that token burn using the
 Creditcoin Decentralized Oracle. We do this by submitting an _oracle query_. Run the following 
@@ -165,7 +160,7 @@ yarn submit_query                                      \
 > This will take a while. Sit back, relax, and wait for the query to process ☕ Proving should take 
 > ~16 minutes and no more than 30 minutes.
 
-Once the proving process completes, you should see some output stating that your query was a proven
+Once the proving process completes, you should see some output stating that your query was proven
 successfully, along with a query id:
 
 ```bash
@@ -198,11 +193,12 @@ Decentralized Oracle!
 
 ## 8. Check Balance in USC Testnet ERC20 Contract
 
-As a final check, we can take a look at the balance of our account on Creditcoin to confirm that the
-bridging process was successful. This will use a [ERC20 contract] which mirrors the test token 
-contract we deployed on Sepolia and which we have already deployed for you on Creditcoin. In a real
-scenario you would want to have a separate ERC20 contract for each of the assets you allow to be 
-bridged to Creditcoin this way.
+As a final check, we can take a look at the balance of your account on Creditcoin to confirm that 
+the bridging process was successful. This will use an [ERC20 contract] which mirrors the test token 
+contract we deployed on Sepolia. This has already deployed for you on Creditcoin, in fact you have 
+already been using it in the previous steps to mint tokens there! In a real scenario, you would 
+probably want to have a separate `ERC20` contract for each of the assets you allow to be bridged to 
+Creditcoin this way.
 
 Run the following command to query the contract:
 
@@ -212,7 +208,7 @@ yarn check_balance                             \
     <You Sepolia wallet address>
 ```
 
-You should showing you wallet's balance:
+You should get some output showing you wallet's balance:
 
 ```bash
 📦 Token: Mintable (TEST)
@@ -223,14 +219,14 @@ You should showing you wallet's balance:
 # Conclusion
 
 Congratulations, you've bridged your first funds using the **Creditcoin Decentralized oracle!** This
-is only a simple example of the cross chain functionality made possible by the Creditcoin, keep on
-reading to find out more about how to leverage this new technology!
+is only a simple example of the cross chain functionality made possible by Creditcoin, keep on 
+reading to find more ways in which you can leverage decentralized cross-chain proofs of state!
 
-In the next tutorial we will be looking at add an additional piece in the puzzle of decentralized 
-bridging, self hosted smart contracts! In a production environment, the Creditcoin oracle will 
-almost always be used by teams of DApp builders who will handle data provisioning on behalf of their
-end users. Such teams will want to define and deploy their own contracts as shown in the [custom 
-contract bridging] tutorial.
+In the next tutorial we will be looking at the next piece in the puzzle of decentralized bridging: 
+self-hosted smart contracts! In a production environment, the Creditcoin oracle will almost always 
+be used by teams of DApp builders who will handle data provisioning on behalf of their end users. 
+Such teams will want to define and deploy their own contracts as shown in the [custom contract 
+bridging] tutorial.
 
 [enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
 [yarn]: https://yarnpkg.com/getting-started/install
@@ -239,6 +235,7 @@ contract bridging] tutorial.
 [chrome]: https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?utm_source=www.google.com
 [firefox]: https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/
 [🚰 testnet faucet]: https://cloud.google.com/application/web3/faucet/ethereum/sepolia
+[🚰 creditcoin discord faucet]: https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1
 [Infura]: https://developer.metamask.io/register
 [already deployed]: https://sepolia.etherscan.io/address/0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8
 [bridge contract]: https://explorer.ccnext-testnet.creditcoin.network/address/0x441726D6821B2009147F0FA96E1Ee09D412cCb38
