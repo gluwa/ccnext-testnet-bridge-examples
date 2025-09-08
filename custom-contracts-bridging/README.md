@@ -272,6 +272,7 @@ for more information on this!
 [setup]: ../hello-bridge/README.md#1-setup
 [yarn]: https://yarnpkg.com/getting-started/install
 [foundry]: https://getfoundry.sh/
+[enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
 [step 2]: #2-deploy-a-test-erc20-contract-on-sepolia
 [step 3.2]: #32-deploy-your-modified-contracts
 [step 5]: #5-get-a-proof-of-the-token-burn-from-the-creditcoin-oracle
