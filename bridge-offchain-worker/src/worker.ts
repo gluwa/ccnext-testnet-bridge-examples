@@ -4,7 +4,8 @@ import { JsonRpcProvider } from "ethers";
 import { chainKeyConverter, computeQueryId } from "./utils";
 import proverAbi from "./contract-abis/prover.json";
 import uscBridgeAbi from "./contract-abis/USCBridge.json";
-import { createPublicClient, createWalletClient, decodeEventLog, erc20Abi, http, isAddressEqual, PublicClient } from "viem";
+import { createPublicClient, createWalletClient, decodeEventLog, http, isAddressEqual, PublicClient } from "viem";
+import erc20Abi from './contract-abis/erc20.json';
 import { PROVER_ABI } from "../../hello-bridge/src/constants/abi";
 import { Abi } from 'abitype/zod';
 import { privateKeyToAccount } from "viem/accounts";
@@ -27,7 +28,7 @@ interface WorkerData {
 }
 
 // Discriminated union type for block range processing
-type BlockRangeResult = 
+type BlockRangeResult =
   | { shouldListen: false }
   | { shouldListen: true; startBlock: bigint; endBlock: bigint };
 
@@ -40,8 +41,8 @@ const getBlockRangeToProcess = async (startBlock: bigint, blockLag: bigint, maxB
     }
   }
 
-  const endBlock = currentBlock - blockLag < startBlock + maxBlockRange 
-    ? currentBlock - blockLag 
+  const endBlock = currentBlock - blockLag < startBlock + maxBlockRange
+    ? currentBlock - blockLag
     : startBlock + maxBlockRange;
   return {
     shouldListen: true,
@@ -50,7 +51,7 @@ const getBlockRangeToProcess = async (startBlock: bigint, blockLag: bigint, maxB
   }
 }
 
-const burnTransactionQueryBuilder = async (transactionHash: string, sourceChainProvider: JsonRpcProvider) : Promise<{ query: ChainQuery, queryId: `0x${string}` }> => {
+const burnTransactionQueryBuilder = async (transactionHash: string, sourceChainProvider: JsonRpcProvider): Promise<{ query: ChainQuery, queryId: `0x${string}` }> => {
   const tx = await sourceChainProvider.getTransaction(transactionHash);
   const receipt = await sourceChainProvider.getTransactionReceipt(transactionHash);
 
@@ -69,7 +70,7 @@ const burnTransactionQueryBuilder = async (transactionHash: string, sourceChainP
   // 0: Rx - Status (from addStaticField(RxStatus))
   // 1: Tx - From (from addStaticField(TxFrom))
   // 2: Tx - To (from addStaticField(TxTo))
-  
+
   builder
     .addStaticField(QueryableFields.RxStatus)
     .addStaticField(QueryableFields.TxFrom)
@@ -101,7 +102,7 @@ const overRunProtectionCallback = (job) => console.log(`Call at ${new Date().toI
 
 const main = async () => {
   console.log("Starting...");
-  
+
   // Validate environment variables
   const sourceChainStartBlock = Number(process.env.SOURCE_CHAIN_INITIAL_START_BLOCK);
   const ccNextStartBlock = Number(process.env.CC_NEXT_INITIAL_START_BLOCK);
@@ -232,7 +233,7 @@ const main = async () => {
           ],
           value: queryCost,
         });
-        
+
         // This is the actual transaction that will be submitted to the Creditcoin oracle/prover
         const txHash = await ccNextWalletClient.writeContract(request);
         console.log(`Query submitted to the Creditcoin oracle: ${txHash}`);
@@ -243,12 +244,12 @@ const main = async () => {
       console.log("Source chain listener has caught up. Job is not listening");
     }
 
-    
-    
+
+
     // CCNext listener part (prover contract)
     const viemUscBridgeAbi = Abi.parse(uscBridgeAbi);
     const viemProverAbi = Abi.parse(proverAbi);
-    const ccNextBlockRange = await getBlockRangeToProcess(contextData.ccNextStartBlock, contextData.ccNextBlockLag, maxBlockRange, ccNextPublicClient);  
+    const ccNextBlockRange = await getBlockRangeToProcess(contextData.ccNextStartBlock, contextData.ccNextBlockLag, maxBlockRange, ccNextPublicClient);
     if (ccNextBlockRange.shouldListen) {
       console.log(`Creditcoin USC chain listener is listening from block ${ccNextBlockRange.startBlock} to ${ccNextBlockRange.endBlock}`);
       const querySubmittedEvent = viemProverAbi.find((abiElement) => abiElement.type === 'event' && abiElement.name === 'QuerySubmitted');
@@ -281,6 +282,10 @@ const main = async () => {
           if (contextData.trackedQueryIds.includes(decodedLog.args.queryId)) {
             console.log(`Caught the query proof verified event: ${decodedLog.args.queryId}`);
             console.log(`Value return in event: ${JSON.stringify(decodedLog, (_, v) => typeof v === 'bigint' ? v.toString() : v)}`);
+
+            // Stop tracking query so we don't re-submit it
+            contextData.trackedQueryIds = contextData.trackedQueryIds.filter((query) => query !== decodedLog.args.queryId);
+
             const queryDetails = await ccNextPublicClient.readContract({
               address: proverContractAddress as `0x${string}`,
               abi: PROVER_ABI,
