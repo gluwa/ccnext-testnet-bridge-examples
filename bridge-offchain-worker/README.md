@@ -130,7 +130,20 @@ Worker job run 2
 > The prover can take a bit of time to get started. Sit back and wait until you get the full log
 > output as shown above ☕
 
-## 3. Burning the tokens you want to bridge
+## 3. Minting some tokens on Sepolia
+
+Changes are after following the previous tutorials you don't have any `TEST` tokens left over:
+remember to mint some so you can initiate the bridge transfer! This will re-use the pre-deployed
+`ERC20` [test contract] from the [Hello Bridge] tutorial:
+
+```bash
+cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
+    0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
+    "mint(uint256)" 50000                                              \
+    --private-key <Your private key>
+```
+
+## 4. Burning the tokens you want to bridge
 
 Like we did in the previous tutorials, we start the bridging process by burning the funds we want to
 bridge on Sepolia. This time however this will be the only transaction we need to submit! The rest
@@ -150,18 +163,18 @@ cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
 > transaction's `blockNumber`: the prover will pick it up when that block number falls into the
 > range of blocks it is listening to on the source chain ☕
 
-## 4. Monitor the Offchain Worker
+## 5. Monitor the Offchain Worker
 
 At this point, you should see the worker start to process some events and requesting a proof of your
 token burn from the Creditcoin Decentralized Oracle:
 
 ```bash
 ...
-Worker job run 4
-Source chain listener is listening from block 8963101 to 8963105
-Found 1 new burn transaction events
-Query cost: 3560 for query 0xa9c8d38267dcab19e06ff27a04457c07229168b7a9015c8084e16aa2b17d4d58
-Transaction submitted to the Creditcoin oracle: 0x6a9a04b663998d1946846829b9a711c8c7d4c52dedb07c862fa768e96e6da027
+Source chain listener is listening from block 9159981 to 9159985
+Found 2 new burn transaction events
+Skipping non-burn transfer: tx=0xa6d0aa852fb1cead707be7fae0c6c3678dd5dcb33ec09327606d53079a8e3039, from=0x0000000000000000000000000000000000000000, to=0x475CFf3D6728B0BaEdDd65d863DD7E82a43367ee, value=50000
+Query cost: 10000000000000000000 for query 0x45778684817c53de254036b8bfe975dd16b93a36f320c7de3f88ae107bf8a2b0
+Query submitted to the Creditcoin oracle: 0x3aa3b0e4f99524f087bb0257b339f3ed1ff7d8ca9ea0c03660577468911e26ae
 ...
 ```
 
@@ -171,30 +184,30 @@ the minting process:
 
 ```bash
 ...
-Creditcoin listener is listening from block 1626782 to 1626793
+Creditcoin USC chain listener is listening from block 69063 to 69066
 Found 1 new prover contract result events
-Caught the query proof verified event: 0xa9c8d38267dcab19e06ff27a04457c07229168b7a9015c8084e16aa2b17d4d58
-Value return in event: {"eventName":"QueryProofVerified","args":{"queryId":"0xa9c8d38267dcab19e06ff27a04457c07229168b7a9015c8084e16aa2b17d4d58","resultSegments":[{"offset":"448","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"192","abiBytes":"0x000000000000000000000000016e7bfe4a7213e18516ca0cb84cf2750d360b33"},{"offset":"224","abiBytes":"0x0000000000000000000000008c4eddfea10aead7a29c00ada09e552b1c44af0c"},{"offset":"800","abiBytes":"0x0000000000000000000000008c4eddfea10aead7a29c00ada09e552b1c44af0c"},{"offset":"928","abiBytes":"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"},{"offset":"960","abiBytes":"0x000000000000000000000000016e7bfe4a7213e18516ca0cb84cf2750d360b33"},{"offset":"992","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"1056","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000032"}],"state":2}}
-Transaction submitted to the Creditcoin bridge USC: 0x21573f3d1f0507525c1bed89cabdd7031bada5c0c269ea226cbe247ca277fcc5
+Caught the query proof verified event: 0x45778684817c53de254036b8bfe975dd16b93a36f320c7de3f88ae107bf8a2b0
+Value return in event: {"eventName":"QueryProofVerified","args":{"queryId":"0x45778684817c53de254036b8bfe975dd16b93a36f320c7de3f88ae107bf8a2b0","resultSegments":[{"offset":"448","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"192","abiBytes":"0x000000000000000000000000475cff3d6728b0baeddd65d863dd7e82a43367ee"},{"offset":"224","abiBytes":"0x00000000000000000000000015166ba9d24abfa477c0c88dd1e6321297214ec8"},{"offset":"800","abiBytes":"0x00000000000000000000000015166ba9d24abfa477c0c88dd1e6321297214ec8"},{"offset":"928","abiBytes":"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"},{"offset":"960","abiBytes":"0x000000000000000000000000475cff3d6728b0baeddd65d863dd7e82a43367ee"},{"offset":"992","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"1056","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000032"}],"state":2}}
+Transaction submitted to the Creditcoin bridge USC: 0x30a57a9f51a36d954e4ae4939589ad8298bdd54d1d69a02485918bfc54d4828e
 ...
 ```
 
 Finally, the worker listens for the `mint` event notifying it that the tokens have been minted to
 our account on Creditcoin.
 
-```
+```bash
 ...
 Found 1 new bridge USC events
-Caught the tokens minted event: 0xa9c8d38267dcab19e06ff27a04457c07229168b7a9015c8084e16aa2b17d4d58
-Value return in event: {"eventName":"TokensMinted","args":{"token":"0xF90ae5240Cc4EbA6e96c97994d62874009Ad60F0","recipient":"0x016e7bFE4a7213E18516CA0Cb84Cf2750D360b33","queryId":"0xa9c8d38267dcab19e06ff27a04457c07229168b7a9015c8084e16aa2b17d4d58","amount":"50"}}
-Congratulations! You've successfully bridged the tokens from source chain to your Creditcoin Chain!
+Caught the tokens minted event: 0x45778684817c53de254036b8bfe975dd16b93a36f320c7de3f88ae107bf8a2b0
+Value return in event: {"eventName":"TokensMinted","args":{"token":"0xb0fb0b182f774266b1c7183535A41D69255937a3","recipient":"0x475CFf3D6728B0BaEdDd65d863DD7E82a43367ee","queryId":"0x45778684817c53de254036b8bfe975dd16b93a36f320c7de3f88ae107bf8a2b0","amount":"50"}}
+Congratulations! You've successfully bridged tokens from your source chain to your Creditcoin chain!
 ...
 ```
 
 That's it! All it took was a single transaction on your end to initiate the bridging process, 
 providing for a _truly native UX_.
 
-## 5. Check Balance in USC Testnet ERC20 Contract
+## 6. Check Balance in USC Testnet ERC20 Contract
 
 As a final check, we can take a look at the balance of your account on Creditcoin to confirm that 
 the bridging process was successful.
@@ -207,12 +220,13 @@ yarn check_balance                             \
     <You Sepolia wallet address>
 ```
 
-You should get some output showing your wallet's balance on Creditcoin:
+I've you've been going through the previous tutorials, your balance should now 
+be:
 
 ```bash
 📦 Token: Mintable (TEST)
-🧾 Raw Balance: 50
-💰 Formatted Balance: 0.00000000000000005 TEST
+🧾 Raw Balance: 100
+💰 Formatted Balance: 0.0000000000000001 TEST
 ```
 
 [Custom Contract Bridging]: ../custom-contracts-bridging/README.md
@@ -220,3 +234,4 @@ You should get some output showing your wallet's balance on Creditcoin:
 [how to customize our trustless bridging logic]: ../custom-contracts-bridging/README.md
 [Hello Bridge]: ../hello-bridge/README.md
 [setup]: ../hello-bridge/README.md#1-setup
+[test contract]: https://sepolia.etherscan.io/address/0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8
