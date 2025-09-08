@@ -146,7 +146,7 @@ npx hardhat deploy                      \
 You should get some output with the address of the contracts you just deployed:
 
 ```bash
-ERC20Mintable deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
+ERC20 deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
 UniversalBridgeProxy deployed to: 0x4858Db7F085418301A010c880B98374d83533fa2
 ```
 

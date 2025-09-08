@@ -453,7 +453,11 @@ const main = async () => {
             console.log(
               `Congratulations! You've successfully bridged tokens from your source chain to your Creditcoin chain!`
             );
+            console.log('Exiting Offchain Worker...');
           }
+
+          // FIXME: offchain worker is having trouble handling events after this point
+          return;
         }
         contextData.ccNextStartBlock = ccNextBlockRange.endBlock + BigInt(1);
       } else {
