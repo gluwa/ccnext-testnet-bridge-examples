@@ -97,7 +97,7 @@ Congratulations! You've successfully bridged the tokens from source chain to you
 
 ## 4. Further reading
 For design considerations and further explanation of this worker, see the Oracle Worker page in our official Universal Smart Contracts Gitbook: 
-https://app.gitbook.com/o/-LjFKFsSaSJudznvwK-5/s/Vp3bVdljVxZuwysnIzZ1/dapp-builder-infrastructure/offchain-oracle-workers
+https://docs.creditcoin.org/usc/offchain-oracle-workers
 
 ## 5. Notes
 If you configure these values SOURCE_CHAIN_INITIAL_START_BLOCK and CC_NEXT_INITIAL_START_BLOCK to blocks in the past, chances are you're going to revisit transactions and events that have been processed. The issue with this light worker is that it will always build and submit the queries as if the queries are first submitted. This will fail on the prover since the prover doesn't allow resubmission unless the query has failed or timed out on the prover contract.
