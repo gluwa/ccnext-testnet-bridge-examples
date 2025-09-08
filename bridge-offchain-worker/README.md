@@ -4,37 +4,37 @@
 > This tutorial builds on the previous [Custom Contract Bridging] example -make sure to check it out
 > before moving on!
 
-So far we have seen [how to initiate a trustless bridge transaction] and [how to customize our 
-trustless bridging logic]. In this tutorial, we will be seeing how to automate most of our 
-interaction with Creditcoin itself so that end users only have to submit _a single transaction_ on 
+So far we have seen [how to initiate a trustless bridge transaction] and [how to customize our
+trustless bridging logic]. In this tutorial, we will be seeing how to automate most of our
+interaction with Creditcoin itself so that end users only have to submit _a single transaction_ on
 the Sepolia _source chain_.
 
 ## What is an Offchain Worker
 
-An Offchain Worker is an script responsible for watching the state of a _source chain_ (in this 
-case, Sepolia) as well as the Creditcoin _execution chain_. It submits _oracles queries_ and 
-interacts with our _bridge proxy_ on Creditcoin in response to specific events on each chain. This 
+An Offchain Worker is an script responsible for watching the state of a _source chain_ (in this
+case, Sepolia) as well as the Creditcoin _execution chain_. It submits _oracles queries_ and
+interacts with our _bridge proxy_ on Creditcoin in response to specific events on each chain. This
 allows us to automate most of the cross-chain interaction in our _trustless bridge_, resulting in a
 smoother UX.
 
 Our offchain worker will listen to events from the following sources:
 
 1. `burn` transfer events which are emitted by our test `ERC20` contract on Sepolia. When our worker
-   detects this, they create an oracle query to request a proof of the token burn from the 
+   detects this, they create an oracle query to request a proof of the token burn from the
    Creditcoin Decentralized Oracle.
 
 2. `queryProofVerified` events which are emitted by the query prover contract on Creditcoin. Each of
-   these events signals that a query has finished being proven by the Creditcoin Decentralized 
-   Oracle. When our worker detects this, it submits a request to our _bridge proxy contract_ to 
-   finalize the bridging process by minting the tokens we burned on Sepolia onto Creditcoin. 
+   these events signals that a query has finished being proven by the Creditcoin Decentralized
+   Oracle. When our worker detects this, it submits a request to our _bridge proxy contract_ to
+   finalize the bridging process by minting the tokens we burned on Sepolia onto Creditcoin.
 
-3. `mint` events which are emitted by our _bridge proxy contract_. This signals that all bridged 
-   tokens have finished minting and we can drop any local records related to the bridged 
+3. `mint` events which are emitted by our _bridge proxy contract_. This signals that all bridged
+   tokens have finished minting and we can drop any local records related to the bridged
    transaction.
 
 ## 1. Setup
 
-This is the same as in [Hello Bridge]. If you have not already done so, follow the installation 
+This is the same as in [Hello Bridge]. If you have not already done so, follow the installation
 steps in the [setup] section there.
 
 Once that is done, you will need to set up some additional configuration for the offchain worker.
@@ -55,7 +55,7 @@ SOURCE_CHAIN_BLOCK_LAG=3
 # Address of the ERC20 token contract on source chain
 SOURCE_CHAIN_CONTRACT_ADDRESS=0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8
 
-# RPC endpoint for the source chain. Following our previous example, this will 
+# RPC endpoint for the source chain. Following our previous example, this will
 # be the Sepolia urls
 SOURCE_CHAIN_RPC_URL=https://sepolia.infura.io/v3/your_infura_api_key
 
@@ -63,7 +63,7 @@ SOURCE_CHAIN_RPC_URL=https://sepolia.infura.io/v3/your_infura_api_key
 #                      Creditcoin USC Chain Configuration                      #
 # ============================================================================ #
 
-# The starting block number to begin listening for prover events. If not 
+# The starting block number to begin listening for prover events. If not
 # provided, the worker will get the latest CC Next block number
 #CC_NEXT_INITIAL_START_BLOCK=<block_number>
 
@@ -99,11 +99,11 @@ MAX_BLOCK_RANGE=2000
 
 > [!CAUTION]
 > If you configure `SOURCE_CHAIN_INITIAL_START_BLOCK` and `CC_NEXT_INITIAL_START_BLOCK` to point to
-> blocks in the past, chances are you're going to re-query transactions and events that have 
-> already been processed. The issue with the example worker we are using is that it will always 
+> blocks in the past, chances are you're going to re-query transactions and events that have
+> already been processed. The issue with the example worker we are using is that it will always
 > build and submit queries as if this was the first time they are being submitted. **This will fail
-> on the prover** since it doesn't allow query resubmissions. **The bridge proxy contract acts 
-> similarly**, in that it will revert mint calls for any query id that has been already been 
+> on the prover** since it doesn't allow query resubmissions. **The bridge proxy contract acts
+> similarly**, in that it will revert mint calls for any query id that has been already been
 > submitted.
 
 ## 2. Start the Offchain Worker
@@ -159,7 +159,7 @@ cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
 ```
 
 > [!TIP]
-> It can take some time for the worker to pick up your transaction. Pay attention to your 
+> It can take some time for the worker to pick up your transaction. Pay attention to your
 > transaction's `blockNumber`: the prover will pick it up when that block number falls into the
 > range of blocks it is listening to on the source chain ☕
 
@@ -204,12 +204,12 @@ Congratulations! You've successfully bridged tokens from your source chain to yo
 ...
 ```
 
-That's it! All it took was a single transaction on your end to initiate the bridging process, 
+That's it! All it took was a single transaction on your end to initiate the bridging process,
 providing for a _truly native UX_.
 
 ## 6. Check Balance in USC Testnet ERC20 Contract
 
-As a final check, we can take a look at the balance of your account on Creditcoin to confirm that 
+As a final check, we can take a look at the balance of your account on Creditcoin to confirm that
 the bridging process was successful.
 
 Run the following command to check your funds:
@@ -220,7 +220,7 @@ yarn check_balance                             \
     <You Sepolia wallet address>
 ```
 
-I've you've been going through the previous tutorials, your balance should now 
+I've you've been going through the previous tutorials, your balance should now
 be:
 
 ```bash
