@@ -32,6 +32,31 @@ Our offchain worker will listen to events from the following sources:
    tokens have finished minting and we can drop any local records related to the bridged
    transaction.
 
+## External dependencies
+
+To continue with this tutorial, you will first need to have the following dependencies available
+locally:
+
+- [yarn]
+- [foundry]
+
+> [!TIP]
+> This project provides a `flake.nix` you can use to download all the dependencies you will need for
+> this tutorial inside of a sandboxed environment. Just keep in mind you will have to
+> **[enable flakes]** for this to work. To start you development environment, simply run:
+>
+> ```bash
+> nix develop
+> ```
+
+Once you have all your dependencies setup, you will need to download some packages with `yarn`:
+
+```sh
+cd hello-bridge
+foundryup --version v1.2.3 # Skip this command if you are using nix!
+yarn
+```
+
 ## 1. Setup
 
 This is the same as in [Hello Bridge]. If you have not already done so, follow the installation
@@ -229,6 +254,9 @@ be:
 💰 Formatted Balance: 0.0000000000000001 TEST
 ```
 
+[enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
+[yarn]: https://yarnpkg.com/getting-started/install
+[foundry]: https://getfoundry.sh/
 [Custom Contract Bridging]: ../custom-contracts-bridging/README.md
 [how to initiate a trustless bridge transaction]: ../hello-bridge/README.md
 [how to customize our trustless bridging logic]: ../custom-contracts-bridging/README.md
