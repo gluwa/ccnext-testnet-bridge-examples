@@ -236,7 +236,7 @@ You should get some output showing your wallet's balance on Creditcoin:
 💰 Formatted Balance: 0.00000000000000005 TEST
 ```
 
-# Conclusion
+## Conclusion
 
 Congratulations, you've bridged your first funds using the **Creditcoin Decentralized oracle!** This
 is only a simple example of the cross chain functionality made possible by Creditcoin, keep on

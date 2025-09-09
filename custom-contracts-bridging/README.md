@@ -269,7 +269,7 @@ You should get some output showing your wallet's balance on Creditcoin:
 
 Notice how you now have _twice_ the amount of tokens you originally minted on Sepolia!
 
-# Conclusion
+## Conclusion
 
 Congratulations! You've set up your first custom smart contracts which make use of the Creditcoin
 Decentralized Oracle!
