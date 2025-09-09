@@ -124,6 +124,13 @@ Next, compile your bridging smart contracts:
 npm install && npx hardhat compile
 ```
 
+> [!CAUTION]
+> If you get an error like:
+> ```bash
+> * Invalid account: #0 for network: cc3_usc_testnet - private key too short, expected 32 bytes
+> ```
+> That means you forgot to set your `.env`!
+
 Finally, deploy your contracts using the following command:
 
 ```bash
