@@ -234,7 +234,7 @@ bridging] tutorial.
 [chrome]: https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?utm_source=www.google.com
 [firefox]: https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/
 [🚰 testnet faucet]: https://cloud.google.com/application/web3/faucet/ethereum/sepolia
-[🚰 creditcoin discord faucet]: https://discord.com/channels/762302877518528522/1407843256636539000
+[🚰 creditcoin discord faucet]: https://discord.com/channels/762302877518528522/1414985542235459707
 [Infura]: https://developer.metamask.io/register
 [already deployed]: https://sepolia.etherscan.io/address/0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8
 [bridge contract]: https://explorer.ccnext-testnet.creditcoin.network/address/0x441726D6821B2009147F0FA96E1Ee09D412cCb38
