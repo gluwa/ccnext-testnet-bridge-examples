@@ -48,7 +48,12 @@ Now that we're done funding an account on Sepolia, we also need to fund an accou
 
 Otherwise our oracle query submission will fail due to lack of funds on our sending account on Testnet.
 
-TODO: Add faucet step here once faucet exists. Then replace any mention of testing key 0x45fbbc5105365822a75e09844a560445cbccf172da3087a94b5812e1871ef591
+The Discord faucet for Creditcoin USC Testnet can be found here: https://discord.com/channels/762302877518528522/1407843256636539000?utm_source=chatgpt.com
+
+To use the faucet, simply submit a command like the following. But substitute in your own Creditcoin USC Testnet address.
+```
+/faucet address: 0xd7a32168b0008d682676c84850b27919eb03d9bc
+```
 
 ## 3. Obtain Infura API Key
 The easiest way to submit transactions to Sepolia is to use Infura with your own api key.
