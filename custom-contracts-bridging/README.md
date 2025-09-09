@@ -88,7 +88,7 @@ Start by cloning the `CCNext-smart-contracts` repository:
 ```sh
 git clone git@github.com:gluwa/CCNext-smart-contracts.git
 cd CCNext-smart-contracts
-git checkout beb448380c509c7833a23095e5efb91bb97f6d5e
+git checkout bed5a89262783c036d853fcb88c4a6b1b93ea258
 ```
 
 ### 3.1 Modify The Bridge Smart Contract
