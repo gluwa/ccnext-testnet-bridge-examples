@@ -52,7 +52,7 @@ locally:
 Once you have all your dependencies setup, you will need to download some packages with `yarn`:
 
 ```sh
-cd hello-bridge
+cd bridge-offchain-worker
 foundryup --version v1.2.3 # Skip this command if you are using nix!
 yarn
 ```
@@ -133,9 +133,14 @@ MAX_BLOCK_RANGE=2000
 
 ## 2. Start the Offchain Worker
 
-Once you have your worker configured, it's time to start automating some queries! Run the following
-command to start the worker:
+Once you have your worker configured, it's time to start automating some queries! 
 
+First make sure you're in the right directory:
+```sh
+cd bridge-offchain-worker
+```
+
+Run the following command to start the worker:
 ```sh
 yarn start_worker
 ```

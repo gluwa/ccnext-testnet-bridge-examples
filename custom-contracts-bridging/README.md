@@ -164,10 +164,11 @@ UniversalBridgeProxy deployed to: 0x4858Db7F085418301A010c880B98374d83533fa2
 ```
 
 Save the address of each contract. You will be needing them in [step 6]. Remember to exit the
-`CCNext-smart-contracts` repository:
+`CCNext-smart-contracts` repository and return to the bridge examples repository:
 
 ```bash
 cd ..
+cd ccnext-testnet-bridge-examples/custom-contracts-bridging
 ```
 
 ## 4. Burning the tokens you want to bridge
