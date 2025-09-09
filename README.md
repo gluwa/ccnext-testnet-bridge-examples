@@ -44,6 +44,6 @@ shows you how offchain workers can be used to simply the user flow of your cross
 [Hello Bridge]: ./hello-bridge/README.md
 [Custom Contracts Bridging]: ./custom-contracts-bridging/README.md
 [Bridge Offchain Worker]: ./bridge-offchain-worker/README.md
-[USC Architecture Overview]: https://app.gitbook.com/o/-LjFKFsSaSJudznvwK-5/s/Vp3bVdljVxZuwysnIzZ1/overview/usc-architecture-overview
-[DApp Builder Infrastructure]: https://app.gitbook.com/o/-LjFKFsSaSJudznvwK-5/s/Vp3bVdljVxZuwysnIzZ1/dapp-builder-infrastructure/
-[Creditcoin Oracle Subsystem]: https://app.gitbook.com/o/-LjFKFsSaSJudznvwK-5/s/Vp3bVdljVxZuwysnIzZ1/creditcoin-oracle-subsystems
+[USC Architecture Overview]: https://docs.creditcoin.org/usc/overview/usc-architecture-overview
+[DApp Builder Infrastructure]: https://docs.creditcoin.org/usc/dapp-builder-infrastructure/
+[Creditcoin Oracle Subsystem]: https://docs.creditcoin.org/usc/creditcoin-oracle-subsystems/

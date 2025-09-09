@@ -21,7 +21,7 @@ const QUERY_ID = process.argv[5];
 const ERC20_ADDRESS = process.argv[6];
 
 // === RPC and signer setup ===
-const RPC_URL = 'https://rpc.ccnext-testnet.creditcoin.network';
+const RPC_URL = 'https://rpc.usc-testnet.creditcoin.network';
 
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 const signer = new ethers.Wallet(PRIVATE_KEY, provider);

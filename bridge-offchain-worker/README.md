@@ -96,7 +96,7 @@ SOURCE_CHAIN_RPC_URL=https://sepolia.infura.io/v3/your_infura_api_key
 USC_TESTNET_BLOCK_LAG=3
 
 # RPC endpoint for the Creditcoin USC chain
-USC_TESTNET_RPC_URL=https://rpc.ccnext-testnet.creditcoin.network
+USC_TESTNET_RPC_URL=https://rpc.usc-testnet.creditcoin.network
 
 # Address of the mintable ERC20 token on Creditcoin USC chain
 USC_TESTNET_ERC20_MINTABLE_ADDRESS=0xb0fb0b182f774266b1c7183535A41D69255937a3

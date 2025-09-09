@@ -16,7 +16,7 @@ const CONTRACT_ADDRESS = process.argv[2];
 const TARGET_ADDRESS = process.argv[3];
 
 // === RPC URL Setup ===
-const RPC_URL = 'https://rpc.ccnext-testnet.creditcoin.network';
+const RPC_URL = 'https://rpc.usc-testnet.creditcoin.network';
 
 // === ERC20 ABI ===
 const ERC20_ABI = [

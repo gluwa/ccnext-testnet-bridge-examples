@@ -57,7 +57,7 @@ async function main() {
     nativeCurrency: { name: 'Creditcoin', symbol: 'CTC', decimals: 18 },
     rpcUrls: {
       default: {
-        http: ['https://rpc.ccnext-testnet.creditcoin.network'],
+        http: ['https://rpc.usc-testnet.creditcoin.network'],
       },
     },
     testnet: true,
