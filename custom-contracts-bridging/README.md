@@ -1,140 +1,280 @@
-## 0. Setup
-Install Foundry: See https://book.getfoundry.sh/getting-started/installation 
+# Custom Contract Bridging
 
-Get dependencies and build
+> [!TIP]
+> This tutorial builds on the previous [Hello Bridge] example -make sure to check it out before
+> moving on!
+
+Now that you have performed your first _trustless bridge transaction_, let's keep going with the next 
+step: this tutorial teaches you how to set up your own custom bridging logic by deploying your own
+smart contracts!
+
+## External dependencies
+
+To continue with this tutorial, you will first need to have the following dependencies available
+locally:
+
+- [yarn]
+- [foundry]
+
+> [!TIP]
+> This project provides a `flake.nix` you can use to download all the dependencies you will need for
+> this tutorial inside of a sandboxed environment. Just keep in mind you will have to
+> **[enable flakes]** for this to work. To start you development environment, simply run:
+>
+> ```bash
+> nix develop
+> ```
+
+Once you have all your dependencies setup, you will need to download some packages with `yarn`:
+
 ```sh
-cd custom-contracts-bridging
+cd hello-bridge
+foundryup --version v1.2.3 # Skip this command if you are using nix!
 yarn
-foundryup --version v1.2.3
-forge build
 ```
 
-## 1. Create Funded Sepolia Account
-Skip this step if you already completed the `hello-bridge` tutorial.
+## 1. Setup
 
-Otherwise, you can find directions in steps 1.1, 1.2, and 1.3 [here](../hello-bridge/README.md)
+This is the same as in [Hello Bridge]. If you have not already done so, follow the installation
+steps in the [setup] section there.
 
-## 2. Create Funded Creditcoin USC Testnet Account
-Skip this step if you already completed the `hello-bridge` tutorial.
+## 2. Deploy A Test `ERC20` Contract on Sepolia
 
-Otherwise, see step 2 [here](../hello-bridge/README.md)
+Let's start by deploying our own `ERC20` contract on Sepolia. The contract contains logic for
+tracking the balance of a coin called `TEST`. The contract also automatically funds its creator's
+address with 1000 `TEST` coins, so we won't have to mint `TEST` tokens manually.
 
-## 3. Obtain Infura API Key
-Skip this step if you already completed the `hello-bridge` tutorial.
-
-Otherwise, see step 3 [here](../hello-bridge/README.md)
-
-## 4. Deploy TestERC20 Smart Contract on Sepolia
-We want to deploy a TestERC20 smart contract on Sepolia. The contract contains logic for tracking balances of a coin called TEST. The contract also automatically funds its creator's address with 1000 TEST coins. It is these coins which we will burn and then mint on Creditcoin USC Testnet.
-
-Run the following to deploy your contract:
+Run the following command to deploy the contract:
 
 ```sh
-forge create --broadcast --rpc-url https://sepolia.infura.io/v3/<Your infura API Key> --private-key <key you funded with Sepolia ETH> TestERC20
+forge create                                                     \
+    --broadcast                                                  \
+    --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
+    --private-key <Your private key>                           \
+    TestERC20
 ```
 
-Upon successful contract creation, the resulting logs will contain your TestERC20 contract address. We will need this in the next step.
-EX: "Deployed to: 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
+This should display some output containing the address of your test `ERC20` contract:
 
-## 5. Clone the CCNext-smart-contracts Repository
-This repository contains templates for two smart contracts we need to launch for this example.
+```bash
+Deployed to: 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
+```
 
-1. UniversalBridgeProxy.sol
-2. ERC20Mintable.sol
+Save the contract address. You will be needing it in the next step.
 
-Oracle proxy contract instances are intended to be deployed by teams of DApp builders. Our particular oracle proxy contract is used only for bridging tokens, so we call it `UniversalBridgeProxy`. Each oracle proxy contract interprets oracle data provisioning outputs relevant to the DApp it serves. 
+## 3. Deploy Your Own Custom Bridging Contracts
 
-For instance, a `UniversalBridgeProxy` enabling token minting would look for fields like `from`, `to`, and `amount` in oracle outputs. With those fields the contract can determine whether a token burn took place, how many tokens to mint, and which address to mint them in.
+In the next few steps we will be deploying our own bridging contracts based off the
+`CCNext-smart-contracts` repository. This repository contains templates for the two smart contracts
+we will be using:
 
-The ERC20Mintable contract is just a place to mint our newly bridged tokens in. The ERC20Mintable contract is modified so that its _mint() function can be called by the UniversalBridgeProxy contract.
+- `UniversalBridgeProxy.sol`
+- `ERC20Mintable.sol`
+
+Proxy contracts such as `UniversalBridgeProxy` are intended to be deployed by DApp builders. Here,
+our proxy contract is used only for bridging tokens. A proxy contract interprets the oracle proof
+data which is send to it, and serves out relevant output for a DApp to process.
+
+For instance, our `UniversalBridgeProxy` looks for fields like `from`, `to`, and `amount` in the
+oracle proof we submit to it. With those fields, the contract can verify whether or not a token
+burn took place, how many tokens it needs to mint on Creditcoin, and which address it should mint
+them to.
+
+Our other contract, `ERC20Mintable`, is only used to mint our newly bridged tokens. It is modified
+so that its `_mint()` function can be called by the our `UniversalBridgeProxy` contract.
+
+Start by cloning the `CCNext-smart-contracts` repository:
 
 ```sh
-cd ../..
 git clone git@github.com:gluwa/CCNext-smart-contracts.git
+cd CCNext-smart-contracts
+git checkout beb448380c509c7833a23095e5efb91bb97f6d5e
 ```
 
-## 6. Modify Your Own Bridge Smart Contract Instance
-Imagine for example that we want to mint 2 TEST tokens on Creditcoin USC Testnet for every TEST token burned on Sepolia. Then we need to modify our bridge proxy contract to multiply the burned amount by 2 before minting.
+### 3.1 Modify The Bridge Smart Contract
 
-In your freshly cloned `CCNext-smart-contracts` repository, open the file `eth/contracts/UniversalBridgeProxy.sol`
+As an exercise, we will be modifying our `UniversalBridgeProxy` so that it mints _twice_ the amount
+of tokens which were burned on our _source chain_.
 
-Within the function `uscBridgeCompleteMint` find the line where we call `_mintTokens`. Then modify `amount` to `amount * 2`.
+> [!NOTE]
+> This is a bad idea in practice, as we are just diluting the value of our `TEST` token each
+> time we bridge it.
 
-The resulting line should look like:
+In your freshly cloned `CCNext-smart-contracts` repository, start by opening the file
+`contracts/UniversalBridgeProxy.sol`. Next, navigate to line `230` inside of the
+`uscBridgeCompleteMint` function. Update it so that your `UniversalBridgeProxy` contract mints twice
+the `amount` of tokens it should on Creditcoin. The resulting line should look something like:
+
 ```sol
 _mintTokens(ERC20Address, fromAddress, amount * 2, queryId);
 ```
 
-## 7. Deploy Your Bridge and ERC20Mintable Contracts
-See the section `Deploying UniversalBridgeProxy and ERC20Mintable Contracts on Creditcoin USC Testnet` [here](https://github.com/gluwa/CCNext-smart-contracts/blob/main/README.md)
+### 3.2 Deploy Your Modified Contracts
 
-When you deploy your contracts retain the contract addresses from this log output:
-```sh
+To deploy your modified bridging contracts, start by creating a `.env` file at the top-level of the
+`CCNext-smart-contracts` repository and add the following contents inside of it:
+
+```env
+OWNER_PRIVATE_KEY=<Your private key>
+```
+
+Next, compile your bridging smart contracts:
+
+```bash
+npm install && npx hardhat compile
+```
+
+Finally, deploy your contracts using the following command:
+
+```bash
+npx hardhat deploy                      \
+    --network ccnext_testnet            \
+    --proceedsaccount <Your public key> \
+    --erc20name Test                    \
+    --erc20symbol TEST                  \
+    --chainkey 102033                   \
+    --timeout 300                       \
+    --lockupduration 86400              \
+    --approvalthreshold 2               \
+    --maxinstantmint 100                \
+    --admin <Your public key>
+```
+
+> [!TIP]
+> This can take a bit of time ☕
+
+You should get some output with the address of the contracts you just deployed:
+
+```bash
+ERC20 deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
 UniversalBridgeProxy deployed to: 0x4858Db7F085418301A010c880B98374d83533fa2
-ERC20Mintable deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
 ```
 
-## 8. Burn Funds on Sepolia Contract
-The first step of bridging tokens is to burn those tokens on the sending chain (Sepolia). For this example we burn TEST tokens in the `TestERC20` contract we created in step 4.
+Save the address of each contract. You will be needing them in [step 6]. Remember to exit the
+`CCNext-smart-contracts` repository:
 
-We burn funds by transferring them to an address for which the private key is unknown. Thereby the funds become inaccessable.
-
-EX:
-```sh
-cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API Key> <Contract address from step 4> "burn(uint256)" "50" --private-key <key you funded with Sepolia ETH>
+```bash
+cd ..
 ```
 
-Save the transaction hash of your token burn transaction for later use
+## 4. Burning the tokens you want to bridge
 
-EX:
+The following few steps are similar to what we did in the [Hello Bridge] example. Start by burning
+the tokens you want to bridge on the _source chain_ (Sepolia in this case). We will be burning the
+`TEST` tokens from the test `ERC20` contract which we deployed in [step 2]. We do this by
+transferring them to an address for which the private key is unknown, making them inaccessible.
+
+Run the following command to initiate the burn:
+
+```bash
+cast send                                                        \
+    --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
+    <Test ERC20 contract address from step 2>                    \
+    "burn(uint256)" "50"                                         \
+    --private-key <Your private key>
+```
+
+This should display some output stating that your transaction was a success, along with a
+transaction hash:
+
+```bash
 transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
-
-## 9. Submit Oracle Query to Creditcoin Prover
-Now that we've burnt funds on Sepolia, we need to make proof of that token burn available on the Creditcoin USC Testnet. We do so by creating an "oracle query".
-
-```sh
-yarn submit_query \
-https://sepolia.infura.io/v3/<Your Infura API Key> \
-<Transaction hash from step 8> \
-<Private key of address from step 2>
 ```
 
-Proving should take ~16 minutes and no more than 30 minutes.
+Save the transaction hash. You will be needing it in the next step.
 
-Once the proving process completes, save the QueryId printed for later:
+## 5. Get a proof of the token burn from the Creditcoin Oracle
 
-EX:
+Now that we've burnt funds on Sepolia, we need to create a proof of that token burn using the
+Creditcoin Decentralized Oracle. We do this by submitting an _oracle query_. Run the following
+command:
+
+```sh
+yarn submit_query                                      \
+    https://sepolia.infura.io/v3/<Your infura API key> \
+    <Transaction hash from step 4>                     \
+    0x<Your private key>
+```
+
+> [!TIP]
+> This will take a while. Sit back, relax, and wait for the query to process ☕ Proving should take
+> ~16 minutes and no more than 30 minutes.
+
+Once the proving process completes, you should see some output stating that your query was proven
+successfully, along with a query id:
+
+```bash
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
-
-## 10. Use Bridged Data to Mint Tokens on Creditcoin USC Testnet
-We need to call `uscBridgeCompleteMint` in the bridge proxy contract we deployed to USC Testnet in step 7.
-
-We also supply the address of the mintable contract we deployed in step 7. This is the contract in which our bridged tokens will be minted.
-
-Finally, we provide the QueryId we saved in step 9.
-
-```sh
-yarn complete_mint \
-<private_key_of_address_from_step_2> \
-<bridge_contract_address> \
-0xc43402c66e88f38a5aa6e35113b310e1c19571d4 \
-<query_id> \
-<mintable_contract_address>
 ```
 
-## 11. Check Balance in USC Testnet ERC20 Contract
-As a final check, we take a look at the balance in our account within the ERC20Mintable contract where we minted our tokens.
+Save the query id. You will be needing it in the next step.
+
+## 6. Mint Tokens on Creditcoin
+
+Now that we have a proof of the token burn on our _source chain_, we can finalize the bridging
+process by minting the same amount of tokens on the Creditcoin testnet. To do that, we need to call
+your `UniversalBridgeProxy` contract on Creditcoin. This will _trustlessly_ very the proof from
+[step 5].
+
+Run the following command to query the proxy contract:
 
 ```sh
-yarn check_balance <mintable_contract_address> <Your account address from Sepolia>
+yarn complete_mint                               \
+    <Your private key>                           \
+    <UniversalBridgeProxy address from step 3.2> \
+    0xc43402c66e88f38a5aa6e35113b310e1c19571d4   \
+    <Query Id from step 5>                       \
+    <ERC20Mintable address from step 3.2>
 ```
 
-You should see a result like:
-📦 Token: Mintable (MNT)
+Congratulations, you've just set up and used your very own _trustless bridge_!
+
+## 7. Check Balance in USC Testnet ERC20 Contract
+
+As a final check, we can take a look at the balance of your account on Creditcoin to confirm that
+the bridging process was successful. This will use the `ERC20Mintable` contract which you deployed
+in [step 3.2].
+
+Run the following command to query the contract:
+
+```sh
+yarn check_balance                        \
+    <ERC20Mintable address from step 3.2> \
+    <You Sepolia wallet address>
+```
+
+You should get some output showing your wallet's balance on Creditcoin:
+
+```bash
+📦 Token: Mintable (TEST)
 🧾 Raw Balance: 100
-💰 Formatted Balance: 0.0000000000000001 MNT
+💰 Formatted Balance: 0.0000000000000001 TEST
+```
+
+Notice how you now have _twice_ the amount of tokens you originally minted on Sepolia!
 
 # Conclusion
-Congratulations! You've launched your first custom smart contracts making use of the Creditcoin Decentralized Oracle!
 
-The next tutorial will add a `Bridge Offchain Worker` which automates two key oracle use steps we've been triggering manually thus far. In practice, DApp builders will want to conduct all oracle use via an offchain worker in order to ensure security and reduce hassle for end users. Take a look at the `bridge-offchain-worker` tutorial to learn more.
+Congratulations! You've set up your first custom smart contracts which make use of the Creditcoin
+Decentralized Oracle!
+
+The next tutorial will bring this one step further by automating a lot of the work we have had to do
+manually so far. We will do this by using an **offchain worker** which will handle the proof query
+submission as well as sending the result of that query to our bridging proxy contract on Creditcoin.
+This _vastly_ improves UX by making it so the end user only has to sign a _single_ transaction to
+initiate the bridging procedure.
+
+In practice, DApp builders will want to conduct all cross-chain queries via an offchain worker in
+order to ensure robustness and streamline UX. Checkout the [bridge offchain worker] tutorial next
+for more information on this!
+
+[Hello Bridge]: ../hello-bridge/README.md
+[setup]: ../hello-bridge/README.md#1-setup
+[yarn]: https://yarnpkg.com/getting-started/install
+[foundry]: https://getfoundry.sh/
+[enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
+[step 2]: #2-deploy-a-test-erc20-contract-on-sepolia
+[step 3.2]: #32-deploy-your-modified-contracts
+[step 5]: #5-get-a-proof-of-the-token-burn-from-the-creditcoin-oracle
+[step 6]: #6-mint-tokens-on-creditcoin
+[bridge offchain worker]: ../bridge-offchain-worker/README.md

@@ -1,20 +1,49 @@
-# ccnext-testnet-bridge-example
-This repository helps potential users and builders to explore the new Creditcoin cross-chain feature set code named `CCNext`. It facilitates three examples that make use of the `Creditcoin Decentralized Oracle` and `Universal Smart Contracts`. All of these tutorials make use of one of the simplest uses for an oracle, token bridging!
+# 🌉 USC Testnet Bridge Example 🌉
 
-As companion content for these tutorials consider reading the `User Infrastructure` section here:
-https://app.gitbook.com/o/-LjFKFsSaSJudznvwK-5/s/Vp3bVdljVxZuwysnIzZ1/oracle-user-infrastructure/user-infrastructure-overview 
-It will give you an overview of the various components that a team using the Creditcoin Oracle will need to set up
+This repository is designed as a starting point for users and builders alike to explore the new
+Creditcoin cross-chain features brought forwards in the new `USC Testnet` update. Learn how to use
+the Creditcoin Decentralized Oracle through a series of guided tutorials where you get to set up and
+interact with your own decentralized bridge!
 
-Tutorial 1, `hello-bridge`, is an example which demonstrates oracle usage from the perspective of an end user. Hello bridge makes use of pre-existing smart contracts on Sepolia and on the Creditcoin USC Testnet so that the user only needs to worry about triggering steps of the oracle data provisioning process.
+## Tutorials
 
-Tutorial 2, `custom-contracts-bridging`. This is a more involved process which simulates the most basic builder experience. First we launch the contracts for our own dApp, then we trigger bridging that makes use of our new contracts.
+Each tutorial is built to be as self-contained as possible. However, we still recommend you go
+through them in the following order:
 
-Tutorial 3, `bridge-offchain-worker`. This tutorial adds a new piece of server infrastructure which improves security in the oracle data provisioning process and reduces hassle to end users. Namely, the `Bridge Offchain Worker`. This worker automates two key oracle use steps we've been triggering manually thus far. In practice, DApp builders will want to conduct all oracle use via an offchain worker in order to ensure security and reduce hassle for end users.
+1. 📚 [Hello Bridge]
+2. 📚 [Custom Contracts Bridging]
+3. 📚 [Bridge Offchain Worker]
 
-# Usage
-It is highly recommended that you complete these tutorials in order:
-1. `hello-bridge`
-2. `custom-contracts-bridging`
-3. `bridge-offchain-worker`
+## Content
 
-To start, just navigate to each tutorial's corresponding readme. (EX: `hello-bridge/README.md`)
+Below is brief overview of each tutorial's content.
+
+### Hello Bridge
+
+Learn how to use the Creditcoin Decentralized Oracle from the perspective of an end user. [Hello
+Bridge] makes use of pre-existing smart contracts on the Sepolia and Creditcoin Testnet so as to
+minimize the amount of setup needed.
+
+### Custom Contracts Bridging
+
+Learn how to setup your own trustless cross-chain bridging logic by deploying your own contracts.
+[Custom Contracts Bridging] teaches you the perspective of a DApp builder by showing you how to set
+up custom logic across each chain you are deploying to.
+
+### Bridge Offchain Worker
+
+Streamline UX by automating away most transactions in the bridging process. [Bridge Offchain Worker]
+shows you how offchain workers can be used to simply the user flow of your cross-chain DApp.
+
+## External Resources
+
+- 📚 [USC Architecture Overview]
+- 📚 [DApp Builder Infrastructure]
+- 📚 [Creditcoin Oracle Subsystem]
+
+[Hello Bridge]: ./hello-bridge/README.md
+[Custom Contracts Bridging]: ./custom-contracts-bridging/README.md
+[Bridge Offchain Worker]: ./bridge-offchain-worker/README.md
+[USC Architecture Overview]: https://docs.creditcoin.org/usc/overview/usc-architecture-overview
+[DApp Builder Infrastructure]: https://docs.creditcoin.org/usc/dapp-builder-infrastructure/
+[Creditcoin Oracle Subsystem]: https://docs.creditcoin.org/usc/creditcoin-oracle-subsystems/

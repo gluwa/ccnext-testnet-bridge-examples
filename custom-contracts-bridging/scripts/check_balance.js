@@ -1,4 +1,4 @@
-const { ethers } = require("ethers");
+const { ethers } = require('ethers');
 
 // === Check for arguments ===
 if (process.argv.length !== 4) {
@@ -16,14 +16,14 @@ const CONTRACT_ADDRESS = process.argv[2];
 const TARGET_ADDRESS = process.argv[3];
 
 // === RPC URL Setup ===
-const RPC_URL = "https://rpc.ccnext-testnet.creditcoin.network";
+const RPC_URL = 'https://rpc.usc-testnet.creditcoin.network';
 
 // === ERC20 ABI ===
 const ERC20_ABI = [
-  "function balanceOf(address account) view returns (uint256)",
-  "function decimals() view returns (uint8)",
-  "function name() view returns (string)",
-  "function symbol() view returns (string)",
+  'function balanceOf(address account) view returns (uint256)',
+  'function decimals() view returns (uint8)',
+  'function name() view returns (string)',
+  'function symbol() view returns (string)',
 ];
 
 async function checkBalance() {
@@ -34,8 +34,8 @@ async function checkBalance() {
     const [rawBalance, decimals, name, symbol] = await Promise.all([
       contract.balanceOf(TARGET_ADDRESS),
       contract.decimals(),
-      contract.name().catch(() => "Unknown"),
-      contract.symbol().catch(() => "UNKNOWN")
+      contract.name().catch(() => 'Unknown'),
+      contract.symbol().catch(() => 'UNKNOWN'),
     ]);
 
     const humanReadable = ethers.formatUnits(rawBalance, decimals);
@@ -45,7 +45,7 @@ async function checkBalance() {
     console.log(`💰 Formatted Balance: ${humanReadable} ${symbol}`);
     console.log(`Decimals for token micro unit: ${decimals}`);
   } catch (err) {
-    console.error("❌ Failed to fetch balance:", err);
+    console.error('❌ Failed to fetch balance:', err);
   }
 }
 
