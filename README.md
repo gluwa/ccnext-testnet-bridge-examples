@@ -33,7 +33,7 @@ up custom logic across each chain you are deploying to.
 ### Bridge Offchain Worker
 
 Streamline UX by automating away most transactions in the bridging process. [Bridge Offchain Worker]
-shows you how offchain workers can be used to simply the user flow of your cross-chain DApp.
+shows you how offchain workers can be used to simplify the user flow of your cross-chain DApp.
 
 ## External Resources
 
