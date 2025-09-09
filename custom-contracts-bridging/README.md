@@ -28,7 +28,7 @@ locally:
 Once you have all your dependencies setup, you will need to download some packages with `yarn`:
 
 ```sh
-cd hello-bridge
+cd custom-contracts-bridging
 foundryup --version v1.2.3 # Skip this command if you are using nix!
 yarn
 ```
@@ -86,7 +86,7 @@ so that its `_mint()` function can be called by the our `UniversalBridgeProxy` c
 Start by cloning the `CCNext-smart-contracts` repository:
 
 ```sh
-git clone git@github.com:gluwa/CCNext-smart-contracts.git
+git clone https://github.com/gluwa/CCNext-smart-contracts.git
 cd CCNext-smart-contracts
 git checkout bed5a89262783c036d853fcb88c4a6b1b93ea258
 ```
@@ -101,8 +101,14 @@ of tokens which were burned on our _source chain_.
 > time we bridge it.
 
 In your freshly cloned `CCNext-smart-contracts` repository, start by opening the file
-`contracts/UniversalBridgeProxy.sol`. Next, navigate to line `230` inside of the
-`uscBridgeCompleteMint` function. Update it so that your `UniversalBridgeProxy` contract mints twice
+`contracts/UniversalBridgeProxy.sol`. Next, navigate to the following line inside of the
+`uscBridgeCompleteMint` function:
+
+```rs
+_mintTokens(ERC20Address, fromAddress, amount, queryId);
+```
+
+Update it so that your `UniversalBridgeProxy` contract mints twice
 the `amount` of tokens it should on Creditcoin. The resulting line should look something like:
 
 ```sol
