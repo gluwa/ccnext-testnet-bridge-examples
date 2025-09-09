@@ -144,19 +144,20 @@ const main = async () => {
   const sourceChainStartBlock = Number(
     process.env.SOURCE_CHAIN_INITIAL_START_BLOCK
   );
-  const ccNextStartBlock = Number(process.env.CC_NEXT_INITIAL_START_BLOCK);
+  const ccNextStartBlock = Number(process.env.USC_TESTNET_INITIAL_START_BLOCK);
   const sourceChainBlockLag = BigInt(
     process.env.SOURCE_CHAIN_BLOCK_LAG || '12'
   );
-  const ccNextBlockLag = BigInt(process.env.CC_NEXT_BLOCK_LAG || '12');
+  const ccNextBlockLag = BigInt(process.env.USC_TESTNET_BLOCK_LAG || '12');
   const maxBlockRange = BigInt(process.env.MAX_BLOCK_RANGE || '2000');
   const sourceChainContractAddress = process.env.SOURCE_CHAIN_CONTRACT_ADDRESS;
   const proverContractAddress = process.env.PROVER_CONTRACT_ADDRESS;
   const uscBridgeContractAddress = process.env.USC_BRIDGE_CONTRACT_ADDRESS;
   const sourceChainRpcUrl = process.env.SOURCE_CHAIN_RPC_URL;
-  const ccNextRpcUrl = process.env.CC_NEXT_RPC_URL;
-  const ccNextWalletPrivateKey = process.env.CC_NEXT_WALLET_PRIVATE_KEY;
-  const ccNextErc20MintableAddress = process.env.CC_NEXT_ERC20_MINTABLE_ADDRESS;
+  const ccNextRpcUrl = process.env.USC_TESTNET_RPC_URL;
+  const ccNextWalletPrivateKey = process.env.USC_TESTNET_WALLET_PRIVATE_KEY;
+  const ccNextErc20MintableAddress =
+    process.env.USC_TESTNET_ERC20_MINTABLE_ADDRESS;
 
   if (!sourceChainContractAddress) {
     throw new Error(
@@ -184,19 +185,19 @@ const main = async () => {
 
   if (!ccNextRpcUrl) {
     throw new Error(
-      'CC_NEXT_RPC_URL environment variable is not configured or invalid'
+      'USC_TESTNET_RPC_URL environment variable is not configured or invalid'
     );
   }
 
   if (!ccNextWalletPrivateKey) {
     throw new Error(
-      'CC_NEXT_WALLET_PRIVATE_KEY environment variable is not configured or invalid'
+      'USC_TESTNET_WALLET_PRIVATE_KEY environment variable is not configured or invalid'
     );
   }
 
   if (!ccNextErc20MintableAddress) {
     throw new Error(
-      'CC_NEXT_ERC20_MINTABLE_ADDRESS environment variable is not configured or invalid'
+      'USC_TESTNET_ERC20_MINTABLE_ADDRESS environment variable is not configured or invalid'
     );
   }
 

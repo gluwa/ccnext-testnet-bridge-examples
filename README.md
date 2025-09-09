@@ -1,8 +1,8 @@
-# 🌉 CCNext Testnet Bridge Example 🌉
+# 🌉 USC Testnet Bridge Example 🌉
 
 This repository is designed as a starting point for users and builders alike to explore the new
-Creditcoin cross-chain features brought forwards in the new `CCNext` update. Learn how to use the
-Creditcoin Decentralized Oracle through a series of guided tutorials where you get to set up and
+Creditcoin cross-chain features brought forwards in the new `USC Testnet` update. Learn how to use
+the Creditcoin Decentralized Oracle through a series of guided tutorials where you get to set up and
 interact with your own decentralized bridge!
 
 ## Tutorials

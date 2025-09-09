@@ -89,20 +89,20 @@ SOURCE_CHAIN_RPC_URL=https://sepolia.infura.io/v3/your_infura_api_key
 # ============================================================================ #
 
 # The starting block number to begin listening for prover events. If not
-# provided, the worker will get the latest CC Next block number
-#CC_NEXT_INITIAL_START_BLOCK=<block_number>
+# provided, the worker will get the latest USC Testnet block number
+#USC_TESTNET_INITIAL_START_BLOCK=<block_number>
 
 # Number of blocks to wait before processing
-CC_NEXT_BLOCK_LAG=3
+USC_TESTNET_BLOCK_LAG=3
 
 # RPC endpoint for the Creditcoin USC chain
-CC_NEXT_RPC_URL=https://rpc.ccnext-testnet.creditcoin.network
+USC_TESTNET_RPC_URL=https://rpc.ccnext-testnet.creditcoin.network
 
 # Address of the mintable ERC20 token on Creditcoin USC chain
-CC_NEXT_ERC20_MINTABLE_ADDRESS=0xb0fb0b182f774266b1c7183535A41D69255937a3
+USC_TESTNET_ERC20_MINTABLE_ADDRESS=0xb0fb0b182f774266b1c7183535A41D69255937a3
 
 # Private key of the wallet that will submit mint requests
-CC_NEXT_WALLET_PRIVATE_KEY=0x_your_private_key
+USC_TESTNET_WALLET_PRIVATE_KEY=0x_your_private_key
 
 # ============================================================================ #
 #                              Contract Addresses                              #
@@ -123,8 +123,8 @@ MAX_BLOCK_RANGE=2000
 ```
 
 > [!CAUTION]
-> If you configure `SOURCE_CHAIN_INITIAL_START_BLOCK` and `CC_NEXT_INITIAL_START_BLOCK` to point to
-> blocks in the past, chances are you're going to re-query transactions and events that have
+> If you configure `SOURCE_CHAIN_INITIAL_START_BLOCK` and `USC_TESTNET_INITIAL_START_BLOCK` to point
+> to blocks in the past, chances are you're going to re-query transactions and events that have
 > already been processed. The issue with the example worker we are using is that it will always
 > build and submit queries as if this was the first time they are being submitted. **This will fail
 > on the prover** since it doesn't allow query resubmissions. **The bridge proxy contract acts
