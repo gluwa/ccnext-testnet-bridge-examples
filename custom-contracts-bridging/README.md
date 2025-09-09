@@ -4,8 +4,8 @@
 > This tutorial builds on the previous [Hello Bridge] example -make sure to check it out before
 > moving on!
 
-Now that you have performed your first _trustless bridge transaction_, its time to get your hands
-dirty: this tutorial teaches you how to set up your own custom bridging logic by deploying your own
+Now that you have performed your first _trustless bridge transaction_, let's keep going with the next 
+step: this tutorial teaches you how to set up your own custom bridging logic by deploying your own
 smart contracts!
 
 ## External dependencies
@@ -97,7 +97,7 @@ As an exercise, we will be modifying our `UniversalBridgeProxy` so that it mints
 of tokens which were burned on our _source chain_.
 
 > [!NOTE]
-> This is a terrible idea in practice, as we are just diluting the value of our `TEST` token each
+> This is a bad idea in practice, as we are just diluting the value of our `TEST` token each
 > time we bridge it.
 
 In your freshly cloned `CCNext-smart-contracts` repository, start by opening the file
