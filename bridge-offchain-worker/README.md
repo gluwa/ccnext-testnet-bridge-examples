@@ -133,21 +133,23 @@ MAX_BLOCK_RANGE=2000
 
 ## 2. Start the Offchain Worker
 
-Once you have your worker configured, it's time to start automating some queries! 
+Once you have your worker configured, it's time to start automating some queries!
 
 First make sure you're in the right directory:
+
 ```sh
 cd bridge-offchain-worker
 ```
 
 Run the following command to start the worker:
+
 ```sh
 yarn start_worker
 ```
 
 Once it's up and running, you start to see the following logs:
 
-```
+```bash
 Starting...
 Worker job run 1
 Source chain listener is listening from block 8827111 to 8827396

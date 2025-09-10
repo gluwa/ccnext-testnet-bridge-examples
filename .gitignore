@@ -21,3 +21,4 @@
 **/*trace.json
 **/*memory.json
 common/eth/.openzeppelin/unknown-*.json
+megalinter-reports/
