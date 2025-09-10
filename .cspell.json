@@ -11,6 +11,6 @@
   ],
   "language": "en",
   "noConfigSearch": true,
-  "words": ["megalinter", "oxsecurity"],
-  "version": "0.2"
-}
+  "words": [
+    "megalinter",
+    "oxsecurity"
