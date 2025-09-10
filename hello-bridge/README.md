@@ -268,8 +268,8 @@ bridging] tutorial.
 <!-- markdown-link-check-enable -->
 
 [already deployed]: https://sepolia.etherscan.io/address/0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8
-[bridge contract]: https://explorer.ccnext-testnet.creditcoin.network/address/0x441726D6821B2009147F0FA96E1Ee09D412cCb38
-[ERC20 contract]: https://explorer.ccnext-testnet.creditcoin.network/token/0xb0fb0b182f774266b1c7183535A41D69255937a3
+[bridge contract]: https://explorer.usc-testnet.creditcoin.network/address/0x441726D6821B2009147F0FA96E1Ee09D412cCb38
+[ERC20 contract]: https://explorer.usc-testnet.creditcoin.network/token/0xb0fb0b182f774266b1c7183535A41D69255937a3
 [custom contract bridging]: ../custom-contracts-bridging/README.md
 [step 2]: #2-minting-some-tokens-on-sepolia
 [step 4]: #4-get-a-proof-of-the-token-burn-from-the-creditcoin-oracle
