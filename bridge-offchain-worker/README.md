@@ -65,7 +65,7 @@ steps in the [setup] section there.
 Once that is done, you will need to set up some additional configuration for the offchain worker.
 Save and edit the following to a `.env` file inside of `bridge-offchain-worker/`:
 
-```bash
+```env
 # ============================================================================ #
 #                          Source Chain Configuration                          #
 # ============================================================================ #
@@ -78,7 +78,7 @@ Save and edit the following to a `.env` file inside of `bridge-offchain-worker/`
 SOURCE_CHAIN_BLOCK_LAG=3
 
 # Address of the ERC20 token contract on source chain
-SOURCE_CHAIN_CONTRACT_ADDRESS=<Addr of source chain contract you deployed in custom-contracts-bridging tutorial>
+SOURCE_CHAIN_CONTRACT_ADDRESS=0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8
 
 # RPC endpoint for the source chain. Following our previous example, this will
 # be the Sepolia urls
@@ -99,10 +99,10 @@ USC_TESTNET_BLOCK_LAG=3
 USC_TESTNET_RPC_URL=https://rpc.usc-testnet.creditcoin.network
 
 # Address of the mintable ERC20 token on Creditcoin USC chain
-USC_TESTNET_ERC20_MINTABLE_ADDRESS=<Your mintable contract address from custom-contracts-bridging tutorial>
+USC_TESTNET_ERC20_MINTABLE_ADDRESS=0xb0fb0b182f774266b1c7183535A41D69255937a3
 
 # Private key of the wallet that will submit mint requests
-USC_TESTNET_WALLET_PRIVATE_KEY=<Private key of testnet wallet you created in custom-contracts-bridging tutorial>
+USC_TESTNET_WALLET_PRIVATE_KEY=0x_your_private_key
 
 # ============================================================================ #
 #                              Contract Addresses                              #
@@ -112,7 +112,7 @@ USC_TESTNET_WALLET_PRIVATE_KEY=<Private key of testnet wallet you created in cus
 PROVER_CONTRACT_ADDRESS=0xc43402c66e88f38a5aa6e35113b310e1c19571d4
 
 # Address of the proxy bridge contract on Creditcoin USC chain
-USC_BRIDGE_CONTRACT_ADDRESS=<Address of USC bridge contract you deployed in custom-contracts-bridging tutorial>
+USC_BRIDGE_CONTRACT_ADDRESS=0x441726D6821B2009147F0FA96E1Ee09D412cCb38
 
 # ============================================================================ #
 #                        Block Processing Configuration                        #
@@ -133,14 +133,16 @@ MAX_BLOCK_RANGE=2000
 
 ## 2. Start the Offchain Worker
 
-Once you have your worker configured, it's time to start automating some queries! 
+Once you have your worker configured, it's time to start automating some queries!
 
 First make sure you're in the right directory:
+
 ```sh
 cd bridge-offchain-worker
 ```
 
 Run the following command to start the worker:
+
 ```sh
 yarn start_worker
 ```
@@ -169,7 +171,7 @@ remember to mint some so you can initiate the bridge transfer! This will re-use 
 ```bash
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
-    "mint(uint256)" 50000                                              \
+    "mint(uint256)" 50000000000000000000                               \
     --private-key <Your private key>
 ```
 
@@ -184,7 +186,7 @@ Run the following command to initiate the burn:
 ```sh
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
-    "burn(uint256)" "50"                                               \
+    "burn(uint256)" 50000000000000000000                               \
     --private-key <Your private key>
 ```
 
@@ -255,8 +257,8 @@ be:
 
 ```bash
 📦 Token: Mintable (TEST)
-🧾 Raw Balance: 100
-💰 Formatted Balance: 0.0000000000000001 TEST
+🧾 Raw Balance: 50000000000000000000
+💰 Formatted Balance: 50 TEST
 ```
 
 [enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
