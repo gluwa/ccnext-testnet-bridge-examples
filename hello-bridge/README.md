@@ -28,7 +28,7 @@ locally:
 
 Once you have all your dependencies setup, you will need to download some packages with `yarn`:
 
-```sh
+```bash
 cd hello-bridge
 foundryup --version v1.2.3 # Skip this command if you are using nix!
 yarn
@@ -42,7 +42,8 @@ will first need a wallet with some funds.
 ### 1.1 Set up a wallet address for testing
 
 > [!CAUTION]
-> Since you will be exposing the private key of this wallet to scripts for this tutorial, make sure the wallet contains nothing of value. Ideally, use a newly created wallet address.
+> Since you will be exposing the private key of this wallet to scripts for this tutorial, make sure
+> the wallet contains nothing of value. Ideally, use a newly created wallet address.
 
 Create a new EVM wallet address for testing. In this tutorial, we will be using [🦊 Metamask].
 Download the [chrome] or [firefox] extension and follow the on-screen steps to create a new wallet.
@@ -135,7 +136,7 @@ use to mint some dummy ERC20 tokens. Run the following command:
 ```bash
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
-    "mint(uint256)" 50000                                              \
+    "mint(uint256)" 50000000000000000000                               \
     --private-key <Your sepolia private key from step 1.3>
 ```
 
@@ -146,10 +147,10 @@ burn tokens by transferring them to an address for which the private key is unkn
 inaccessible. This way, when creating the same amount of tokens on Creditcoin at the end of the
 bridging process, we won't be creating any artificial value. Run the following command:
 
-```sh
+```bash
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
-    "burn(uint256)" "50"                                               \
+    "burn(uint256)" 50000000000000000000                               \
     --private-key <Your sepolia private key from step 1.3>
 ```
 
@@ -174,7 +175,7 @@ Now that we've burnt funds on Sepolia, we need to create a proof of that token b
 Creditcoin Decentralized Oracle. We do this by submitting an _oracle query_. Run the following
 command:
 
-```sh
+```bash
 yarn submit_query                                      \
     https://sepolia.infura.io/v3/<Your infura API key> \
     <Transaction hash from step 3>                     \
@@ -207,7 +208,7 @@ contract we deployed on Sepolia. This contract is already deployed on creditcoin
 
 Run the following command to query the bridge contract:
 
-```sh
+```bash
 yarn complete_mint                             \
     <Your usc testnet private key from step 1.4> \
     0x441726D6821B2009147F0FA96E1Ee09D412cCb38 \
@@ -226,7 +227,7 @@ the bridging process was successful.
 
 Run the following command to query the contract:
 
-```sh
+```bash
 yarn check_balance                             \
     0xb0fb0b182f774266b1c7183535A41D69255937a3 \
     <Your Sepolia wallet address from step 1.1>
@@ -236,8 +237,8 @@ You should get some output showing your wallet's balance on Creditcoin:
 
 ```bash
 📦 Token: Mintable (TEST)
-🧾 Raw Balance: 50
-💰 Formatted Balance: 0.00000000000000005 TEST
+🧾 Raw Balance: 50000000000000000000
+💰 Formatted Balance: 50.0 TEST
 ```
 
 ## Conclusion
