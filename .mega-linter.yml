@@ -6,6 +6,9 @@
 # all, none, or list of linter keys
 APPLY_FIXES: none
 
+JAVASCRIPT_DEFAULT_STYLE: prettier
+TYPESCRIPT_DEFAULT_STYLE: prettier
+
 DISABLE:
   - COPYPASTE # Comment to enable checks of excessive copy-pastes
 
@@ -21,4 +24,3 @@ DISABLE_LINTERS:
   - SPELL_CSPELL
 
 SHOW_ELAPSED_TIME: true
-JAVASCRIPT_DEFAULT_STYLE: prettier
