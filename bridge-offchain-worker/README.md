@@ -133,7 +133,7 @@ MAX_BLOCK_RANGE=2000
 
 ## 2. Start the Offchain Worker
 
-Once you have your worker configured, it's time to start automating some queries! 
+Once you have your worker configured, it's time to start automating some queries!
 
 First make sure you're in the right directory:
 

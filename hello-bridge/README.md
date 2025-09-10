@@ -61,7 +61,7 @@ Currency: ETH
 ### 1.2 Get some test funds (`Sepolia`)
 
 Now that you have your new test address ready, you will be needing some funds to make transactions.
-You can request some Sepolia ETH tokens using a [🚰 testnet faucet]. We link to the Google sepolia 
+You can request some Sepolia ETH tokens using a [🚰 testnet faucet]. We link to the Google sepolia
 faucet here.
 
 ### 1.3 Retrieving your private key (`Sepolia`)
@@ -76,15 +76,18 @@ then follow the on-screen instructions to copy it. You will need to do this seve
 following sections.
 
 ### 1.4 Create a Creditcoin Testnet Wallet
-We need to generate a new EVM wallet address for use on Creditcoin USC Testnet. This is the wallet 
+
+We need to generate a new EVM wallet address for use on Creditcoin USC Testnet. This is the wallet
 that will submit oracle queries and universal smart contract calls. Doing so is simple! Just run the
 following command:
-```
+
+```bash
 cast wallet new
 ```
 
 Save the resulting address and private key for future use. They should look like:
-```
+
+```bash
 Address:     0xBE7959cA1b19e159D8C0649860793dDcd125a2D5
 Private key: 0xb9c179ed56514accb60c23a862194fa2a6db8bdeb815d16e2c21aa4d7dc2845d
 ```
@@ -93,11 +96,12 @@ Private key: 0xb9c179ed56514accb60c23a862194fa2a6db8bdeb815d16e2c21aa4d7dc2845d
 
 You will also need to fund your account on the Creditcoin Testnet, otherwise our oracle query
 submission will fail due to lack of funds. Head to the [🚰 creditcoin discord faucet] to request
-some test tokens there. 
+some test tokens there.
 
-Your request for tokens in the Discord faucet should look like this. Substitute in your testnet 
+Your request for tokens in the Discord faucet should look like this. Substitute in your testnet
 account address from step 1.4:
-```
+
+```bash
 /faucet address: 0xBE7959cA1b19e159D8C0649860793dDcd125a2D5
 ```
 
@@ -118,9 +122,9 @@ are now ready to go with the rest of the tutorial!
 
 ## 2. Minting some tokens on Sepolia
 
-More tokens? But I thought I had all the tokens I needed! Well, kind of. For our example we 
-demonstrate burning ERC20 tokens rather than sepolia native tokens. Making an ERC20 contract call 
-to burn tokens and emitting a token burn event better demonstrates the best practice way of using 
+More tokens? But I thought I had all the tokens I needed! Well, kind of. For our example we
+demonstrate burning ERC20 tokens rather than sepolia native tokens. Making an ERC20 contract call
+to burn tokens and emitting a token burn event better demonstrates the best practice way of using
 the Creditcoin Oracle described in our [DApp Design Patterns] Gitbook page.
 
 But your new Sepolia account doesn't have these tokens yet!
@@ -195,7 +199,7 @@ Save the query id. You will be needing it in the next step.
 Now that we have a proof of the token burn on our _source chain_, we can finalize the bridging
 process by minting the same amount of tokens on the Creditcoin testnet. To do that, we need to call
 a [bridge contract] on Creditcoin which will interpret the data of our proof from [step 4]. We have
-already deployed this contract for you, since in this tutorial you're acting as an end user. But 
+already deployed this contract for you, since in this tutorial you're acting as an end user. But
 normally each DApp team would customize and deploy their own USC.
 
 As we complete the minting process, we're minting tokens in an [ERC20 contract] which mirrors the test token
