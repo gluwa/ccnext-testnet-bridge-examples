@@ -263,7 +263,7 @@ You should get some output showing your wallet's balance on Creditcoin:
 ```bash
 📦 Token: Mintable (TEST)
 🧾 Raw Balance: 100000000000000000000
-💰 Formatted Balance: 100 TEST
+💰 Formatted Balance: 100.0 TEST
 ```
 
 Notice how you now have _twice_ the amount of tokens you originally minted on Sepolia!

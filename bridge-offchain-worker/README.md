@@ -257,8 +257,8 @@ be:
 
 ```bash
 📦 Token: Mintable (TEST)
-🧾 Raw Balance: 50000000000000000000
-💰 Formatted Balance: 50 TEST
+🧾 Raw Balance: 100000000000000000000
+💰 Formatted Balance: 100.0 TEST
 ```
 
 [enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
