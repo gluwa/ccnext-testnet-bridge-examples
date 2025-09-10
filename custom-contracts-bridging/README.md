@@ -167,11 +167,10 @@ UniversalBridgeProxy deployed to: 0x4858Db7F085418301A010c880B98374d83533fa2
 ```
 
 Save the address of each contract. You will be needing them in [step 6]. Remember to exit the
-`CCNext-smart-contracts` repository and return to the bridge examples repository:
+`CCNext-smart-contracts` repository and return to the `custom-contracts-bridging` folder:
 
 ```bash
-cd ..
-cd ccnext-testnet-bridge-examples/custom-contracts-bridging
+cd ../../custom-contracts-bridging
 ```
 
 ## 4. Burning the tokens you want to bridge
@@ -187,8 +186,13 @@ Run the following command to initiate the burn:
 cast send                                                        \
     --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     <Test ERC20 contract address from step 2>                    \
+<<<<<<< HEAD
     "burn(uint256)" "50"                                         \
     --private-key <Your wallet private key>
+=======
+    "burn(uint256)" 50000000000000000000                         \
+    --private-key <Your sepolia private key from hello-bridge step 1.3>
+>>>>>>> b2630d1 (fix(tokens): mint/burn amount)
 ```
 
 This should display some output stating that your transaction was a success, along with a
@@ -264,8 +268,8 @@ You should get some output showing your wallet's balance on Creditcoin:
 
 ```bash
 📦 Token: Mintable (TEST)
-🧾 Raw Balance: 100
-💰 Formatted Balance: 0.0000000000000001 TEST
+🧾 Raw Balance: 100000000000000000000
+💰 Formatted Balance: 100 TEST
 ```
 
 Notice how you now have _twice_ the amount of tokens you originally burned on Sepolia!

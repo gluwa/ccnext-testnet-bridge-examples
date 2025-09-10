@@ -65,7 +65,7 @@ steps in the [setup] section there.
 Once that is done, you will need to set up some additional configuration for the offchain worker.
 Save and edit the following to a `.env` file inside of `bridge-offchain-worker/`:
 
-```bash
+```env
 # ============================================================================ #
 #                          Source Chain Configuration                          #
 # ============================================================================ #
@@ -173,7 +173,7 @@ Run the following command to initiate the burn:
 ```sh
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     <Addr of source chain contract you deployed in custom-contracts-bridging tutorial> \
-    "burn(uint256)" "50"                                               \
+    "burn(uint256)" 50000000000000000000                               \
     --private-key <Your wallet private key>
 ```
 
@@ -244,8 +244,8 @@ be:
 
 ```bash
 📦 Token: Mintable (TEST)
-🧾 Raw Balance: 200
-💰 Formatted Balance: 0.0000000000000002 TEST
+🧾 Raw Balance: 200000000000000000000
+💰 Formatted Balance: 200 TEST
 ```
 
 ## Conclusion
