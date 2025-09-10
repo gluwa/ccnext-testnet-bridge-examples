@@ -38,7 +38,7 @@ async function main() {
     process.exit(1);
   }
 
-  const [rpcUrl, transactionHash, ccNextPrivateKey] = args;
+  var [rpcUrl, transactionHash, ccNextPrivateKey] = args;
 
   // Validate RPC URL
   if (!rpcUrl.startsWith('http://') && !rpcUrl.startsWith('https://')) {
@@ -46,14 +46,23 @@ async function main() {
   }
 
   // Validate Transaction Hash
-  if (!transactionHash.startsWith('0x') || transactionHash.length !== 66) {
+  if (!transactionHash.startsWith('0x')) {
+    transactionHash = '0x' + transactionHash;
+  }
+
+  if (transactionHash.length !== 66) {
     throw new Error('Invalid transaction hash provided');
   }
 
   // Validate Private Key
   if (!ccNextPrivateKey.startsWith('0x')) {
+    ccNextPrivateKey = '0x' + ccNextPrivateKey;
+  }
+
+  if (ccNextPrivateKey.length != 66) {
     throw new Error('Invalid private key provided');
   }
+
   // 1. Setup your source chain rpc
   const provider = new ethers.JsonRpcProvider(rpcUrl);
 
