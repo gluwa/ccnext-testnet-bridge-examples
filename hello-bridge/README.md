@@ -218,7 +218,7 @@ You should get some output showing your wallet's balance on Creditcoin:
 ```bash
 📦 Token: Mintable (TEST)
 🧾 Raw Balance: 50000000000000000000
-💰 Formatted Balance: 50 TEST
+💰 Formatted Balance: 50.0 TEST
 ```
 
 ## Conclusion
