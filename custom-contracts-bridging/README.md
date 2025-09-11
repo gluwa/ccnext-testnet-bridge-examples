@@ -4,7 +4,7 @@
 > This tutorial builds on the previous [Hello Bridge] example -make sure to check it out before
 > moving on!
 
-Now that you have performed your first _trustless bridge transaction_, let's keep going with the next 
+Now that you have performed your first _trustless bridge transaction_, let's keep going with the next
 step: this tutorial teaches you how to set up your own custom bridging logic by deploying your own
 smart contracts!
 
@@ -132,9 +132,11 @@ npm install && npx hardhat compile
 
 > [!CAUTION]
 > If you get an error like:
+>
 > ```bash
 > * Invalid account: #0 for network: cc3_usc_testnet - private key too short, expected 32 bytes
 > ```
+>
 > That means you forgot to set your `.env`!
 
 Finally, deploy your contracts using the following command:
@@ -267,7 +269,7 @@ You should get some output showing your wallet's balance on Creditcoin:
 
 Notice how you now have _twice_ the amount of tokens you originally burned on Sepolia!
 
-# Conclusion
+## Conclusion
 
 Congratulations! You've set up your first custom smart contracts which make use of the Creditcoin
 Decentralized Oracle!

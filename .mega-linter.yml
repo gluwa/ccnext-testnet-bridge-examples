@@ -1,0 +1,26 @@
+# Configuration file for MegaLinter
+#
+# See all available variables at https://megalinter.io/latest/config-file/ and in
+# linters documentation
+
+# all, none, or list of linter keys
+APPLY_FIXES: none
+
+JAVASCRIPT_DEFAULT_STYLE: prettier
+TYPESCRIPT_DEFAULT_STYLE: prettier
+
+DISABLE:
+  - COPYPASTE # Comment to enable checks of excessive copy-pastes
+
+DISABLE_LINTERS:
+  - BASH_SHFMT
+  - COPYPASTE_JSCPD
+  - REPOSITORY_GRYPE
+  # https://gluwa.atlassian.net/browse/CSUB-460
+  - REPOSITORY_TRIVY
+  - REPOSITORY_GITLEAKS
+  - JAVASCRIPT_STANDARD
+  - TYPESCRIPT_STANDARD
+  - SPELL_CSPELL
+
+SHOW_ELAPSED_TIME: true
