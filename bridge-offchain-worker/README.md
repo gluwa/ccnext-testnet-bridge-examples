@@ -102,7 +102,7 @@ USC_TESTNET_RPC_URL=https://rpc.usc-testnet.creditcoin.network
 USC_TESTNET_ERC20_MINTABLE_ADDRESS=<Your mintable contract address from custom-contracts-bridging tutorial>
 
 # Private key of the wallet that will submit mint requests
-USC_TESTNET_WALLET_PRIVATE_KEY=<Private key of testnet wallet you created in custom-contracts-bridging tutorial>
+USC_TESTNET_WALLET_PRIVATE_KEY=<Your wallet private key from custom-contracts-bridging tutorial>
 
 # ============================================================================ #
 #                              Contract Addresses                              #
@@ -170,7 +170,7 @@ remember to mint some so you can initiate the bridge transfer! This will re-use 
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
     "mint(uint256)" 50000                                              \
-    --private-key <Your private key>
+    --private-key <Your wallet private key>
 ```
 
 ## 4. Burning the tokens you want to bridge
@@ -185,7 +185,7 @@ Run the following command to initiate the burn:
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
     "burn(uint256)" "50"                                               \
-    --private-key <Your private key>
+    --private-key <Your wallet private key>
 ```
 
 > [!TIP]
@@ -247,16 +247,16 @@ Run the following command to check your funds:
 ```sh
 yarn check_balance                             \
     0xb0fb0b182f774266b1c7183535A41D69255937a3 \
-    <You Sepolia wallet address>
+    <Your wallet address>
 ```
 
-I've you've been going through the previous tutorials, your balance should now
+If you've been going through the previous tutorials, your balance should now
 be:
 
 ```bash
 📦 Token: Mintable (TEST)
-🧾 Raw Balance: 100
-💰 Formatted Balance: 0.0000000000000001 TEST
+🧾 Raw Balance: 200
+💰 Formatted Balance: 0.0000000000000002 TEST
 ```
 
 [enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily

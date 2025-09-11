@@ -50,7 +50,7 @@ Run the following command to deploy the contract:
 forge create                                                     \
     --broadcast                                                  \
     --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
-    --private-key <Your sepolia private key from hello-bridge step 1.3> \
+    --private-key <Your wallet private key>                      \
     TestERC20
 ```
 
@@ -104,7 +104,7 @@ In your freshly cloned `CCNext-smart-contracts` repository, start by opening the
 `contracts/UniversalBridgeProxy.sol`. Next, navigate to the following line inside of the
 `uscBridgeCompleteMint` function:
 
-```rs
+```sol
 _mintTokens(ERC20Address, fromAddress, amount, queryId);
 ```
 
@@ -121,7 +121,7 @@ To deploy your modified bridging contracts, start by creating a `.env` file at t
 `CCNext-smart-contracts` repository and add the following contents inside of it:
 
 ```env
-OWNER_PRIVATE_KEY=<Your creditcoin testnet private key from hello-bridge step 1.4>
+OWNER_PRIVATE_KEY=<Your test wallet private key>
 ```
 
 Next, compile your bridging smart contracts:
@@ -142,7 +142,7 @@ Finally, deploy your contracts using the following command:
 ```bash
 npx hardhat deploy                      \
     --network cc3_usc_testnet            \
-    --proceedsaccount <Your creditcoin testnet public key from hello bridge step 1.4> \
+    --proceedsaccount <Your wallet private key> \
     --erc20name Test                    \
     --erc20symbol TEST                  \
     --chainkey 102033                   \
@@ -150,7 +150,7 @@ npx hardhat deploy                      \
     --lockupduration 86400              \
     --approvalthreshold 2               \
     --maxinstantmint 100                \
-    --admin <Your creditcoin testnet public key from hello bridge step 1.4>
+    --admin <Your wallet private key>
 ```
 
 > [!TIP]
@@ -185,7 +185,7 @@ cast send                                                        \
     --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     <Test ERC20 contract address from step 2>                    \
     "burn(uint256)" "50"                                         \
-    --private-key <Your sepolia private key from hello-bridge step 1.3>
+    --private-key <Your wallet private key>
 ```
 
 This should display some output stating that your transaction was a success, along with a
@@ -207,7 +207,7 @@ command:
 yarn submit_query                                      \
     https://sepolia.infura.io/v3/<Your infura API key> \
     <Transaction hash from step 4>                     \
-    <Your creditcoin testnet private key from hello-bridge step 1.4>
+    <Your wallet private key>
 ```
 
 > [!TIP]
@@ -234,7 +234,7 @@ Run the following command to query the proxy contract:
 
 ```sh
 yarn complete_mint                               \
-    <Your creditcoin testnet private key from hello-bridge step 1.4> \
+    <Your wallet private key> \
     <UniversalBridgeProxy address from step 3.2> \
     0xc43402c66e88f38a5aa6e35113b310e1c19571d4   \
     <Query Id from step 5>                       \
@@ -254,7 +254,7 @@ Run the following command to query the contract:
 ```sh
 yarn check_balance                        \
     <ERC20Mintable address from step 3.2> \
-    <You Sepolia wallet address>
+    <Your wallet address>
 ```
 
 You should get some output showing your wallet's balance on Creditcoin:
@@ -265,7 +265,7 @@ You should get some output showing your wallet's balance on Creditcoin:
 💰 Formatted Balance: 0.0000000000000001 TEST
 ```
 
-Notice how you now have _twice_ the amount of tokens you originally minted on Sepolia!
+Notice how you now have _twice_ the amount of tokens you originally burned on Sepolia!
 
 # Conclusion
 
