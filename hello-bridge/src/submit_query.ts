@@ -16,6 +16,13 @@ import {
   QueryableFields,
 } from '@gluwa/cc-next-query-builder';
 
+// Not all RPC nodes have the most recent blocks at the same time. This can cause
+// events very near the head of the chain to be missed if http requests are sent
+// to different RPC nodes due to the use of a load balancer. So we introduce a 
+// block lag to ensure all RPC nodes have the same block history at the height
+// we access.
+const BLOCK_LAG: bigint = 3n;
+
 async function main() {
   // Setup
   const args = process.argv.slice(2);
@@ -217,7 +224,7 @@ async function main() {
         queryProofVerificationFailed,
       ],
       fromBlock: BigInt(startBlock),
-      toBlock: BigInt(currentBlock),
+      toBlock: BigInt(currentBlock - BLOCK_LAG),
     });
     const proverLogs = await ccNextPublicClient.getFilterLogs({
       filter: proverFilter,
@@ -275,7 +282,7 @@ async function main() {
     // Update block tracking and wait before next iteration
     startBlock = currentBlock + 1n;
     console.log(
-      `Still waiting on prover events. Current block: ${currentBlock}`
+      `Still waiting on prover events. Current block: ${currentBlock - BLOCK_LAG}`
     );
     const uninstalledFilter = await ccNextPublicClient.uninstallFilter({
       filter: proverFilter,
