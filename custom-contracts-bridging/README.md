@@ -41,7 +41,7 @@ steps in the [setup] section there.
 ## 2. Deploy A Test `ERC20` Contract on Sepolia
 
 Let's start by deploying our own `ERC20` contract on Sepolia. The contract contains logic for
-tracking the balance of a coin called `TEST`. The contract also automatically funds its creator's
+tracking the balances of a coin called `TEST`. The contract also automatically funds its creator's
 address with 1000 `TEST` coins, so we won't have to mint `TEST` tokens manually.
 
 Run the following command to deploy the contract:
@@ -66,14 +66,15 @@ Save the contract address. You will be needing it in the next step.
 
 In the next few steps we will be deploying our own bridging contracts based off the
 `CCNext-smart-contracts` repository. This repository contains templates for the two smart contracts
-we will be using:
+we will be deploying on Creditcoin USC Testnet:
 
 - `UniversalBridgeProxy.sol`
 - `ERC20Mintable.sol`
 
-Proxy contracts such as `UniversalBridgeProxy` are intended to be deployed by DApp builders. Here,
-our proxy contract is used only for bridging tokens. A proxy contract interprets the oracle proof
-data which is send to it, and serves out relevant output for a DApp to process.
+Universal smart contracts (USCs) such as `UniversalBridgeProxy` are intended to be deployed by DApp 
+builders. Here, our USC is used only for bridging tokens. A USC retrieves cross-chain data from 
+oracle query results. It then interprets that data into typed values, and uses the typed cross-chain 
+data to call further DApp business logic.
 
 For instance, our `UniversalBridgeProxy` looks for fields like `from`, `to`, and `amount` in the
 oracle proof we submit to it. With those fields, the contract can verify whether or not a token
@@ -88,7 +89,7 @@ Start by cloning the `CCNext-smart-contracts` repository:
 ```sh
 git clone https://github.com/gluwa/CCNext-smart-contracts.git
 cd CCNext-smart-contracts
-git checkout bed5a89262783c036d853fcb88c4a6b1b93ea258
+git checkout 382aa218889af6ac484cfe33018f1f9e6866cdcf
 ```
 
 ### 3.1 Modify The Bridge Smart Contract
@@ -97,8 +98,8 @@ As an exercise, we will be modifying our `UniversalBridgeProxy` so that it mints
 of tokens which were burned on our _source chain_.
 
 > [!NOTE]
-> This is a bad idea in practice, as we are just diluting the value of our `TEST` token each
-> time we bridge it.
+> This is for demonstration purposes only, as bridging this way dilutes the value of our `TEST` 
+> token each time we bridge it.
 
 In your freshly cloned `CCNext-smart-contracts` repository, start by opening the file
 `contracts/UniversalBridgeProxy.sol`. Next, navigate to the following line inside of the
@@ -229,8 +230,8 @@ Save the query id. You will be needing it in the next step.
 
 Now that we have a proof of the token burn on our _source chain_, we can finalize the bridging
 process by minting the same amount of tokens on the Creditcoin testnet. To do that, we need to call
-your `UniversalBridgeProxy` contract on Creditcoin. This will _trustlessly_ very the proof from
-[step 5].
+the function `uscBridgeCompleteMint` in your `UniversalBridgeProxy` contract on Creditcoin. This 
+will fetch and interpret cross-chain data from our _trustlessly_ verified proof created in [step 5].
 
 Run the following command to query the proxy contract:
 
@@ -274,15 +275,14 @@ Notice how you now have _twice_ the amount of tokens you originally burned on Se
 Congratulations! You've set up your first custom smart contracts which make use of the Creditcoin
 Decentralized Oracle!
 
-The next tutorial will bring this one step further by automating a lot of the work we have had to do
-manually so far. We will do this by using an **offchain worker** which will handle the proof query
-submission as well as sending the result of that query to our bridging proxy contract on Creditcoin.
-This _vastly_ improves UX by making it so the end user only has to sign a _single_ transaction to
-initiate the bridging procedure.
+The next tutorial will take another important step towards developing a mature, production ready 
+cross-chain DApp. That step is automation! We automate using an **offchain worker** which submits 
+oracle queries and triggers use of oracle results. This _vastly_ improves UX by making it so the 
+end user only has to sign a _single_ transaction to initiate the bridging procedure.
 
 In practice, DApp builders will want to conduct all cross-chain queries via an offchain worker in
 order to ensure robustness and streamline UX. Checkout the [bridge offchain worker] tutorial next
-for more information on this!
+for more information!
 
 [Hello Bridge]: ../hello-bridge/README.md
 [setup]: ../hello-bridge/README.md#1-setup

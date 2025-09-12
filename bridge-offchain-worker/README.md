@@ -4,18 +4,18 @@
 > This tutorial builds on the previous [Custom Contract Bridging] example -make sure to check it out
 > before moving on!
 
-So far we have seen [how to initiate a trustless bridge transaction] and [how to customize our
-trustless bridging logic]. In this tutorial, we will be seeing how to automate most of our
-interaction with Creditcoin itself so that end users only have to submit _a single transaction_ on
-the Sepolia _source chain_.
+So far we have seen [how to initiate a trustless bridge transaction] and 
+[how to customize our trustless bridging logic]. In this tutorial, we will be seeing how to automate 
+our interaction with the Creditcoin oracle so that end users only have to submit _a single transaction_ 
+on the Sepolia _source chain_.
 
 ## What is an Offchain Worker
 
 An Offchain Worker is an script responsible for watching the state of a _source chain_ (in this
-case, Sepolia) as well as the Creditcoin _execution chain_. It submits _oracles queries_ and
-interacts with our _bridge proxy_ on Creditcoin in response to specific events on each chain. This
-allows us to automate most of the cross-chain interaction in our _trustless bridge_, resulting in a
-smoother UX.
+case, Sepolia) as well as the Creditcoin _execution chain_. It submits _oracle queries_ and
+interacts with our _Universal Smart Contract_ on Creditcoin in response to specific events on 
+each chain. With an offchain worker, all the end user needs to do is sign a single transaction
+on the source chain kicking off cross-chain interaction.
 
 Our offchain worker will listen to events from the following sources:
 
@@ -23,7 +23,7 @@ Our offchain worker will listen to events from the following sources:
    detects this, they create an oracle query to request a proof of the token burn from the
    Creditcoin Decentralized Oracle.
 
-2. `queryProofVerified` events which are emitted by the query prover contract on Creditcoin. Each of
+2. `queryProofVerified` events which are emitted by the prover contract on Creditcoin. Each of
    these events signals that a query has finished being proven by the Creditcoin Decentralized
    Oracle. When our worker detects this, it submits a request to our _bridge proxy contract_ to
    finalize the bridging process by minting the tokens we burned on Sepolia onto Creditcoin.
@@ -99,7 +99,7 @@ USC_TESTNET_BLOCK_LAG=3
 USC_TESTNET_RPC_URL=https://rpc.usc-testnet.creditcoin.network
 
 # Address of the mintable ERC20 token on Creditcoin USC chain
-USC_TESTNET_ERC20_MINTABLE_ADDRESS=<Your mintable contract address from custom-contracts-bridging tutorial>
+USC_TESTNET_ERC20_MINTABLE_ADDRESS=<Addr of ERC20 deployed in step 3.2 of custom-contracts-bridging tutorial>
 
 # Private key of the wallet that will submit mint requests
 USC_TESTNET_WALLET_PRIVATE_KEY=<Your wallet private key from custom-contracts-bridging tutorial>
@@ -162,20 +162,7 @@ Worker job run 2
 > The prover can take a bit of time to get started. Sit back and wait until you get the full log
 > output as shown above ☕
 
-## 3. Minting some tokens on Sepolia
-
-Changes are after following the previous tutorials you don't have any `TEST` tokens left over:
-remember to mint some so you can initiate the bridge transfer! This will re-use the pre-deployed
-`ERC20` [test contract] from the [Hello Bridge] tutorial:
-
-```bash
-cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
-    0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
-    "mint(uint256)" 50000                                              \
-    --private-key <Your wallet private key>
-```
-
-## 4. Burning the tokens you want to bridge
+## 3. Burning the tokens you want to bridge
 
 Like we did in the previous tutorials, we start the bridging process by burning the funds we want to
 bridge on Sepolia. This time however this will be the only transaction we need to submit! The rest
@@ -185,7 +172,7 @@ Run the following command to initiate the burn:
 
 ```sh
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
-    0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
+    <Addr of source chain contract you deployed in custom-contracts-bridging tutorial> \
     "burn(uint256)" "50"                                               \
     --private-key <Your wallet private key>
 ```
@@ -195,7 +182,7 @@ cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
 > transaction's `blockNumber`: the prover will pick it up when that block number falls into the
 > range of blocks it is listening to on the source chain ☕
 
-## 5. Monitor the Offchain Worker
+## 4. Monitor the Offchain Worker
 
 At this point, you should see the worker start to process some events and requesting a proof of your
 token burn from the Creditcoin Decentralized Oracle:
@@ -239,7 +226,7 @@ Congratulations! You've successfully bridged tokens from your source chain to yo
 That's it! All it took was a single transaction on your end to initiate the bridging process,
 providing for a _truly native UX_.
 
-## 6. Check Balance in USC Testnet ERC20 Contract
+## 5. Check Balance in USC Testnet ERC20 Contract
 
 As a final check, we can take a look at the balance of your account on Creditcoin to confirm that
 the bridging process was successful.
@@ -248,7 +235,7 @@ Run the following command to check your funds:
 
 ```sh
 yarn check_balance                             \
-    0xb0fb0b182f774266b1c7183535A41D69255937a3 \
+    <Addr of ERC20 deployed in step 3.2 of custom-contracts-bridging tutorial> \
     <Your wallet address>
 ```
 
@@ -261,6 +248,17 @@ be:
 💰 Formatted Balance: 0.0000000000000002 TEST
 ```
 
+## Conclusion
+
+Congratulations! You've completed the Creditcoin Universal Smart Contracts tutorial series!
+You've learned:
+
+1. How to interact with the Creditcoin Oracle
+2. How to deploy your own custom Universal Smart Contracts
+3. How to run an offchain worker to support smooth cross-chain user experience
+
+If you haven't already, take a look at the [USC Gitbook] for more information.
+
 [enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
 [yarn]: https://yarnpkg.com/getting-started/install
 [foundry]: https://getfoundry.sh/
@@ -270,3 +268,4 @@ be:
 [Hello Bridge]: ../hello-bridge/README.md
 [setup]: ../hello-bridge/README.md#1-setup
 [test contract]: https://sepolia.etherscan.io/address/0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8
+[USC Gitbook]: https://docs.creditcoin.org/usc
