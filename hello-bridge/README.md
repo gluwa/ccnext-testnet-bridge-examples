@@ -17,6 +17,7 @@ locally:
 - [yarn]
 - [foundry]
 
+<!-- ignore -->
 > [!TIP]
 > This project provides a `flake.nix` you can use to download all the dependencies you will need for
 > this tutorial inside of a sandboxed environment. Just keep in mind you will have to
@@ -26,11 +27,23 @@ locally:
 > nix develop
 > ```
 
-Once you have all your dependencies setup, you will need to download some packages with `yarn`:
+Start by heading to the `hello-bridge` folder:
 
 ```bash
 cd hello-bridge
+```
+
+You will need to set up the right version of foundry `foundryup`:
+
+<!-- ignore -->
+```bash
 foundryup --version v1.2.3 # Skip this command if you are using nix!
+
+```
+
+You will then need to download some packages with `yarn`:
+
+```sh
 yarn
 ```
 
@@ -62,6 +75,8 @@ cast wallet new
 ```
 
 Save the resulting wallet address and private key for future use. They should look like:
+
+<!-- ignore -->
 ```bash
 Address:     0xBE7959cA1b19e159D8C0649860793dDcd125a2D5
 Private key: 0xb9c179ed56514accb60c23a862194fa2a6db8bdeb815d16e2c21aa4d7dc2845d
@@ -113,11 +128,13 @@ But your new Sepolia account doesn't have these tokens yet!
 For your convenience, we have [already deployed] a test `ERC20` contract to Sepolia which you can
 use to mint some dummy ERC20 tokens. Run the following command:
 
+<!-- env your_infura_api_key INFURA_API_KEY -->
+<!-- env your_private_key PRIVATE_KEY -->
 ```bash
-cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
+cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
     "mint(uint256)" 50000000000000000000                               \
-    --private-key <Your wallet private key>
+    --private-key <your_private_key>
 ```
 
 ## 3. Burning the tokens you want to bridge
@@ -127,16 +144,18 @@ burn tokens by transferring them to an address for which the private key is unkn
 inaccessible. This way, when creating the same amount of tokens on Creditcoin at the end of the
 bridging process, we won't be creating any artificial value. Run the following command:
 
-```bash
-cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
+<!-- extract transaction_hash_from_step_3 "transactionHash\s*(0[xX][a-fA-F0-9]{64})" -->
+```sh
+cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
     "burn(uint256)" 50000000000000000000                               \
-    --private-key <Your wallet private key>
+    --private-key <your_private_key>
 ```
 
 This should display some output stating that your transaction was a success, along with a
 transaction hash:
 
+<!-- ignore -->
 ```bash
 transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
 ```
@@ -155,11 +174,12 @@ Now that we've burnt funds on Sepolia, we need to create a proof of that token b
 Creditcoin Decentralized Oracle. We do this by submitting an _oracle query_. Run the following
 command:
 
-```bash
+<!-- extract query_id_from_step_4 "Query Proving completed. QueryId: (0[xX][a-fA-F0-9]{64})" -->
+```sh
 yarn submit_query                                      \
-    https://sepolia.infura.io/v3/<Your infura API key> \
-    <Transaction hash from step 3>                     \
-    <Your wallet private key>
+    https://sepolia.infura.io/v3/<your_infura_api_key> \
+    <transaction_hash_from_step_3>                     \
+    <your_private_key>
 ```
 
 > [!TIP]
@@ -169,6 +189,7 @@ yarn submit_query                                      \
 Once the proving process completes, you should see some output stating that your query was proven
 successfully, along with a query id:
 
+<!-- ignore -->
 ```bash
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
 ```
@@ -190,10 +211,10 @@ Run the following command to query the bridge contract:
 
 ```bash
 yarn complete_mint                             \
-    <Your wallet private key>                  \
+    <your_private_key>                         \
     0x441726D6821B2009147F0FA96E1Ee09D412cCb38 \
     0xc43402c66e88f38a5aa6e35113b310e1c19571d4 \
-    <Query Id from step 4>                     \
+    <query_id_from_step_4>                     \
     0xb0fb0b182f774266b1c7183535A41D69255937a3
 ```
 
@@ -207,14 +228,16 @@ the bridging process was successful.
 
 Run the following command to query the contract:
 
-```bash
+<!-- env your_wallet_address PUBLIC_KEY -->
+```sh
 yarn check_balance                             \
     0xb0fb0b182f774266b1c7183535A41D69255937a3 \
-    <Your wallet address>
+    <your_wallet_address>
 ```
 
 You should get some output showing your wallet's balance on Creditcoin:
 
+<!-- ignore -->
 ```bash
 📦 Token: Mintable (TEST)
 🧾 Raw Balance: 50000000000000000000
