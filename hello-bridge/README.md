@@ -33,7 +33,7 @@ Start by heading to the `hello-bridge` folder:
 cd hello-bridge
 ```
 
-You will need to set up the right version of foundry `foundryup`:
+You will need to set up the right version of foundry with `foundryup`:
 
 <!-- ignore -->
 ```bash
@@ -41,7 +41,7 @@ foundryup --version v1.2.3 # Skip this command if you are using nix!
 
 ```
 
-You will then need to download some packages with `yarn`:
+And download some packages with `yarn`:
 
 ```sh
 yarn
