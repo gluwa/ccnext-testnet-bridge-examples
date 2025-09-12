@@ -224,7 +224,7 @@ async function main() {
         queryProofVerificationFailed,
       ],
       fromBlock: BigInt(startBlock),
-      toBlock: BigInt(currentBlock - BLOCK_LAG),
+      toBlock: BigInt(currentBlock),
     });
     const proverLogs = await ccNextPublicClient.getFilterLogs({
       filter: proverFilter,
@@ -282,7 +282,7 @@ async function main() {
     // Update block tracking and wait before next iteration
     startBlock = currentBlock + 1n;
     console.log(
-      `Still waiting on prover events. Current block: ${currentBlock - BLOCK_LAG}`
+      `Still waiting on prover events. Current block: ${currentBlock}`
     );
     const uninstalledFilter = await ccNextPublicClient.uninstallFilter({
       filter: proverFilter,
