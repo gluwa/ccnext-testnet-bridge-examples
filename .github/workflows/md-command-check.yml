@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: actions-rust-lang/setup-rust-toolchain@v1
-      - run: cargo install --git https://github.com/Trantorian1/md-command-check#96c5c4001f1f9cf73092272457a3d1bc11e85ee9
+      - run: cargo install --git https://github.com/Trantorian1/md-command-check#4a93c29f71cbccfbb7a977fa74ce3938d7077f7d
 
       - uses: cachix/install-nix-action@v31
         with:
