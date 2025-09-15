@@ -53,14 +53,7 @@ create on both Sepolia and Creditcoin USC Testnet.
 > your wallet's behalf. Make sure the wallet you use contains nothing of value. Ideally it should be
 > a newly created address.
 
-Here's how you can find your private key in MetaMask: head to `Account Settings -> Private Key`,
-then follow the on-screen instructions to copy it. You will need to do this several times in the
-following sections.
-
-### 1.4 Create a Creditcoin Testnet Wallet
-We need to generate a new EVM wallet address for use on Creditcoin USC Testnet. This is the wallet 
-that will submit oracle queries and universal smart contract calls. Doing so is simple! Just run the
-following command:
+Generating our new wallet is simple! Just run the following command:
 ```bash
 cast wallet new
 ```
