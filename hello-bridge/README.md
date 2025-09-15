@@ -41,7 +41,7 @@ foundryup --version v1.2.3 # Skip this command if you are using nix!
 
 ```
 
-And download some packages with `yarn`:
+And download the required packages with `yarn`:
 
 ```sh
 yarn
