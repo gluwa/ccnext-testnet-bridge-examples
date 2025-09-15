@@ -17,6 +17,7 @@ locally:
 - [foundry]
 
 <!-- ignore -->
+
 > [!TIP]
 > This project provides a `flake.nix` you can use to download all the dependencies you will need for
 > this tutorial inside of a sandboxed environment. Just keep in mind you will have to
@@ -35,6 +36,7 @@ cd custom-contracts-bridging
 You will need to set up the right version of foundry with `foundryup`:
 
 <!-- ignore -->
+
 ```bash
 foundryup --version v1.2.3 # Skip this command if you are using nix!
 
@@ -62,6 +64,7 @@ Run the following command to deploy the contract:
 <!-- env your_infura_api_key USC_DOCS_INFURA_KEY -->
 <!-- env your_private_key USC_DOCS_TESTING_PK -->
 <!-- extract test_erc20_contract_address_from_step_2 "Deployed to: (0[xX][a-fA-F0-9]{40})" -->
+
 ```sh
 forge create                                                     \
     --broadcast                                                  \
@@ -73,6 +76,7 @@ forge create                                                     \
 This should display some output containing the address of your test `ERC20` contract:
 
 <!-- ignore -->
+
 ```bash
 Deployed to: 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
 ```
@@ -88,9 +92,9 @@ we will be deploying on Creditcoin USC Testnet:
 - `UniversalBridgeProxy.sol`
 - `ERC20Mintable.sol`
 
-Universal smart contracts (USCs) such as `UniversalBridgeProxy` are intended to be deployed by DApp 
-builders. Here, our USC is used only for bridging tokens. A USC retrieves cross-chain data from 
-oracle query results. It then interprets that data into typed values, and uses the typed cross-chain 
+Universal smart contracts (USCs) such as `UniversalBridgeProxy` are intended to be deployed by DApp
+builders. Here, our USC is used only for bridging tokens. A USC retrieves cross-chain data from
+oracle query results. It then interprets that data into typed values, and uses the typed cross-chain
 data to call further DApp business logic.
 
 For instance, our `UniversalBridgeProxy` looks for fields like `from`, `to`, and `amount` in the
@@ -115,7 +119,7 @@ As an exercise, we will be modifying our `UniversalBridgeProxy` so that it mints
 of tokens which were burned on our _source chain_.
 
 > [!NOTE]
-> This is for demonstration purposes only, as bridging this way dilutes the value of our `TEST` 
+> This is for demonstration purposes only, as bridging this way dilutes the value of our `TEST`
 > token each time we bridge it.
 
 In your freshly cloned `CCNext-smart-contracts` repository, start by opening the file
@@ -149,6 +153,7 @@ npm install && npx hardhat compile
 ```
 
 <!-- ignore -->
+
 > [!CAUTION]
 > If you get an error like:
 >
@@ -163,6 +168,7 @@ Finally, deploy your contracts using the following command:
 <!-- extract erc20_mintable_address_from_step_3_2 "ERC20 deployed to: (0[xX][a-fA-F0-9]{40})" -->
 <!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
 <!-- extract universal_bridge_proxy_address_from_step_3_2 "UniversalBridgeProxy deployed to: (0[xX][a-fA-F0-9]{40})" -->
+
 ```bash
 npx hardhat deploy                          \
     --network cc3_usc_testnet               \
@@ -183,6 +189,7 @@ npx hardhat deploy                          \
 You should get some output with the address of the contracts you just deployed:
 
 <!-- ignore -->
+
 ```bash
 ERC20 deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
 UniversalBridgeProxy deployed to: 0x4858Db7F085418301A010c880B98374d83533fa2
@@ -205,6 +212,7 @@ transferring them to an address for which the private key is unknown, making the
 Run the following command to initiate the burn:
 
 <!-- extract transaction_hash_from_step_4 "transactionHash\s*(0[xX][a-fA-F0-9]{64})" -->
+
 ```bash
 cast send                                                        \
     --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
@@ -217,6 +225,7 @@ This should display some output stating that your transaction was a success, alo
 transaction hash:
 
 <!-- ignore -->
+
 ```bash
 transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
 ```
@@ -230,6 +239,7 @@ Creditcoin Decentralized Oracle. We do this by submitting an _oracle query_. Run
 command:
 
 <!-- extract query_id_from_step_5 "Query Proving completed. QueryId: (0[xX][a-fA-F0-9]{64})" -->
+
 ```sh
 yarn submit_query                                      \
     https://sepolia.infura.io/v3/<your_infura_api_key> \
@@ -245,6 +255,7 @@ Once the proving process completes, you should see some output stating that your
 successfully, along with a query id:
 
 <!-- ignore -->
+
 ```bash
 Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
 ```
@@ -255,7 +266,7 @@ Save the query id. You will be needing it in the next step.
 
 Now that we have a proof of the token burn on our _source chain_, we can finalize the bridging
 process by minting the same amount of tokens on the Creditcoin testnet. To do that, we need to call
-the function `uscBridgeCompleteMint` in your `UniversalBridgeProxy` contract on Creditcoin. This 
+the function `uscBridgeCompleteMint` in your `UniversalBridgeProxy` contract on Creditcoin. This
 will fetch and interpret cross-chain data from our _trustlessly_ verified proof created in [step 5].
 
 Run the following command to query the proxy contract:
@@ -288,6 +299,7 @@ yarn check_balance                        \
 You should get some output showing your wallet's balance on Creditcoin:
 
 <!-- ignore -->
+
 ```bash
 📦 Token: Mintable (TEST)
 🧾 Raw Balance: 100000000000000000000
@@ -301,9 +313,9 @@ Notice how you now have _twice_ the amount of tokens you originally burned on Se
 Congratulations! You've set up your first custom smart contracts which make use of the Creditcoin
 Decentralized Oracle!
 
-The next tutorial will take another important step towards developing a mature, production ready 
-cross-chain DApp. That step is automation! We automate using an **offchain worker** which submits 
-oracle queries and triggers use of oracle results. This _vastly_ improves UX by making it so the 
+The next tutorial will take another important step towards developing a mature, production ready
+cross-chain DApp. That step is automation! We automate using an **offchain worker** which submits
+oracle queries and triggers use of oracle results. This _vastly_ improves UX by making it so the
 end user only has to sign a _single_ transaction to initiate the bridging procedure.
 
 In practice, DApp builders will want to conduct all cross-chain queries via an offchain worker in

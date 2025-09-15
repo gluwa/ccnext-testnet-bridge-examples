@@ -4,16 +4,16 @@
 > This tutorial builds on the previous [Custom Contract Bridging] example -make sure to check it out
 > before moving on!
 
-So far we have seen [how to initiate a trustless bridge transaction] and 
-[how to customize our trustless bridging logic]. In this tutorial, we will be seeing how to automate 
-our interaction with the Creditcoin oracle so that end users only have to submit _a single transaction_ 
+So far we have seen [how to initiate a trustless bridge transaction] and
+[how to customize our trustless bridging logic]. In this tutorial, we will be seeing how to automate
+our interaction with the Creditcoin oracle so that end users only have to submit _a single transaction_
 on the Sepolia _source chain_.
 
 ## What is an Offchain Worker
 
 An Offchain Worker is an script responsible for watching the state of a _source chain_ (in this
 case, Sepolia) as well as the Creditcoin _execution chain_. It submits _oracle queries_ and
-interacts with our _Universal Smart Contract_ on Creditcoin in response to specific events on 
+interacts with our _Universal Smart Contract_ on Creditcoin in response to specific events on
 each chain. With an offchain worker, all the end user needs to do is sign a single transaction
 on the source chain kicking off cross-chain interaction.
 
@@ -41,6 +41,7 @@ locally:
 - [foundry]
 
 <!-- ignore -->
+
 > [!TIP]
 > This project provides a `flake.nix` you can use to download all the dependencies you will need for
 > this tutorial inside of a sandboxed environment. Just keep in mind you will have to
@@ -59,6 +60,7 @@ cd bridge-offchain-worker
 You will need to set up the right version of foundry with `foundryup`:
 
 <!-- ignore -->
+
 ```bash
 foundryup --version v1.2.3 # Skip this command if you are using nix!
 
@@ -79,6 +81,7 @@ Once that is done, you will need to set up some additional configuration for the
 Save and edit the following to a `.env` file inside of `bridge-offchain-worker/`:
 
 <!-- ignore -->
+
 ```env
 # ============================================================================ #
 #                          Source Chain Configuration                          #
@@ -152,6 +155,7 @@ Once you have your worker configured, it's time to start automating some queries
 Run the following command to start the worker:
 
 <!-- ignore -->
+
 ```sh
 yarn start_worker
 ```
@@ -159,6 +163,7 @@ yarn start_worker
 Once it's up and running, you start to see the following logs:
 
 <!-- ignore -->
+
 ```bash
 Starting...
 Worker job run 1
@@ -183,6 +188,7 @@ Run the following command to initiate the burn:
 <!-- env your_infura_api_key USC_DOCS_INFURA_KEY -->
 <!-- env your_private_key USC_DOCS_TESTING_PK -->
 <!-- alias test_erc20_contract_address_from_step_2 test_erc20_contract_address_from_custom_contracts_bridging -->
+
 ```sh
 cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
     <test_erc20_contract_address_from_custom_contracts_bridging>       \
@@ -201,6 +207,7 @@ At this point, you should see the worker start to process some events and reques
 token burn from the Creditcoin Decentralized Oracle:
 
 <!-- ignore -->
+
 ```bash
 ...
 Source chain listener is listening from block 9159981 to 9159985
@@ -216,6 +223,7 @@ the query has been processed. It then queries the _bridging proxy contract_ on C
 the minting process:
 
 <!-- ignore -->
+
 ```bash
 ...
 Creditcoin USC chain listener is listening from block 69063 to 69066
@@ -230,6 +238,7 @@ Finally, the worker listens for the `mint` event notifying it that the tokens ha
 our account on Creditcoin.
 
 <!-- ignore -->
+
 ```bash
 ...
 Found 1 new bridge USC events
@@ -251,6 +260,7 @@ Run the following command to check your funds:
 
 <!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
 <!-- alias erc20_mintable_address_from_step_3_2 erc20_mintable_address_from_custom_contracts_bridging -->
+
 ```sh
 yarn check_balance                                          \
     <erc20_mintable_address_from_custom_contracts_bridging> \
@@ -261,6 +271,7 @@ If you've been going through the previous tutorials, your balance should now
 be:
 
 <!-- ignore -->
+
 ```bash
 📦 Token: Mintable (TEST)
 🧾 Raw Balance: 200000000000000000000
