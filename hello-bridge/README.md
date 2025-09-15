@@ -128,8 +128,8 @@ But your new Sepolia account doesn't have these tokens yet!
 For your convenience, we have [already deployed] a test `ERC20` contract to Sepolia which you can
 use to mint some dummy ERC20 tokens. Run the following command:
 
-<!-- env your_infura_api_key INFURA_API_KEY -->
-<!-- env your_private_key PRIVATE_KEY -->
+<!-- env your_infura_api_key USC_DOCS_INFURA_KEY -->
+<!-- env your_private_key USC_DOCS_TESTING_PK -->
 ```bash
 cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
@@ -228,7 +228,7 @@ the bridging process was successful.
 
 Run the following command to query the contract:
 
-<!-- env your_wallet_address PUBLIC_KEY -->
+<!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
 ```sh
 yarn check_balance                             \
     0xb0fb0b182f774266b1c7183535A41D69255937a3 \

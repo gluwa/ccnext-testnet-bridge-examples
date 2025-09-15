@@ -180,8 +180,8 @@ will be handled automatically by the worker 🤖
 
 Run the following command to initiate the burn:
 
-<!-- env your_infura_api_key INFURA_API_KEY -->
-<!-- env your_private_key PRIVATE_KEY -->
+<!-- env your_infura_api_key USC_DOCS_INFURA_KEY -->
+<!-- env your_private_key USC_DOCS_TESTING_PK -->
 <!-- alias test_erc20_contract_address_from_step_2 test_erc20_contract_address_from_custom_contracts_bridging -->
 ```sh
 cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
@@ -249,7 +249,7 @@ the bridging process was successful.
 
 Run the following command to check your funds:
 
-<!-- env your_wallet_address PUBLIC_KEY -->
+<!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
 <!-- alias erc20_mintable_address_from_step_3_2 erc20_mintable_address_from_custom_contracts_bridging -->
 ```sh
 yarn check_balance                                          \

@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   md-check:
     runs-on: ubuntu-latest
@@ -27,8 +31,8 @@ jobs:
 
       - name: md-command-check
         env:
-          INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-          PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
+          USC_DOCS_INFURA_KEY: ${{ secrets.USC_DOCS_INFURA_KEY }}
+          USC_DOCS_TESTING_PK: ${{ secrets.USC_DOCS_TESTING_PK }}
+          USC_DOCS_TESTING_ADDRESS: ${{ secrets.USC_DOCS_TESTING_ADDRESS }}
         run: |
           nix develop --command md-command-check --debug $FILES

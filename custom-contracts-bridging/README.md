@@ -59,8 +59,8 @@ address with 1000 `TEST` coins, so we won't have to mint `TEST` tokens manually.
 
 Run the following command to deploy the contract:
 
-<!-- env your_infura_api_key INFURA_API_KEY -->
-<!-- env your_private_key PRIVATE_KEY -->
+<!-- env your_infura_api_key USC_DOCS_INFURA_KEY -->
+<!-- env your_private_key USC_DOCS_TESTING_PK -->
 <!-- extract test_erc20_contract_address_from_step_2 "Deployed to: (0[xX][a-fA-F0-9]{40})" -->
 ```sh
 forge create                                                     \
@@ -161,7 +161,7 @@ npm install && npx hardhat compile
 Finally, deploy your contracts using the following command:
 
 <!-- extract erc20_mintable_address_from_step_3_2 "ERC20 deployed to: (0[xX][a-fA-F0-9]{40})" -->
-<!-- env your_wallet_address PUBLIC_KEY -->
+<!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
 <!-- extract universal_bridge_proxy_address_from_step_3_2 "UniversalBridgeProxy deployed to: (0[xX][a-fA-F0-9]{40})" -->
 ```bash
 npx hardhat deploy                          \
