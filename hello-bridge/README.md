@@ -42,7 +42,8 @@ This tutorial involves the use of two different blockchains.
 - Creditcoin USC Testnet, which serves as our _execution chain_ for the tutorial. This is where 
   oracle queries are processed and where tokens are minted.
 
-In order to use both blockchains we need to create a wallet and fund it with the native tokens of both networks.
+In order to use both blockchains we need to create a wallet and fund it with the native tokens of 
+both networks.
 
 ### 1.1 Generate a New Wallet Address
 
@@ -54,14 +55,13 @@ create on both Sepolia and Creditcoin USC Testnet.
 > In this tutorial, we will be using your wallet's private key to allow some test scripts to act on
 > your wallet's behalf. Make sure the wallet you use contains nothing of value. Ideally it should be
 > a newly created address.
-Generating our new wallet is simple! Just run the following command:
 
+Generating our new wallet is simple! Just run the following command:
 ```bash
 cast wallet new
 ```
 
 Save the resulting wallet address and private key for future use. They should look like:
-
 ```bash
 Address:     0xBE7959cA1b19e159D8C0649860793dDcd125a2D5
 Private key: 0xb9c179ed56514accb60c23a862194fa2a6db8bdeb815d16e2c21aa4d7dc2845d
@@ -70,7 +70,7 @@ Private key: 0xb9c179ed56514accb60c23a862194fa2a6db8bdeb815d16e2c21aa4d7dc2845d
 ### 1.2 Get some test funds (`Sepolia`)
 
 Now that you have your new test address ready, you will be needing some funds to make transactions.
-You can request some Sepolia ETH tokens using a [🚰 testnet faucet]. We link to the Google sepolia 
+You can request some Sepolia ETH tokens using a [🚰 testnet faucet]. We link to the Google sepolia
 faucet here.
 
 ### 1.3 Get some test funds (`Creditcoin`)
@@ -117,7 +117,7 @@ use to mint some dummy ERC20 tokens. Run the following command:
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
     "mint(uint256)" 50000000000000000000                               \
-    --private-key <Your sepolia private key from step 1.3>
+    --private-key <Your wallet private key>
 ```
 
 ## 3. Burning the tokens you want to bridge
@@ -131,7 +131,7 @@ bridging process, we won't be creating any artificial value. Run the following c
 cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
     "burn(uint256)" 50000000000000000000                               \
-    --private-key <Your sepolia private key from step 1.3>
+    --private-key <Your wallet private key>
 ```
 
 This should display some output stating that your transaction was a success, along with a

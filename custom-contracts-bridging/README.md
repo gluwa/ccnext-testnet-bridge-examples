@@ -186,13 +186,8 @@ Run the following command to initiate the burn:
 cast send                                                        \
     --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
     <Test ERC20 contract address from step 2>                    \
-<<<<<<< HEAD
-    "burn(uint256)" "50"                                         \
-    --private-key <Your wallet private key>
-=======
     "burn(uint256)" 50000000000000000000                         \
-    --private-key <Your sepolia private key from hello-bridge step 1.3>
->>>>>>> b2630d1 (fix(tokens): mint/burn amount)
+    --private-key <Your wallet private key>
 ```
 
 This should display some output stating that your transaction was a success, along with a
