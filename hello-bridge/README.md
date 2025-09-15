@@ -3,7 +3,7 @@
 This tutorial introduces you to one of the most common uses for a cross chain oracle, **cross chain
 bridging!** Cross-chain bridging on Creditcoin can be broken down into three broad steps:
 
-1. To being, the `ERC20` tokens to bridge are burned using a smart contract on our _source chain_
+1. To begin, the `ERC20` tokens to bridge are burned using a smart contract on our _source chain_
    (in this case, Sepolia).
 2. Then, we query the Creditcoin decentralized oracle for a _proof_ of our source chain token burn.
 3. Finally, using the resulting proof from [step 2], we mint the same amount of tokens on Creditcoin
