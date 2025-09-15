@@ -256,6 +256,8 @@ be used by teams of DApp builders who will handle data provisioning on behalf of
 Such teams will want to define and deploy their own contracts as shown in the [custom contract
 bridging] tutorial.
 
+<!-- teardown "cd .." -->
+
 [enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
 [yarn]: https://yarnpkg.com/getting-started/install
 [foundry]: https://getfoundry.sh/

@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/SchemaStore/schemastore/refs/heads/master/src/schemas/json/github-workflow.json
+---
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  md-check:
+    runs-on: ubuntu-latest
+
+    env:
+      FILES: hello-bridge/README.md custom-contracts-bridging/README.md bridge-offchain-worker/README.md
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - run: cargo install --git https://github.com/Trantorian1/md-command-check#96c5c4001f1f9cf73092272457a3d1bc11e85ee9
+
+      - name: list tests
+        run: |
+          md-command-check --list --debug $FILES
+
+      - name: md-command-check
+        env:
+          INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
+        run: |
+          md-command-check --debug $FILES

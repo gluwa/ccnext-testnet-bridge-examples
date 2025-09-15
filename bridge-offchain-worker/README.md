@@ -278,6 +278,8 @@ You've learned:
 
 If you haven't already, take a look at the [USC Gitbook] for more information.
 
+<!-- teardown "cd .." -->
+
 [enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
 [yarn]: https://yarnpkg.com/getting-started/install
 [foundry]: https://getfoundry.sh/

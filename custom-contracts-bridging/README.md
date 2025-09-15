@@ -310,6 +310,8 @@ In practice, DApp builders will want to conduct all cross-chain queries via an o
 order to ensure robustness and streamline UX. Checkout the [bridge offchain worker] tutorial next
 for more information!
 
+<!-- teardown "cd .." -->
+
 [Hello Bridge]: ../hello-bridge/README.md
 [setup]: ../hello-bridge/README.md#1-setup
 [yarn]: https://yarnpkg.com/getting-started/install
