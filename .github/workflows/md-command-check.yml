@@ -17,9 +17,13 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1
       - run: cargo install --git https://github.com/Trantorian1/md-command-check#96c5c4001f1f9cf73092272457a3d1bc11e85ee9
 
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: list tests
         run: |
-          md-command-check --list --debug $FILES
+          nix develop --command md-command-check --list --debug $FILES
 
       - name: md-command-check
         env:
@@ -27,4 +31,4 @@ jobs:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
         run: |
-          md-command-check --debug $FILES
+          nix develop --command md-command-check --debug $FILES
