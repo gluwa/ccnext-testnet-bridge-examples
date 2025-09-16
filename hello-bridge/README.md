@@ -51,13 +51,13 @@ yarn
 
 ## 1. Setup
 
-This tutorial involves the use of two different blockchains. 
+This tutorial involves the use of two different blockchains.
 
 - Sepolia, which serves as our _source chain_ for the tutorial. This is where tokens are burned.
-- Creditcoin USC Testnet, which serves as our _execution chain_ for the tutorial. This is where 
+- Creditcoin USC Testnet, which serves as our _execution chain_ for the tutorial. This is where
   oracle queries are processed and where tokens are minted.
 
-In order to use both blockchains we need to create a wallet and fund it with the native tokens of 
+In order to use both blockchains we need to create a wallet and fund it with the native tokens of
 both networks.
 
 ### 1.1 Generate a New Wallet Address
