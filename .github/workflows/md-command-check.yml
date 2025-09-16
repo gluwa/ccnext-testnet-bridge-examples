@@ -28,13 +28,15 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: list tests
+        shell: bash
         run: |
-          "nix develop --command md-command-check --list --debug $FILES"
+          nix develop --command md-command-check --list --debug $FILES
 
       - name: md-command-check
         env:
           USC_DOCS_INFURA_KEY: ${{ secrets.USC_DOCS_INFURA_KEY }}
           USC_DOCS_TESTING_PK: ${{ secrets.USC_DOCS_TESTING_PK }}
           USC_DOCS_TESTING_ADDRESS: ${{ secrets.USC_DOCS_TESTING_ADDRESS }}
+        shell: bash
         run: |
-          "nix develop --command md-command-check --debug $FILES"
+          nix develop --command md-command-check --debug $FILES
