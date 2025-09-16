@@ -274,9 +274,6 @@ bridging] tutorial.
 [enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
 [yarn]: https://yarnpkg.com/getting-started/install
 [foundry]: https://getfoundry.sh/
-[🦊 MetaMask]: https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?utm_source=www.google.com
-[chrome]: https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?utm_source=www.google.com
-[firefox]: https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/
 [🚰 testnet faucet]: https://cloud.google.com/application/web3/faucet/ethereum/sepolia
 [🚰 creditcoin discord faucet]: https://discord.com/channels/762302877518528522/1414985542235459707
 
