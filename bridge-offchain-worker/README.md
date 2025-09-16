@@ -4,16 +4,16 @@
 > This tutorial builds on the previous [Custom Contract Bridging] example -make sure to check it out
 > before moving on!
 
-So far we have seen [how to initiate a trustless bridge transaction] and 
-[how to customize our trustless bridging logic]. In this tutorial, we will be seeing how to automate 
-our interaction with the Creditcoin oracle so that end users only have to submit _a single transaction_ 
+So far we have seen [how to initiate a trustless bridge transaction] and
+[how to customize our trustless bridging logic]. In this tutorial, we will be seeing how to automate
+our interaction with the Creditcoin oracle so that end users only have to submit _a single transaction_
 on the Sepolia _source chain_.
 
 ## What is an Offchain Worker
 
 An Offchain Worker is an script responsible for watching the state of a _source chain_ (in this
 case, Sepolia) as well as the Creditcoin _execution chain_. It submits _oracle queries_ and
-interacts with our _Universal Smart Contract_ on Creditcoin in response to specific events on 
+interacts with our _Universal Smart Contract_ on Creditcoin in response to specific events on
 each chain. With an offchain worker, all the end user needs to do is sign a single transaction
 on the source chain kicking off cross-chain interaction.
 
@@ -40,6 +40,8 @@ locally:
 - [yarn]
 - [foundry]
 
+<!-- ignore -->
+
 > [!TIP]
 > This project provides a `flake.nix` you can use to download all the dependencies you will need for
 > this tutorial inside of a sandboxed environment. Just keep in mind you will have to
@@ -49,11 +51,24 @@ locally:
 > nix develop
 > ```
 
-Once you have all your dependencies setup, you will need to download some packages with `yarn`:
+Start by heading to the `bridge-offchain-worker` folder:
+
+```bash
+cd bridge-offchain-worker
+```
+
+You will need to set up the right version of foundry with `foundryup`:
+
+<!-- ignore -->
+
+```bash
+foundryup --version v1.2.3 # Skip this command if you are using nix!
+
+```
+
+And download the required packages with `yarn`:
 
 ```sh
-cd bridge-offchain-worker
-foundryup --version v1.2.3 # Skip this command if you are using nix!
 yarn
 ```
 
@@ -64,6 +79,8 @@ steps in the [setup] section there.
 
 Once that is done, you will need to set up some additional configuration for the offchain worker.
 Save and edit the following to a `.env` file inside of `bridge-offchain-worker/`:
+
+<!-- ignore -->
 
 ```env
 # ============================================================================ #
@@ -78,11 +95,11 @@ Save and edit the following to a `.env` file inside of `bridge-offchain-worker/`
 SOURCE_CHAIN_BLOCK_LAG=3
 
 # Address of the ERC20 token contract on source chain
-SOURCE_CHAIN_CONTRACT_ADDRESS=<Addr of source chain contract you deployed in custom-contracts-bridging tutorial>
+SOURCE_CHAIN_CONTRACT_ADDRESS=<test_erc20_contract_address_from_custom_contracts_bridging>
 
 # RPC endpoint for the source chain. Following our previous example, this will
 # be the Sepolia urls
-SOURCE_CHAIN_RPC_URL=https://sepolia.infura.io/v3/your_infura_api_key
+SOURCE_CHAIN_RPC_URL=https://sepolia.infura.io/v3/<your_infura_api_key>
 
 # ============================================================================ #
 #                      Creditcoin USC Chain Configuration                      #
@@ -99,10 +116,10 @@ USC_TESTNET_BLOCK_LAG=3
 USC_TESTNET_RPC_URL=https://rpc.usc-testnet.creditcoin.network
 
 # Address of the mintable ERC20 token on Creditcoin USC chain
-USC_TESTNET_ERC20_MINTABLE_ADDRESS=<Addr of ERC20 deployed in step 3.2 of custom-contracts-bridging tutorial>
+USC_TESTNET_ERC20_MINTABLE_ADDRESS=<erc20_mintable_address_from_custom_contracts_bridging>
 
 # Private key of the wallet that will submit mint requests
-USC_TESTNET_WALLET_PRIVATE_KEY=<Your wallet private key from custom-contracts-bridging tutorial>
+USC_TESTNET_WALLET_PRIVATE_KEY=<your_private_key>
 
 # ============================================================================ #
 #                              Contract Addresses                              #
@@ -112,7 +129,7 @@ USC_TESTNET_WALLET_PRIVATE_KEY=<Your wallet private key from custom-contracts-br
 PROVER_CONTRACT_ADDRESS=0xc43402c66e88f38a5aa6e35113b310e1c19571d4
 
 # Address of the proxy bridge contract on Creditcoin USC chain
-USC_BRIDGE_CONTRACT_ADDRESS=<Address of USC bridge contract you deployed in custom-contracts-bridging tutorial>
+USC_BRIDGE_CONTRACT_ADDRESS=<universal_bridge_proxy_address_from_custom_contracts_bridging>
 
 # ============================================================================ #
 #                        Block Processing Configuration                        #
@@ -135,19 +152,17 @@ MAX_BLOCK_RANGE=2000
 
 Once you have your worker configured, it's time to start automating some queries!
 
-First make sure you're in the right directory:
-
-```sh
-cd bridge-offchain-worker
-```
-
 Run the following command to start the worker:
+
+<!-- ignore -->
 
 ```sh
 yarn start_worker
 ```
 
 Once it's up and running, you start to see the following logs:
+
+<!-- ignore -->
 
 ```bash
 Starting...
@@ -170,11 +185,15 @@ will be handled automatically by the worker 🤖
 
 Run the following command to initiate the burn:
 
+<!-- env your_infura_api_key USC_DOCS_INFURA_KEY -->
+<!-- env your_private_key USC_DOCS_TESTING_PK -->
+<!-- alias test_erc20_contract_address_from_step_2 test_erc20_contract_address_from_custom_contracts_bridging -->
+
 ```sh
-cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
-    <Addr of source chain contract you deployed in custom-contracts-bridging tutorial> \
+cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
+    <test_erc20_contract_address_from_custom_contracts_bridging>       \
     "burn(uint256)" 50000000000000000000                               \
-    --private-key <Your wallet private key>
+    --private-key <your_private_key>
 ```
 
 > [!TIP]
@@ -186,6 +205,8 @@ cast send --rpc-url https://sepolia.infura.io/v3/<Your Infura API key> \
 
 At this point, you should see the worker start to process some events and requesting a proof of your
 token burn from the Creditcoin Decentralized Oracle:
+
+<!-- ignore -->
 
 ```bash
 ...
@@ -201,6 +222,8 @@ The worker then waits for the prover contract to emit a `QueryProofVerified` eve
 the query has been processed. It then queries the _bridging proxy contract_ on Creditcoin to initate
 the minting process:
 
+<!-- ignore -->
+
 ```bash
 ...
 Creditcoin USC chain listener is listening from block 69063 to 69066
@@ -213,6 +236,8 @@ Transaction submitted to the Creditcoin bridge USC: 0x30a57a9f51a36d954e4ae49395
 
 Finally, the worker listens for the `mint` event notifying it that the tokens have been minted to
 our account on Creditcoin.
+
+<!-- ignore -->
 
 ```bash
 ...
@@ -233,14 +258,19 @@ the bridging process was successful.
 
 Run the following command to check your funds:
 
+<!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
+<!-- alias erc20_mintable_address_from_step_3_2 erc20_mintable_address_from_custom_contracts_bridging -->
+
 ```sh
-yarn check_balance                             \
-    <Addr of ERC20 deployed in step 3.2 of custom-contracts-bridging tutorial> \
-    <Your wallet address>
+yarn check_balance                                          \
+    <erc20_mintable_address_from_custom_contracts_bridging> \
+    <your_wallet_address>
 ```
 
 If you've been going through the previous tutorials, your balance should now
 be:
+
+<!-- ignore -->
 
 ```bash
 📦 Token: Mintable (TEST)
@@ -259,6 +289,8 @@ You've learned:
 
 If you haven't already, take a look at the [USC Gitbook] for more information.
 
+<!-- teardown "cd .." -->
+
 [enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
 [yarn]: https://yarnpkg.com/getting-started/install
 [foundry]: https://getfoundry.sh/
@@ -267,5 +299,4 @@ If you haven't already, take a look at the [USC Gitbook] for more information.
 [how to customize our trustless bridging logic]: ../custom-contracts-bridging/README.md
 [Hello Bridge]: ../hello-bridge/README.md
 [setup]: ../hello-bridge/README.md#1-setup
-[test contract]: https://sepolia.etherscan.io/address/0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8
 [USC Gitbook]: https://docs.creditcoin.org/usc
