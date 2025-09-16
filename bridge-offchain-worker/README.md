@@ -177,7 +177,7 @@ Worker job run 2
 > The prover can take a bit of time to get started. Sit back and wait until you get the full log
 > output as shown above ☕
 
-## 4. Burning the tokens you want to bridge
+## 3. Burning the tokens you want to bridge
 
 Like we did in the previous tutorials, we start the bridging process by burning the funds we want to
 bridge on Sepolia. This time however this will be the only transaction we need to submit! The rest
