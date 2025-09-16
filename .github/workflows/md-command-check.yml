@@ -30,6 +30,8 @@ jobs:
       - name: list tests
         shell: bash
         run: |
+          # Yes, I want word splitting
+          # shellcheck disable=SC2086
           nix develop --command md-command-check --list --debug $FILES
 
       - name: md-command-check
@@ -39,4 +41,5 @@ jobs:
           USC_DOCS_TESTING_ADDRESS: ${{ secrets.USC_DOCS_TESTING_ADDRESS }}
         shell: bash
         run: |
+          # shellcheck disable=SC2086
           nix develop --command md-command-check --debug $FILES

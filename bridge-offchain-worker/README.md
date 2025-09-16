@@ -299,5 +299,4 @@ If you haven't already, take a look at the [USC Gitbook] for more information.
 [how to customize our trustless bridging logic]: ../custom-contracts-bridging/README.md
 [Hello Bridge]: ../hello-bridge/README.md
 [setup]: ../hello-bridge/README.md#1-setup
-[test contract]: https://sepolia.etherscan.io/address/0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8
 [USC Gitbook]: https://docs.creditcoin.org/usc
