@@ -418,6 +418,28 @@ const main = async () => {
               );
             }
           }
+          if (decodedLog.eventName === 'QueryMarkedInvalid') {
+            if (contextData.trackedQueryIds.includes(decodedLog.args.queryId)) {
+              console.log(
+                `Caught event, QueryMarkedInvalid: ${decodedLog.args.queryId}`
+              );
+              // Stop tracking query so we don't re-submit it
+              contextData.trackedQueryIds = contextData.trackedQueryIds.filter(
+                (query) => query !== decodedLog.args.queryId
+              );
+            }
+          }
+          if (decodedLog.eventName === 'QueryProcessingFailed') {
+            if (contextData.trackedQueryIds.includes(decodedLog.args.queryId)) {
+              console.log(
+                `Caught event, QueryProcessingFailed: ${decodedLog.args.queryId}`
+              );
+              // Stop tracking query so we don't re-submit it
+              contextData.trackedQueryIds = contextData.trackedQueryIds.filter(
+                (query) => query !== decodedLog.args.queryId
+              );
+            }
+          }
         }
 
         // Listen to bridge usc events

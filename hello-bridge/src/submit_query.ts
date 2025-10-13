@@ -269,10 +269,18 @@ async function main() {
           stopListening = true;
         }
       }
-      if (decodedLog.eventName === 'QueryProofVerificationFailed') {
+      if (decodedLog.eventName === 'QueryMarkedInvalid') {
         if (decodedLog.args.queryId === computedQueryId) {
           console.log(
-            `Caught the query proof verification failed event: ${decodedLog.args.queryId}`
+            `Caught event, QueryMarkedInvalid: ${decodedLog.args.queryId}`
+          );
+          stopListening = true;
+        }
+      }
+      if (decodedLog.eventName === 'QueryProcessingFailed') {
+        if (decodedLog.args.queryId === computedQueryId) {
+          console.log(
+            `Caught event, QueryProcessingFailed: ${decodedLog.args.queryId}`
           );
           stopListening = true;
         }
