@@ -350,9 +350,24 @@ const main = async () => {
             abiElement.type === 'event' &&
             abiElement.name === 'QueryProofVerified'
         );
+        const queryMarkedInvalid = PROVER_ABI.find(
+          (abiElement) =>
+            abiElement.type === 'event' &&
+            abiElement.name === 'QueryMarkedInvalid'
+        );
+        const queryProcessingFailed = PROVER_ABI.find(
+          (abiElement) =>
+            abiElement.type === 'event' &&
+            abiElement.name === 'QueryProcessingFailed'
+        );
         const proverFilter = await ccNextPublicClient.createEventFilter({
           address: proverContractAddress as `0x${string}`,
-          events: [querySubmittedEvent, queryProofVerifiedEvent],
+          events: [
+            querySubmittedEvent, 
+            queryProofVerifiedEvent,
+            queryMarkedInvalid,
+            queryProcessingFailed,
+          ],
           fromBlock: ccNextBlockRange.startBlock,
           toBlock: ccNextBlockRange.endBlock,
         });
@@ -415,6 +430,28 @@ const main = async () => {
               const txHash = await ccNextWalletClient.writeContract(request);
               console.log(
                 `Transaction submitted to the Creditcoin bridge USC: ${txHash}`
+              );
+            }
+          }
+          if (decodedLog.eventName === 'QueryMarkedInvalid') {
+            if (contextData.trackedQueryIds.includes(decodedLog.args.queryId)) {
+              console.log(
+                `Caught event, QueryMarkedInvalid: ${decodedLog.args.queryId}`
+              );
+              // Stop tracking query so we don't re-submit it
+              contextData.trackedQueryIds = contextData.trackedQueryIds.filter(
+                (query) => query !== decodedLog.args.queryId
+              );
+            }
+          }
+          if (decodedLog.eventName === 'QueryProcessingFailed') {
+            if (contextData.trackedQueryIds.includes(decodedLog.args.queryId)) {
+              console.log(
+                `Caught event, QueryProcessingFailed: ${decodedLog.args.queryId}`
+              );
+              // Stop tracking query so we don't re-submit it
+              contextData.trackedQueryIds = contextData.trackedQueryIds.filter(
+                (query) => query !== decodedLog.args.queryId
               );
             }
           }

@@ -36,6 +36,28 @@
     "type": "constructor"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -78,6 +100,25 @@
       }
     ],
     "name": "EscrowedPaymentReclaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
     "type": "event"
   },
   {
@@ -170,7 +211,26 @@
         "type": "string"
       }
     ],
-    "name": "QueryProofVerificationFailed",
+    "name": "QueryMarkedInvalid",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "QueryId",
+        "name": "queryId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "QueryProcessingFailed",
     "type": "event"
   },
   {
@@ -518,6 +578,71 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "chainId",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "height",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "index",
+            "type": "uint64"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint64",
+                "name": "offset",
+                "type": "uint64"
+              },
+              {
+                "internalType": "uint64",
+                "name": "size",
+                "type": "uint64"
+              }
+            ],
+            "internalType": "struct LayoutSegment[]",
+            "name": "layoutSegments",
+            "type": "tuple[]"
+          }
+        ],
+        "internalType": "struct ChainQuery",
+        "name": "query",
+        "type": "tuple"
+      }
+    ],
+    "name": "getQueryResult",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "offset",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "abiBytes",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct ResultSegment[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getUnprocessedQueries",
     "outputs": [
@@ -597,6 +722,24 @@
       }
     ],
     "name": "markAsInvalid",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "QueryId",
+        "name": "queryId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "markProcessingFailed",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -725,6 +868,13 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "components": [
@@ -809,6 +959,19 @@
         "type": "tuple[]"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },

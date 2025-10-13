@@ -211,17 +211,23 @@ async function main() {
       (abiElement) =>
         abiElement.type === 'event' && abiElement.name === 'QueryProofVerified'
     );
-    const queryProofVerificationFailed = PROVER_ABI.find(
+    const queryMarkedInvalid = PROVER_ABI.find(
       (abiElement) =>
         abiElement.type === 'event' &&
-        abiElement.name === 'QueryProofVerificationFailed'
+        abiElement.name === 'QueryMarkedInvalid'
+    );
+    const queryProcessingFailed = PROVER_ABI.find(
+      (abiElement) =>
+        abiElement.type === 'event' &&
+        abiElement.name === 'QueryProcessingFailed'
     );
     const proverFilter = await ccNextPublicClient.createEventFilter({
       address: proverContractAddress as `0x${string}`,
       events: [
         querySubmittedEvent,
         queryProofVerified,
-        queryProofVerificationFailed,
+        queryMarkedInvalid,
+        queryProcessingFailed,
       ],
       fromBlock: BigInt(startBlock - BLOCK_LAG),
       toBlock: BigInt(currentBlock - BLOCK_LAG),
@@ -269,10 +275,18 @@ async function main() {
           stopListening = true;
         }
       }
-      if (decodedLog.eventName === 'QueryProofVerificationFailed') {
+      if (decodedLog.eventName === 'QueryMarkedInvalid') {
         if (decodedLog.args.queryId === computedQueryId) {
           console.log(
-            `Caught the query proof verification failed event: ${decodedLog.args.queryId}`
+            `Caught event, QueryMarkedInvalid: ${decodedLog.args.queryId}`
+          );
+          stopListening = true;
+        }
+      }
+      if (decodedLog.eventName === 'QueryProcessingFailed') {
+        if (decodedLog.args.queryId === computedQueryId) {
+          console.log(
+            `Caught event, QueryProcessingFailed: ${decodedLog.args.queryId}`
           );
           stopListening = true;
         }
