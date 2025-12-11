@@ -198,6 +198,8 @@ yarn submit_query                                      \
 
 You should see some messages like the following from the script:
 
+<!-- ignore -->
+
 ```sh
 Transaction found in block 32: 0xb95b3b0ae14eb81eccd6203cc6479be46c0c578a440ac86c23e2de2411aed31f at index 0
 Found attestation bounds for height 32: lower=10, upper=130
