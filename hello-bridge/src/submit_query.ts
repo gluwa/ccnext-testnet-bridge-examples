@@ -5,7 +5,7 @@ import { EncodingVersion, raw } from '@gluwa/cc-next-query-builder';
 import simpleMinterAbi from './contract-abis/SimpleMinterUSC.json';
 
 // TODO: Update with deployed address on testnet
-const USC_MINTER_CONTRACT_ADDRESS = '0x0165878A594ca255338adfa4d48449f69242Eb8F';
+const USC_MINTER_CONTRACT_ADDRESS = '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6';
 
 async function main() {
   // Setup
