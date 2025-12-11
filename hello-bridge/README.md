@@ -171,7 +171,7 @@ transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf
 
 Save the transaction hash. You will be needing it in the next step.
 
-## 4. Get a proof of the token burn from the Creditcoin Oracle
+## 4. Submit a mint query to the USC contract
 
 Great, we've burned some tokens! But how can we prove it? Most cross-chain bridges rely on a
 _centralized_, _trusted_ approach: one service or company handles all the token burns on the _source
@@ -179,8 +179,10 @@ chain_ and is responsible for distributing the same amount of tokens on the targ
 be an issue, since nothing is preventing that company from censoring certain transactions or even
 stealing funds! Web3 was made to be _trustless_ and _decentralized_, let's make it that way 😎.
 
-Now that we've burnt funds on Sepolia, we can generate a proof of the burning and use that to trigger the
-minting of tokens in our USC on the Creditcoin side:
+Now that we've burnt funds on Sepolia, we can use that transaction to request a mint in our USC contract, 
+this also includes generating the proof for the Oracle using the Creditcoin proof generator library.
+
+All these steps are condensed in the `submit_query` script, which is run like this:
 
 ```sh
 yarn submit_query                                      \
@@ -196,20 +198,20 @@ yarn submit_query                                      \
 
 You should see some messages like the following from the script:
 
-```
+```sh
 Transaction found in block 32: 0xb95b3b0ae14eb81eccd6203cc6479be46c0c578a440ac86c23e2de2411aed31f at index 0
 Found attestation bounds for height 32: lower=10, upper=130
 Built 100 continuity blocks for height 32
 Transaction submitted:  0xf134fc29c12b22bb542da0393df527b40e1b772e71d87631b886bc8d14d594dd
 Waiting for TokensMinted event...
+Waiting for TokensMinted event...
 Tokens minted! Contract: 0x0165878A594ca255338adfa4d48449f69242Eb8F, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0x115e4c9437f48e8ae9795e7c828f56b6a738000aa06ac08e769375c5dc4f7bcc
 Minting completed!
 ```
 
-Sometimes it may take a bit more for the `TokensMinted` event to trigger, but should not be more than 30 seconds
+Sometimes it may take a bit more for the `TokensMinted` event to trigger, but should be no more than 30 seconds.
 
-Once the proving process completes, you should see some output stating that your query was proven
-successfully, along with a query id:
+Once that's done we only need to check our newly minted tokens!
 
 ## 5. Check Balance in USC Testnet ERC20 Contract
 
