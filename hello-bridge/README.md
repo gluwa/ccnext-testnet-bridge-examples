@@ -5,9 +5,9 @@ bridging!** Cross-chain bridging on Creditcoin can be broken down into three bro
 
 1. To begin, the `ERC20` tokens to bridge are burned using a smart contract on our _source chain_
    (in this case, Sepolia).
-2. Then, we query the Creditcoin decentralized oracle for a _proof_ of our source chain token burn.
-3. Finally, using the resulting proof from [step 2], we mint the same amount of tokens on Creditcoin
-   (in this case, Creditcoin testnet).
+2. Then, we generate a proof of our source chain token burn
+3. Using that proof we call our minter contract which will internally call the Creditcoin oracle to validate the generated proof
+4. After that the same contract will mint the tokens on Creditcoin
 
 ## External dependencies
 
@@ -179,11 +179,8 @@ chain_ and is responsible for distributing the same amount of tokens on the targ
 be an issue, since nothing is preventing that company from censoring certain transactions or even
 stealing funds! Web3 was made to be _trustless_ and _decentralized_, let's make it that way 😎.
 
-Now that we've burnt funds on Sepolia, we need to create a proof of that token burn using the
-Creditcoin Decentralized Oracle. We do this by submitting an _oracle query_. Run the following
-command:
-
-<!-- extract query_id_from_step_4 "Query Proving completed. QueryId: (0[xX][a-fA-F0-9]{64})" -->
+Now that we've burnt funds on Sepolia, we can generate a proof of the burning and use that to trigger the
+minting of tokens in our USC on the Creditcoin side:
 
 ```sh
 yarn submit_query                                      \
@@ -193,46 +190,28 @@ yarn submit_query                                      \
 ```
 
 > [!TIP]
-> This will take a while. Sit back, relax, and wait for the query to process ☕ Proving should take
-> ~16 minutes and no more than 30 minutes.
+> It's possible that if you submit the query too quickly after having burned the tokens that you get
+> an error, that is to be expected since the Creditcoin network takes a while to build the proper proofs
+> to validate the transaction you submitted in the source chain.
+
+You should see some messages like the following from the script:
+
+```
+Transaction found in block 32: 0xb95b3b0ae14eb81eccd6203cc6479be46c0c578a440ac86c23e2de2411aed31f at index 0
+Found attestation bounds for height 32: lower=10, upper=130
+Built 100 continuity blocks for height 32
+Transaction submitted:  0xf134fc29c12b22bb542da0393df527b40e1b772e71d87631b886bc8d14d594dd
+Waiting for TokensMinted event...
+Tokens minted! Contract: 0x0165878A594ca255338adfa4d48449f69242Eb8F, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0x115e4c9437f48e8ae9795e7c828f56b6a738000aa06ac08e769375c5dc4f7bcc
+Minting completed!
+```
+
+Sometimes it may take a bit more for the `TokensMinted` event to trigger, but should not be more than 30 seconds
 
 Once the proving process completes, you should see some output stating that your query was proven
 successfully, along with a query id:
 
-<!-- ignore -->
-
-```bash
-Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
-```
-
-Save the query id. You will be needing it in the next step.
-
-## 5. Mint Tokens on Creditcoin
-
-Now that we have a proof of the token burn on our _source chain_, we can finalize the bridging
-process by minting the same amount of tokens on the Creditcoin testnet. To do that, we need to call
-a [bridge contract] on Creditcoin which will interpret the data of our proof from [step 4]. We have
-already deployed this contract for you, since in this tutorial you're acting as an end user. But
-normally each DApp team would customize and deploy their own USC.
-
-As we complete the minting process, we're minting tokens in an [ERC20 contract] which mirrors the test token
-contract we deployed on Sepolia. This contract is already deployed on creditcoin usc testnet.
-
-Run the following command to query the bridge contract:
-
-```bash
-yarn complete_mint                             \
-    <your_private_key>                         \
-    0x441726D6821B2009147F0FA96E1Ee09D412cCb38 \
-    0xc43402c66e88f38a5aa6e35113b310e1c19571d4 \
-    <query_id_from_step_4>                     \
-    0xb0fb0b182f774266b1c7183535A41D69255937a3
-```
-
-Congratulations, you've just made your first _trutsless bridge transaction_ using the Creditcoin
-Decentralized Oracle!
-
-## 6. Check Balance in USC Testnet ERC20 Contract
+## 5. Check Balance in USC Testnet ERC20 Contract
 
 As a final check, we can take a look at the balance of your account on Creditcoin to confirm that
 the bridging process was successful.
@@ -255,6 +234,7 @@ You should get some output showing your wallet's balance on Creditcoin:
 📦 Token: Mintable (TEST)
 🧾 Raw Balance: 50000000000000000000
 💰 Formatted Balance: 50.0 TEST
+Decimals for token micro unit: 18
 ```
 
 ## Conclusion

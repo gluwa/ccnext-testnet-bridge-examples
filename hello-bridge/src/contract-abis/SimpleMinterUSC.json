@@ -121,17 +121,29 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "from",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "value",
+        "name": "amount",
         "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "queryId",
+        "type": "bytes32"
       }
     ],
-    "name": "TokensBurned",
+    "name": "TokensMinted",
     "type": "event"
   },
   {
@@ -158,19 +170,6 @@
     ],
     "name": "Transfer",
     "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "BURN_ADDRESS",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [
@@ -240,25 +239,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "burn",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "decimals",
     "outputs": [
@@ -272,6 +252,79 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "chainKey",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "height",
+        "type": "uint64"
+      },
+      {
+        "internalType": "bytes",
+        "name": "encodedTransaction",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "merkleRoot",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "hash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bool",
+            "name": "isLeft",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct INativeQueryVerifier.MerkleProofEntry[]",
+        "name": "siblings",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "lowerEndpointDigest",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "merkleRoot",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "digest",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct INativeQueryVerifier.ContinuityBlock[]",
+        "name": "continuityBlocks",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "mintFromQuery",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "success",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "name",
     "outputs": [
@@ -279,6 +332,25 @@
         "internalType": "string",
         "name": "",
         "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "processedQueries",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -361,6 +433,19 @@
       }
     ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "verifier",
+    "outputs": [
+      {
+        "internalType": "contract INativeQueryVerifier",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

@@ -1,0 +1,6 @@
+[profile.default]
+out = "contract-abis"
+src = "contracts"
+
+libs = ["node_modules"]
+viaIR = true
