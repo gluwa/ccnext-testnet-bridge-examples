@@ -22,7 +22,7 @@ async function main() {
     process.exit(1);
   }
 
-  var [rpcUrl, transactionHash, ccNextPrivateKey] = args;
+  const [rpcUrl, transactionHash, ccNextPrivateKey] = args;
 
   // Validate RPC URL
   if (!rpcUrl.startsWith('http://') && !rpcUrl.startsWith('https://')) {
@@ -30,20 +30,12 @@ async function main() {
   }
 
   // Validate Transaction Hash
-  if (!transactionHash.startsWith('0x')) {
-    transactionHash = '0x' + transactionHash;
-  }
-
-  if (transactionHash.length !== 66) {
+  if (!transactionHash.startsWith('0x') || transactionHash.length !== 66) {
     throw new Error('Invalid transaction hash provided');
   }
 
   // Validate Private Key
-  if (!ccNextPrivateKey.startsWith('0x')) {
-    ccNextPrivateKey = '0x' + ccNextPrivateKey;
-  }
-
-  if (ccNextPrivateKey.length != 66) {
+  if (!ccNextPrivateKey.startsWith('0x') || ccNextPrivateKey.length !== 66) {
     throw new Error('Invalid private key provided');
   }
 

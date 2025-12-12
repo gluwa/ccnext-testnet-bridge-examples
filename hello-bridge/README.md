@@ -226,7 +226,7 @@ Run the following command to query the contract:
 
 ```sh
 yarn check_balance                             \
-    0xb0fb0b182f774266b1c7183535A41D69255937a3 \
+    0xCHANGEMELATER \
     <your_wallet_address>
 ```
 
@@ -273,5 +273,5 @@ bridging] tutorial.
 [custom contract bridging]: ../custom-contracts-bridging/README.md
 [step 1.1]: #11-generate-a-new-wallet-address
 [step 2]: #2-minting-some-tokens-on-sepolia
-[step 4]: #4-get-a-proof-of-the-token-burn-from-the-creditcoin-oracle
+[step 4]: #4-submit-a-mint-query-to-the-usc-contract
 [DApp Design Patterns]: https://docs.creditcoin.org/usc/dapp-builder-infrastructure/dapp-design-patterns

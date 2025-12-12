@@ -86,36 +86,32 @@ Save the contract address. You will be needing it in the next step.
 ## 3. Deploy Your Own Custom Bridging Contracts
 
 In the next few steps we will be deploying our own bridging contracts based off the
-`CCNext-smart-contracts` repository. This repository contains templates for the two smart contracts
+`CCNext-smart-contracts` repository. This repository contains the template for the smart contract
 we will be deploying on Creditcoin USC Testnet:
 
-- `UniversalBridgeProxy.sol`
-- `ERC20Mintable.sol`
+- `SimpleMinterUSC.sol`
 
-Universal smart contracts (USCs) such as `UniversalBridgeProxy` are intended to be deployed by DApp
+Universal smart contracts (USCs) such as `SimpleMinterUSC` are intended to be deployed by DApp
 builders. Here, our USC is used only for bridging tokens. A USC retrieves cross-chain data from
 oracle query results. It then interprets that data into typed values, and uses the typed cross-chain
 data to call further DApp business logic.
 
-For instance, our `UniversalBridgeProxy` looks for fields like `from`, `to`, and `amount` in the
+For instance, our `SimpleMinterUSC` looks for fields like `from`, `to`, and `amount` in the
 oracle proof we submit to it. With those fields, the contract can verify whether or not a token
 burn took place, how many tokens it needs to mint on Creditcoin, and which address it should mint
 them to.
-
-Our other contract, `ERC20Mintable`, is only used to mint our newly bridged tokens. It is modified
-so that its `_mint()` function can be called by the our `UniversalBridgeProxy` contract.
 
 Start by cloning the `CCNext-smart-contracts` repository:
 
 ```sh
 git clone https://github.com/gluwa/CCNext-smart-contracts.git
 cd CCNext-smart-contracts
-git checkout 382aa218889af6ac484cfe33018f1f9e6866cdcf
+git checkout CHANGEMELATER
 ```
 
 ### 3.1 Modify The Bridge Smart Contract
 
-As an exercise, we will be modifying our `UniversalBridgeProxy` so that it mints _twice_ the amount
+As an exercise, we will be modifying our `SimpleMinterUSC` so that it mints _twice_ the amount
 of tokens which were burned on our _source chain_.
 
 > [!NOTE]
@@ -123,21 +119,21 @@ of tokens which were burned on our _source chain_.
 > token each time we bridge it.
 
 In your freshly cloned `CCNext-smart-contracts` repository, start by opening the file
-`contracts/UniversalBridgeProxy.sol`. Next, navigate to the following line inside of the
-`uscBridgeCompleteMint` function:
+`contracts/SimpleMinterUSC.sol`. Next, navigate to the following line inside of the
+`mintFromQuery` function:
 
 ```sol
-_mintTokens(ERC20Address, fromAddress, amount, queryId);
+_mint(msg.sender, MINT_AMOUNT);
 ```
 
-Update it so that your `UniversalBridgeProxy` contract mints twice
-the `amount` of tokens it should on Creditcoin. The resulting line should look something like:
+Update it so that your `SimpleMinterUSC` contract mints twice
+the `MINT_AMOUNT` of tokens it should on Creditcoin. The resulting line should look something like:
 
 ```sol
-_mintTokens(ERC20Address, fromAddress, amount * 2, queryId);
+_mint(msg.sender, MINT_AMOUNT * 2);
 ```
 
-### 3.2 Deploy Your Modified Contracts
+### 3.2 Deploy Your Modified Contract
 
 To deploy your modified bridging contracts, start by creating a `.env` file at the top-level of the
 `CCNext-smart-contracts` repository. Run the following command to setup your `.env`:
@@ -186,16 +182,15 @@ npx hardhat deploy                          \
 > [!TIP]
 > This can take a bit of time ☕
 
-You should get some output with the address of the contracts you just deployed:
+You should get some output with the address of the contract you just deployed:
 
 <!-- ignore -->
 
 ```bash
-ERC20 deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
-UniversalBridgeProxy deployed to: 0x4858Db7F085418301A010c880B98374d83533fa2
+SimpleMinterUSC deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
 ```
 
-Save the address of each contract. You will be needing them in [step 6]. Remember to exit the
+Save the address of the contract. You will be needing it in [step 5]. Remember to exit the
 `CCNext-smart-contracts` repository and return to the `custom-contracts-bridging` folder:
 
 ```bash
@@ -232,57 +227,44 @@ transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf
 
 Save the transaction hash. You will be needing it in the next step.
 
-## 5. Get a proof of the token burn from the Creditcoin Oracle
+## 5. Submit a mint query to the USC contract
 
-Now that we've burnt funds on Sepolia, we need to create a proof of that token burn using the
-Creditcoin Decentralized Oracle. We do this by submitting an _oracle query_. Run the following
-command:
-
-<!-- extract query_id_from_step_5 "Query Proving completed. QueryId: (0[xX][a-fA-F0-9]{64})" -->
+Now that we've burnt funds on Sepolia, we can use that transaction to request a mint in our custom USC contract, 
+this also includes generating the proof for the Oracle using the Creditcoin proof generator library.
 
 ```sh
 yarn submit_query                                      \
     https://sepolia.infura.io/v3/<your_infura_api_key> \
     <transaction_hash_from_step_4>                     \
-    <your_private_key>
+    <your_private_key>                                 \
+    <contract_address_from_step_3_2>
 ```
 
 > [!TIP]
-> This will take a while. Sit back, relax, and wait for the query to process ☕ Proving should take
-> ~16 minutes and no more than 30 minutes.
+> If you submit a query within the first minute of conducting your token burn, it's possible that your query will fail. This is 
+> because the Creditcoin Oracle takes up to a minute to attest to new blocks on a source chain. If your query fails 
+> for this reason, wait a few seconds and try re-submitting it.
 
-Once the proving process completes, you should see some output stating that your query was proven
-successfully, along with a query id:
+On a succesfull query, you should see some messages like the following from the script:
 
 <!-- ignore -->
 
-```bash
-Query Proving completed. QueryId: 0x7ee33a2be05c9019dedcd833c9c2fa516c2bd316b225dd7ca3bde5b1cdb987db
-```
-
-Save the query id. You will be needing it in the next step.
-
-## 6. Mint Tokens on Creditcoin
-
-Now that we have a proof of the token burn on our _source chain_, we can finalize the bridging
-process by minting the same amount of tokens on the Creditcoin testnet. To do that, we need to call
-the function `uscBridgeCompleteMint` in your `UniversalBridgeProxy` contract on Creditcoin. This
-will fetch and interpret cross-chain data from our _trustlessly_ verified proof created in [step 5].
-
-Run the following command to query the proxy contract:
-
 ```sh
-yarn complete_mint                               \
-    <your_private_key> \
-    <universal_bridge_proxy_address_from_step_3_2> \
-    0xc43402c66e88f38a5aa6e35113b310e1c19571d4   \
-    <query_id_from_step_5>                       \
-    <erc20_mintable_address_from_step_3_2>
+Transaction found in block 32: 0xb95b3b0ae14eb81eccd6203cc6479be46c0c578a440ac86c23e2de2411aed31f at index 0
+Found attestation bounds for height 32: lower=10, upper=130
+Built 100 continuity blocks for height 32
+Transaction submitted:  0xf134fc29c12b22bb542da0393df527b40e1b772e71d87631b886bc8d14d594dd
+Waiting for TokensMinted event...
+Waiting for TokensMinted event...
+Tokens minted! Contract: 0x0165878A594ca255338adfa4d48449f69242Eb8F, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0x115e4c9437f48e8ae9795e7c828f56b6a738000aa06ac08e769375c5dc4f7bcc
+Minting completed!
 ```
 
-Congratulations, you've just set up and used your very own _trustless bridge_!
+Sometimes it may take a bit more for the `TokensMinted` event to trigger, but should be no more than 30 seconds.
 
-## 7. Check Balance in USC Testnet ERC20 Contract
+Once that's done we only need to check our newly minted tokens!
+
+## 6. Check Balance in USC Testnet ERC20 Contract
 
 As a final check, we can take a look at the balance of your account on Creditcoin to confirm that
 the bridging process was successful. This will use the `ERC20Mintable` contract which you deployed
@@ -315,7 +297,7 @@ Decentralized Oracle!
 
 The next tutorial will take another important step towards developing a mature, production ready
 cross-chain DApp. That step is automation! We automate using an **offchain worker** which submits
-oracle queries and triggers use of oracle results. This _vastly_ improves UX by making it so the
+queries automatically. This _vastly_ improves UX by making it so the
 end user only has to sign a _single_ transaction to initiate the bridging procedure.
 
 In practice, DApp builders will want to conduct all cross-chain queries via an offchain worker in
@@ -330,7 +312,6 @@ for more information!
 [foundry]: https://getfoundry.sh/
 [enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
 [step 2]: #2-deploy-a-test-erc20-contract-on-sepolia
-[step 3.2]: #32-deploy-your-modified-contracts
-[step 5]: #5-get-a-proof-of-the-token-burn-from-the-creditcoin-oracle
-[step 6]: #6-mint-tokens-on-creditcoin
+[step 3.2]: #32-deploy-your-modified-contract
+[step 5]: #5-submit-a-mint-query-to-the-usc-contract
 [bridge offchain worker]: ../bridge-offchain-worker/README.md

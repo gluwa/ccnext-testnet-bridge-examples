@@ -1,5 +1,5 @@
 [profile.default]
-out = "src/abis"
+out = "out"
 src = "src/contracts"
 
 libs = ["node_modules"]

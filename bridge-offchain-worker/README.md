@@ -12,25 +12,13 @@ on the Sepolia _source chain_.
 ## What is an Offchain Worker
 
 An Offchain Worker is an script responsible for watching the state of a _source chain_ (in this
-case, Sepolia) as well as the Creditcoin _execution chain_. It submits _oracle queries_ and
-interacts with our _Universal Smart Contract_ on Creditcoin in response to specific events on
+case, Sepolia) and in more complex setups also Creditcoin's chain. It queries to our 
+_Universal Smart Contract_ on Creditcoin in response to specific events on
 each chain. With an offchain worker, all the end user needs to do is sign a single transaction
 on the source chain kicking off cross-chain interaction.
 
-Our offchain worker will listen to events from the following sources:
-
-1. `burn` transfer events which are emitted by our test `ERC20` contract on Sepolia. When our worker
-   detects this, they create an oracle query to request a proof of the token burn from the
-   Creditcoin Decentralized Oracle.
-
-2. `queryProofVerified` events which are emitted by the prover contract on Creditcoin. Each of
-   these events signals that a query has finished being proven by the Creditcoin Decentralized
-   Oracle. When our worker detects this, it submits a request to our _bridge proxy contract_ to
-   finalize the bridging process by minting the tokens we burned on Sepolia onto Creditcoin.
-
-3. `mint` events which are emitted by our _bridge proxy contract_. This signals that all bridged
-   tokens have finished minting and we can drop any local records related to the bridged
-   transaction.
+Our offchain worker will listen to `TokenBurned` events on the source chain and in response will attempt to
+generate the necessary proofs to then forward to the USC contract on Creditcoin.
 
 ## External dependencies
 
@@ -87,15 +75,11 @@ Save and edit the following to a `.env` file inside of `bridge-offchain-worker/`
 #                          Source Chain Configuration                          #
 # ============================================================================ #
 
-# The starting block number to begin listening for burn events. If not provided,
-# the worker will get the latest source chain block number
-# SOURCE_CHAIN_INITIAL_START_BLOCK=<block_number>
-
-# Number of blocks to wait before processing events
-SOURCE_CHAIN_BLOCK_LAG=3
-
 # Address of the ERC20 token contract on source chain
 SOURCE_CHAIN_CONTRACT_ADDRESS=<test_erc20_contract_address_from_custom_contracts_bridging>
+
+# Chain identifier of the source chain on Creditcoin, for Sepolia it would be 102033
+SOURCE_CHAIN_KEY=<source_chain_key>
 
 # RPC endpoint for the source chain. Following our previous example, this will
 # be the Sepolia urls
@@ -105,48 +89,15 @@ SOURCE_CHAIN_RPC_URL=https://sepolia.infura.io/v3/<your_infura_api_key>
 #                      Creditcoin USC Chain Configuration                      #
 # ============================================================================ #
 
-# The starting block number to begin listening for prover events. If not
-# provided, the worker will get the latest USC Testnet block number
-#USC_TESTNET_INITIAL_START_BLOCK=<block_number>
-
-# Number of blocks to wait before processing
-USC_TESTNET_BLOCK_LAG=3
-
 # RPC endpoint for the Creditcoin USC chain
 USC_TESTNET_RPC_URL=https://rpc.usc-testnet.creditcoin.network
 
-# Address of the mintable ERC20 token on Creditcoin USC chain
-USC_TESTNET_ERC20_MINTABLE_ADDRESS=<erc20_mintable_address_from_custom_contracts_bridging>
+# Address of the minter contract on Creditcoin
+USC_MINTER_CONTRACT_ADDRESS=<erc20_minter_address_from_custom_contracts_bridging>
 
 # Private key of the wallet that will submit mint requests
 USC_TESTNET_WALLET_PRIVATE_KEY=<your_private_key>
-
-# ============================================================================ #
-#                              Contract Addresses                              #
-# ============================================================================ #
-
-# Address of the prover contract on Creditcoin USC chain
-PROVER_CONTRACT_ADDRESS=0xc43402c66e88f38a5aa6e35113b310e1c19571d4
-
-# Address of the proxy bridge contract on Creditcoin USC chain
-USC_BRIDGE_CONTRACT_ADDRESS=<universal_bridge_proxy_address_from_custom_contracts_bridging>
-
-# ============================================================================ #
-#                        Block Processing Configuration                        #
-# ============================================================================ #
-
-# Maximum number of blocks to process in each worker run
-MAX_BLOCK_RANGE=2000
 ```
-
-> [!CAUTION]
-> If you configure `SOURCE_CHAIN_INITIAL_START_BLOCK` and `USC_TESTNET_INITIAL_START_BLOCK` to point
-> to blocks in the past, chances are you're going to re-query transactions and events that have
-> already been processed. The issue with the example worker we are using is that it will always
-> build and submit queries as if this was the first time they are being submitted. **This will fail
-> on the prover** since it doesn't allow query resubmissions. **The bridge proxy contract acts
-> similarly**, in that it will revert mint calls for any query id that has been already been
-> submitted.
 
 ## 2. Start the Offchain Worker
 
@@ -166,16 +117,8 @@ Once it's up and running, you start to see the following logs:
 
 ```bash
 Starting...
-Worker job run 1
-Source chain listener is listening from block 8827111 to 8827396
-Creditcoin chain listener is listening from block 1298785 to 1299490
-Worker job run 2
-...
+Worker started! Listening for burn events...
 ```
-
-> [!TIP]
-> The prover can take a bit of time to get started. Sit back and wait until you get the full log
-> output as shown above ☕
 
 ## 3. Burning the tokens you want to bridge
 
@@ -197,55 +140,33 @@ cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
 ```
 
 > [!TIP]
-> It can take some time for the worker to pick up your transaction. Pay attention to your
-> transaction's `blockNumber`: the prover will pick it up when that block number falls into the
-> range of blocks it is listening to on the source chain ☕
+> If your worker is not running when the transaction processes on the source chain it will not pick up
+> the event! This example is made for simplicity, a more robust worker would be able to read events from
+> previous blocks and have more complex event filters.
 
 ## 4. Monitor the Offchain Worker
 
-At this point, you should see the worker start to process some events and requesting a proof of your
-token burn from the Creditcoin Decentralized Oracle:
+At this point, you should see the worker picking up the event.
 
 <!-- ignore -->
 
 ```bash
-...
-Source chain listener is listening from block 9159981 to 9159985
-Found 2 new burn transaction events
-Skipping non-burn transfer: tx=0xa6d0aa852fb1cead707be7fae0c6c3678dd5dcb33ec09327606d53079a8e3039, from=0x0000000000000000000000000000000000000000, to=0x475CFf3D6728B0BaEdDd65d863DD7E82a43367ee, value=50000
-Query cost: 10000000000000000000 for query 0x45778684817c53de254036b8bfe975dd16b93a36f320c7de3f88ae107bf8a2b0
-Query submitted to the Creditcoin oracle: 0x3aa3b0e4f99524f087bb0257b339f3ed1ff7d8ca9ea0c03660577468911e26ae
-...
+Detected burn of 1000 tokens from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 at 0x49537972ceb6bb8308252474e14847253c4bdf74e87c2ab53cb8e29eea9f5719
+Transaction found in block 596: 0xa2f465f09f0cbb95bd202e9fe303c48d1badceadfac3a577e28b726658321287 at index 0
+Proof generation failed: Failed to build continuity proof: Cannot build continuity proof for height 596 without both lower and upper bounds. Retrying in 30 seconds...
 ```
 
-The worker then waits for the prover contract to emit a `QueryProofVerified` event notifying it that
-the query has been processed. It then queries the _bridging proxy contract_ on Creditcoin to initate
-the minting process:
+> [!TIP]
+> Notice how the logs show an error failing to build the continuity proof. Don't be alarmed! That's normal
+> since the Creditcoin chain will still have not attested the block in which the transaction happened,
+> the worker will retry again and eventually the proof will get built and submitted!
+
+Eventually, you should see a message like this one:
 
 <!-- ignore -->
 
 ```bash
-...
-Creditcoin USC chain listener is listening from block 69063 to 69066
-Found 1 new prover contract result events
-Caught the query proof verified event: 0x45778684817c53de254036b8bfe975dd16b93a36f320c7de3f88ae107bf8a2b0
-Value return in event: {"eventName":"QueryProofVerified","args":{"queryId":"0x45778684817c53de254036b8bfe975dd16b93a36f320c7de3f88ae107bf8a2b0","resultSegments":[{"offset":"448","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"192","abiBytes":"0x000000000000000000000000475cff3d6728b0baeddd65d863dd7e82a43367ee"},{"offset":"224","abiBytes":"0x00000000000000000000000015166ba9d24abfa477c0c88dd1e6321297214ec8"},{"offset":"800","abiBytes":"0x00000000000000000000000015166ba9d24abfa477c0c88dd1e6321297214ec8"},{"offset":"928","abiBytes":"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"},{"offset":"960","abiBytes":"0x000000000000000000000000475cff3d6728b0baeddd65d863dd7e82a43367ee"},{"offset":"992","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000001"},{"offset":"1056","abiBytes":"0x0000000000000000000000000000000000000000000000000000000000000032"}],"state":2}}
-Transaction submitted to the Creditcoin bridge USC: 0x30a57a9f51a36d954e4ae4939589ad8298bdd54d1d69a02485918bfc54d4828e
-...
-```
-
-Finally, the worker listens for the `mint` event notifying it that the tokens have been minted to
-our account on Creditcoin.
-
-<!-- ignore -->
-
-```bash
-...
-Found 1 new bridge USC events
-Caught the tokens minted event: 0x45778684817c53de254036b8bfe975dd16b93a36f320c7de3f88ae107bf8a2b0
-Value return in event: {"eventName":"TokensMinted","args":{"token":"0xb0fb0b182f774266b1c7183535A41D69255937a3","recipient":"0x475CFf3D6728B0BaEdDd65d863DD7E82a43367ee","queryId":"0x45778684817c53de254036b8bfe975dd16b93a36f320c7de3f88ae107bf8a2b0","amount":"50"}}
-Congratulations! You've successfully bridged tokens from your source chain to your Creditcoin chain!
-...
+Tokens minted! Contract: 0x0165878A594ca255338adfa4d48449f69242Eb8F, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0x115e4c9437f48e8ae9795e7c828f56b6a738000aa06ac08e769375c5dc4f7bcc
 ```
 
 That's it! All it took was a single transaction on your end to initiate the bridging process,
