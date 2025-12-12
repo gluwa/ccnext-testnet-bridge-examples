@@ -77,6 +77,10 @@ contract SimpleMinterUSC is ERC20 {
 
         require(verified, "Verification failed");
 
+        // TODO: Currently we don't parse the encodedTransaction to extract any result segments
+        // and simply mint a fixed amount of tokens. In a future implementation, we will also parse
+        // the transaction to extract relevant data (e.g., recipient address, amount, etc.)
+        
         _mint(msg.sender, 1_000);
         processedQueries[queryId] = true;
         emit TokensMinted(address(this), msg.sender, 1_000, queryId);

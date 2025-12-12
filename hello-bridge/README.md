@@ -5,8 +5,8 @@ bridging!** Cross-chain bridging on Creditcoin can be broken down into three bro
 
 1. To begin, the `ERC20` tokens to bridge are burned using a smart contract on our _source chain_
    (in this case, Sepolia).
-2. Then, we generate a proof of our source chain token burn
-3. Using that proof we call our minter contract which will internally call the Creditcoin oracle to validate the generated proof
+2. Then, we generate merkle and continuity proofs corresponding to our source chain token burn
+3. Using the proofs we generated, we call our minter contract which will internally call the Creditcoin oracle's native proof verifier
 4. After that the same contract will mint the tokens on Creditcoin
 
 ## External dependencies
@@ -192,11 +192,11 @@ yarn submit_query                                      \
 ```
 
 > [!TIP]
-> It's possible that if you submit the query too quickly after having burned the tokens that you get
-> an error, that is to be expected since the Creditcoin network takes a while to build the proper proofs
-> to validate the transaction you submitted in the source chain.
+> If you submit a query within the first minute of conducting your token burn, it's possible that your query will fail. This is 
+> because the Creditcoin Oracle takes up to a minute to attest to new blocks on a source chain. If your query fails 
+> for this reason, wait a few seconds and try re-submitting it.
 
-You should see some messages like the following from the script:
+On a succesfull query, you should see some messages like the following from the script:
 
 <!-- ignore -->
 
