@@ -11,14 +11,11 @@ on the Sepolia _source chain_.
 
 ## What is an Offchain Worker
 
-An Offchain Worker is an script responsible for watching the state of a _source chain_ (in this
-case, Sepolia) and in more complex setups also Creditcoin's chain. It queries to our 
+An Offchain Worker is a script responsible for watching the state of a _source chain_: in this
+case, Sepolia. In more complex cases this would also listen to state changes on the Creditcoin execution chain. The worker queries to our 
 _Universal Smart Contract_ on Creditcoin in response to specific events on
 each chain. With an offchain worker, all the end user needs to do is sign a single transaction
 on the source chain kicking off cross-chain interaction.
-
-Our offchain worker will listen to `TokenBurned` events on the source chain and in response will attempt to
-generate the necessary proofs to then forward to the USC contract on Creditcoin.
 
 ## External dependencies
 
@@ -140,7 +137,7 @@ cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
 ```
 
 > [!TIP]
-> If your worker is not running when the transaction processes on the source chain it will not pick up
+> If your worker is not running when the transaction is being processed on the source chain it will not pick up
 > the event! This example is made for simplicity, a more robust worker would be able to read events from
 > previous blocks and have more complex event filters.
 
@@ -157,9 +154,9 @@ Proof generation failed: Failed to build continuity proof: Cannot build continui
 ```
 
 > [!TIP]
-> Notice how the logs show an error failing to build the continuity proof. Don't be alarmed! That's normal
-> since the Creditcoin chain will still have not attested the block in which the transaction happened,
-> the worker will retry again and eventually the proof will get built and submitted!
+> Notice how the logs show an error failing to build the continuity proof. Don't be alarmed! This is due to the
+> fact that the Creditcoin chain still hasn' t attested to the block in which the transaction took place.
+> The worker will keep retrying this until the proof will is succesfully built and submitted!
 
 Eventually, you should see a message like this one:
 

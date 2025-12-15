@@ -182,7 +182,7 @@ stealing funds! Web3 was made to be _trustless_ and _decentralized_, let's make 
 Now that we've burnt funds on Sepolia, we can use that transaction to request a mint in our USC contract, 
 this also includes generating the proof for the Oracle using the Creditcoin proof generator library.
 
-All these steps are condensed in the `submit_query` script, which is run like this:
+All these steps are condensed in the `submit_query` script, which is run as follows:
 
 ```sh
 yarn submit_query                                      \
