@@ -233,11 +233,10 @@ Now that we've burnt funds on Sepolia, we can use that transaction to request a 
 this also includes generating the proof for the Oracle using the Creditcoin proof generator library.
 
 ```sh
-yarn submit_query                                      \
-    https://sepolia.infura.io/v3/<your_infura_api_key> \
-    <transaction_hash_from_step_4>                     \
-    <your_private_key>                                 \
-    <contract_address_from_step_3_2>
+yarn submit_query                  \
+    102033                         \
+    <transaction_hash_from_step_3> \
+    <your_private_key>
 ```
 
 > [!TIP]

@@ -185,9 +185,9 @@ this also includes generating the proof for the Oracle using the Creditcoin proo
 All these steps are condensed in the `submit_query` script, which is run as follows:
 
 ```sh
-yarn submit_query                                      \
-    https://sepolia.infura.io/v3/<your_infura_api_key> \
-    <transaction_hash_from_step_3>                     \
+yarn submit_query                  \
+    102033                         \
+    <transaction_hash_from_step_3> \
     <your_private_key>
 ```
 

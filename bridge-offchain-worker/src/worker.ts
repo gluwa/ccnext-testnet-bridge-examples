@@ -1,10 +1,12 @@
 import dotenv from 'dotenv';
 import { Contract, ContractEventPayload, ethers, InterfaceAbi } from 'ethers';
 
-import { EncodingVersion, raw } from '@gluwa/cc-next-query-builder';
+import { api } from '@gluwa/cc-next-query-builder';
 
 import burnerAbi from './contract-abis/TestERC20Abi.json';
 import simpleMinterAbi from './contract-abis/SimpleMinterUSC.json';
+
+const PROVER_API_URL = 'https://proof-gen-api.usc-devnet.creditcoin.network';
 
 dotenv.config();
 
@@ -50,43 +52,35 @@ const main = async () => {
     );
   }
 
-  // 1. Setup your source chain block provider
-  const ethProvider = new ethers.JsonRpcProvider(sourceChainRpcUrl);
-  const blockProvider = new raw.blockProvider.SimpleBlockProvider(ethProvider);
-
-  // 2. Setup your source chain continuity provider
-  const ccProvider = new ethers.JsonRpcProvider(ccNextRpcUrl);
-  const wallet = new ethers.Wallet(ccNextWalletPrivateKey, ccProvider);
-  const continuityProvider = new raw.continuityProvider.PrecompileContinuityProvider(wallet);
-
-  // 3. Using the above, create a proof generator
-  const proofGenerator = new raw.RawProofGenerator(
+  // 1. Estabnlish connection to prover API
+  const proofGenerator = new api.ProverAPIProofGenerator(
     sourceChainKey,
-    blockProvider,
-    continuityProvider,
-    EncodingVersion.V1,
+    PROVER_API_URL
   );
 
-  // Instantiate source chain burner contract
+  // 2. Instantiate source chain burner contract
+  const ethProvider = new ethers.JsonRpcProvider(sourceChainRpcUrl);
   const burnerContract = new Contract(
     sourceChainContractAddress,
     burnerAbi as unknown as InterfaceAbi,
     ethProvider
   );
 
-  // Instantiate minter contract on Creditcoin USC chain
+  // 3. Instantiate minter contract on Creditcoin USC chain
+  const ccProvider = new ethers.JsonRpcProvider(ccNextRpcUrl);
+  const wallet = new ethers.Wallet(ccNextWalletPrivateKey, ccProvider);
   const minterContract = new Contract(
     uscMinterContractAddress,
     simpleMinterAbi as unknown as InterfaceAbi,
     wallet
   );
 
-  // Listen to Minter events on USC chain
+  // 4. Listen to Minter events on USC chain
   const minterHandle = minterContract.on('TokensMinted', (contract, to, amount, queryId) => {
     console.log(`Tokens minted! Contract: ${contract}, To: ${to}, Amount: ${amount.toString()}, QueryId: ${queryId}`);
   });
 
-  // Listen to Burn events on source chain
+  // 5. Listen to Burn events on source chain
   const burnerHandle = burnerContract.on('TokensBurned', async (from, amount, payload: ContractEventPayload) => {
     // We validate that the event is from the wallet address we're monitoring and the contract we deployed
     const contractAddress = payload.log.address;

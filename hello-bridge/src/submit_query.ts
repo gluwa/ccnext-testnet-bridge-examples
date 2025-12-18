@@ -1,11 +1,14 @@
 import { Contract, ethers, InterfaceAbi } from 'ethers';
 
-import { EncodingVersion, raw } from '@gluwa/cc-next-query-builder';
+import { api } from '@gluwa/cc-next-query-builder';
 
 import simpleMinterAbi from './contract-abis/SimpleMinterUSC.json';
 
 // TODO: Update with deployed address on testnet
-const USC_MINTER_CONTRACT_ADDRESS = '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6';
+const USC_MINTER_CONTRACT_ADDRESS = '0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690';
+
+const PROVER_API_URL = 'https://proof-gen-api.usc-devnet.creditcoin.network';
+const CREDITCOIN_RPC_URL = 'https://rpc.usc-devnet.creditcoin.network';
 
 async function main() {
   // Setup
@@ -14,19 +17,21 @@ async function main() {
   if (args.length !== 3) {
     console.error(`
   Usage:
-    yarn submit_query <Sepolia_RPC_URL> <Transaction_Hash> <Creditcoin_Private_Key>
+    yarn submit_query <Sepolia_Chain_Key> <Transaction_Hash> <Creditcoin_Private_Key>
 
   Example:
-    yarn submit_query https://sepolia.infura.io/v3/YOUR_KEY 0xabc123... 0xYOURPRIVATEKEY
+    yarn submit_query 102033 0xabc123... 0xYOURPRIVATEKEY
   `);
     process.exit(1);
+
   }
 
-  const [rpcUrl, transactionHash, ccNextPrivateKey] = args;
+  const [chainKey, transactionHash, ccNextPrivateKey] = args;
 
-  // Validate RPC URL
-  if (!rpcUrl.startsWith('http://') && !rpcUrl.startsWith('https://')) {
-    throw new Error('Invalid URL: must start with http:// or https://');
+  // Validate Chain Key
+  const chainKeyNum = parseInt(chainKey, 10);
+  if (isNaN(chainKeyNum) || chainKeyNum <= 0) {
+    throw new Error('Invalid chain key provided');
   }
 
   // Validate Transaction Hash
@@ -39,32 +44,21 @@ async function main() {
     throw new Error('Invalid private key provided');
   }
 
-  // 1. Setup your source chain block provider
-  const ethProvider = new ethers.JsonRpcProvider(rpcUrl);
-  const blockProvider = new raw.blockProvider.SimpleBlockProvider(ethProvider);
-
-  // 2. Setup your source chain continuity provider
-  const testnetRpcUrl = 'https://rpc.usc-testnet.creditcoin.network';
-  const ccProvider = new ethers.JsonRpcProvider(testnetRpcUrl);
-  const wallet = new ethers.Wallet(ccNextPrivateKey, ccProvider);
-  const continuityProvider = new raw.continuityProvider.PrecompileContinuityProvider(wallet);
-
-  // 3. Using the above, create a proof generator
-  const sepoliaChainKey = 102033;
-  const proofGenerator = new raw.RawProofGenerator(
-    sepoliaChainKey,
-    blockProvider,
-    continuityProvider,
-    EncodingVersion.V1,
+  // 1. Estabnlish connection to prover API
+  const proofGenerator = new api.ProverAPIProofGenerator(
+    chainKeyNum,
+    PROVER_API_URL
   );
 
-  // 4. Build proof using the generator
+  // 2. Build proof using the generator
   const proofResult = await proofGenerator.generateProof(transactionHash);
   if (!proofResult.success) {
     throw new Error(`Failed to generate proof: ${proofResult.error}`);
   }
 
-  // 5. Establish link with the USC contract
+  // 3. Establish link with the USC contract
+  const ccProvider = new ethers.JsonRpcProvider(CREDITCOIN_RPC_URL);
+  const wallet = new ethers.Wallet(ccNextPrivateKey, ccProvider);
   const contractABI = simpleMinterAbi as unknown as InterfaceAbi;
   const minterContract = new Contract(USC_MINTER_CONTRACT_ADDRESS, contractABI, wallet);
 
@@ -77,7 +71,7 @@ async function main() {
     eventTriggered = true;
   });
 
-  // 6. Submit the proof to the USC contract to mint tokens
+  // 4. Submit the proof to the USC contract to mint tokens
   try {
     const proofData = proofResult.data!;
     const chainKey = proofData.chainKey;
@@ -100,10 +94,11 @@ async function main() {
     console.log('Transaction submitted: ', response.hash);
   } catch (error) {
     console.error('Error submitting transaction: ', error);
-    return;
+
+    process.exit(1);
   }
 
-  // 7. Wait for the TokensMinted event
+  // 5. Wait for the TokensMinted event
   while (!eventTriggered) {
     console.log('Waiting for TokensMinted event...');
     await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait for 5 seconds
