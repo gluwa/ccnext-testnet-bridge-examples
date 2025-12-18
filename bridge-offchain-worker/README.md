@@ -75,7 +75,7 @@ Save and edit the following to a `.env` file inside of `bridge-offchain-worker/`
 # Address of the ERC20 token contract on source chain
 SOURCE_CHAIN_CONTRACT_ADDRESS=<test_erc20_contract_address_from_custom_contracts_bridging>
 
-# Chain identifier of the source chain on Creditcoin, for Sepolia it would be 102033
+# Chain identifier of the source chain on Creditcoin, for Sepolia it would be 1
 SOURCE_CHAIN_KEY=<source_chain_key>
 
 # RPC endpoint for the source chain. Following our previous example, this will

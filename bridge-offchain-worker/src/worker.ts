@@ -14,7 +14,7 @@ const main = async () => {
   console.log('Starting...');
   // Source chain contract address (ERC20 contract on source chain) where tokens are burned
   const sourceChainContractAddress = process.env.SOURCE_CHAIN_CONTRACT_ADDRESS;
-  const sourceChainKey = Number(process.env.SOURCE_CHAIN_KEY || 102033);
+  const sourceChainKey = Number(process.env.SOURCE_CHAIN_KEY || 1);
   const sourceChainRpcUrl = process.env.SOURCE_CHAIN_RPC_URL;
 
   // Minter USC contract address on Creditcoin

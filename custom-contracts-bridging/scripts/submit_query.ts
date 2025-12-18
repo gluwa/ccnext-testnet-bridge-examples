@@ -17,7 +17,7 @@ async function main() {
     yarn submit_query <Sepolia_Chain_Key> <Transaction_Hash> <Creditcoin_Private_Key> <Minter_Contract_Address>
 
   Example:
-    yarn submit_query 102033 0xabc123... 0xYOURPRIVATEKEY 0xMinterContractAddress
+    yarn submit_query 1 0xabc123... 0xYOURPRIVATEKEY 0xMinterContractAddress
   `);
     process.exit(1);
   }

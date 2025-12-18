@@ -186,7 +186,7 @@ All these steps are condensed in the `submit_query` script, which is run as foll
 
 ```sh
 yarn submit_query                  \
-    102033                         \
+    1                         \
     <transaction_hash_from_step_3> \
     <your_private_key>
 ```

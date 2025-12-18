@@ -171,7 +171,7 @@ npx hardhat deploy                          \
     --proceedsaccount <your_wallet_address> \
     --erc20name Test                        \
     --erc20symbol TEST                      \
-    --chainkey 102033                       \
+    --chainkey 1                       \
     --timeout 300                           \
     --lockupduration 86400                  \
     --approvalthreshold 2                   \
