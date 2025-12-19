@@ -144,7 +144,7 @@ use to mint some dummy ERC20 tokens. Run the following command:
 cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
     "mint(uint256)" 50000000000000000000                               \
-    --private-key <your_sepolia_private_key>
+    --private-key <your_private_key>
 ```
 
 ## 3. Burning the tokens you want to bridge
@@ -160,7 +160,7 @@ bridging process, we won't be creating any artificial value. Run the following c
 cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
     "burn(uint256)" 50000000000000000000                               \
-    --private-key <your_sepolia_private_key>
+    --private-key <your_private_key>
 ```
 
 This should display some output stating that your transaction was a success, along with a
@@ -194,7 +194,7 @@ All these steps are condensed in the `submit_query` script, which is run as foll
 yarn submit_query                  \
     3                         \
     <transaction_hash_from_step_3> \
-    <your_creditcoin_evm_private_key>
+    <your_private_key>
 ```
 
 > [!TIP]
@@ -227,6 +227,17 @@ As a final check, verify that your tokens were successfully minted on Creditcoin
 
 - **Block Explorer**: Visit the [bridge contract] on the explorer and check your address
 - **Direct Contract Call**: Use `cast` or any web3 tool to call `balanceOf()` on the contract
+
+Cast example:
+
+```bash
+cast call --rpc-url https://rpc.usc-devnet.creditcoin.network \
+    0x9cEfa7025C6093965230868e48d61ff6f616958C \
+    "balanceOf(address)" \
+    <your_wallet_address>
+```
+
+This will return your balance in wei (the smallest unit). To convert to tokens, divide by 10^18. For example, if you see `1000000000000000000000`, that's 1000 TEST tokens.
 
 The contract address and your wallet address should show your minted TEST tokens from the bridging process.
 

@@ -137,9 +137,27 @@ Search for your contract address to see deployment details and transaction histo
 
 ### Error: "already known" or "nonce already used"
 
-This error means a transaction with that nonce was already submitted to the network. You **can** redeploy - each deployment creates a **new contract address**.
+This error typically means a transaction with that nonce was already submitted to the network. This can happen when:
+- A previous transaction with the same nonce is pending
+- An underfunded transaction is stuck in the mempool
 
-**Solution 1: Wait and retry** (recommended)
+You **can** redeploy - each deployment creates a **new contract address**.
+
+**Solution 1: Increase gas fees** (if transaction is underfunded)
+
+If the transaction is stuck in the mempool due to insufficient gas fees, retry with increased gas:
+
+```bash
+# Retry deployment with higher gas price
+forge create \
+    --broadcast \
+    --rpc-url https://rpc.usc-devnet.creditcoin.network \
+    --private-key $PRIVATE_KEY \
+    --gas-price <higher_gas_price> \
+    src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
+```
+
+**Solution 2: Wait and retry** (recommended)
 
 ```bash
 # Wait 10-30 seconds for the previous transaction to confirm
@@ -147,7 +165,7 @@ This error means a transaction with that nonce was already submitted to the netw
 yarn deploy:devnet
 ```
 
-**Solution 2: Check current nonce and use next**
+**Solution 3: Check current nonce and use next**
 
 ```bash
 # Get your current nonce
@@ -162,7 +180,7 @@ forge create \
     src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
 ```
 
-**Solution 3: Check if contract was already deployed**
+**Solution 4: Check if contract was already deployed**
 
 - Check the block explorer for your address
 - Look for contract creation transactions
