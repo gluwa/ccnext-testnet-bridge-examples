@@ -54,8 +54,11 @@ yarn
 This tutorial involves the use of two different blockchains.
 
 - Sepolia, which serves as our _source chain_ for the tutorial. This is where tokens are burned.
-- Creditcoin USC Testnet, which serves as our _execution chain_ for the tutorial. This is where
+- Creditcoin USC Devnet, which serves as our _execution chain_ for the tutorial. This is where
   oracle queries are processed and where tokens are minted.
+
+> [!NOTE]
+> **USC Testnet is coming soon!** This tutorial currently uses USC Devnet. When Testnet becomes available, you can use it instead.
 
 In order to use both blockchains we need to create a wallet and fund it with the native tokens of
 both networks.
@@ -64,7 +67,7 @@ both networks.
 
 In order to safely sign transactions for this tutorial, we want to generate a fresh EVM wallet address.
 Since all EVM networks use the same address and transaction signature scheme we can use the address we
-create on both Sepolia and Creditcoin USC Testnet.
+create on both Sepolia and Creditcoin USC Devnet.
 
 > [!CAUTION]
 > In this tutorial, we will be using your wallet's private key to allow some test scripts to act on
@@ -94,11 +97,11 @@ faucet here.
 
 ### 1.3 Get some test funds (`Creditcoin`)
 
-You will also need to fund your account on the Creditcoin Testnet, otherwise our oracle query
+You will also need to fund your account on the Creditcoin Devnet, otherwise our oracle query
 submission will fail due to lack of funds. Head to the [🚰 creditcoin discord faucet] to request
 some test tokens there.
 
-Your request for tokens in the Discord faucet should look like this. Substitute in your testnet
+Your request for tokens in the Discord faucet should look like this. Substitute in your devnet
 account address from [step 1.1]:
 
 <!-- ignore -->
@@ -108,7 +111,7 @@ account address from [step 1.1]:
 ```
 
 Note, that currently the faucet yields 100 test CTC every 24 hours. This balance is sufficient
-to submit 9 oracle queries, since testnet oracle fees are artificially high to prevent DOS.
+to submit 9 oracle queries, since devnet oracle fees are artificially high to prevent DOS.
 
 Now that your wallet is ready to make transactions on both networks, you will be needing a way
 to interact with it from the command line.
@@ -141,7 +144,7 @@ use to mint some dummy ERC20 tokens. Run the following command:
 cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
     "mint(uint256)" 50000000000000000000                               \
-    --private-key <your_private_key>
+    --private-key <your_sepolia_private_key>
 ```
 
 ## 3. Burning the tokens you want to bridge
@@ -157,7 +160,7 @@ bridging process, we won't be creating any artificial value. Run the following c
 cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
     0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
     "burn(uint256)" 50000000000000000000                               \
-    --private-key <your_private_key>
+    --private-key <your_sepolia_private_key>
 ```
 
 This should display some output stating that your transaction was a success, along with a
@@ -179,21 +182,24 @@ chain_ and is responsible for distributing the same amount of tokens on the targ
 be an issue, since nothing is preventing that company from censoring certain transactions or even
 stealing funds! Web3 was made to be _trustless_ and _decentralized_, let's make it that way 😎.
 
-Now that we've burnt funds on Sepolia, we can use that transaction to request a mint in our USC contract, 
+Now that we've burnt funds on Sepolia, we can use that transaction to request a mint in our USC contract,
 this also includes generating the proof for the Oracle using the Creditcoin proof generator library.
+
+> [!NOTE]
+> This tutorial uses USC Devnet (USC Testnet is coming soon). If you want to deploy your own `SimpleMinterUSC` contract, see the [Deployment Guide](DEPLOY.md) for detailed instructions.
 
 All these steps are condensed in the `submit_query` script, which is run as follows:
 
 ```sh
 yarn submit_query                  \
-    1                         \
+    3                         \
     <transaction_hash_from_step_3> \
-    <your_private_key>
+    <your_creditcoin_evm_private_key>
 ```
 
 > [!TIP]
-> If you submit a query within the first minute of conducting your token burn, it's possible that your query will fail. This is 
-> because the Creditcoin Oracle takes up to a minute to attest to new blocks on a source chain. If your query fails 
+> If you submit a query within the first minute of conducting your token burn, it's possible that your query will fail. This is
+> because the Creditcoin Oracle takes up to a minute to attest to new blocks on a source chain. If your query fails
 > for this reason, wait a few seconds and try re-submitting it.
 
 On a succesfull query, you should see some messages like the following from the script:
@@ -207,7 +213,7 @@ Built 100 continuity blocks for height 32
 Transaction submitted:  0xf134fc29c12b22bb542da0393df527b40e1b772e71d87631b886bc8d14d594dd
 Waiting for TokensMinted event...
 Waiting for TokensMinted event...
-Tokens minted! Contract: 0x0165878A594ca255338adfa4d48449f69242Eb8F, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0x115e4c9437f48e8ae9795e7c828f56b6a738000aa06ac08e769375c5dc4f7bcc
+Tokens minted! Contract: 0x9cEfa7025C6093965230868e48d61ff6f616958C, To: 0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac, Amount: 1000, QueryId: 0x20b75e448fbe82f278a054c401f5aacc0fb04e011d9dffdce314087ab2e582b5
 Minting completed!
 ```
 
@@ -215,31 +221,14 @@ Sometimes it may take a bit more for the `TokensMinted` event to trigger, but sh
 
 Once that's done we only need to check our newly minted tokens!
 
-## 5. Check Balance in USC Testnet ERC20 Contract
+## 5. Verify Your Bridged Tokens
 
-As a final check, we can take a look at the balance of your account on Creditcoin to confirm that
-the bridging process was successful.
+As a final check, verify that your tokens were successfully minted on Creditcoin Devnet. You can check your balance using:
 
-Run the following command to query the contract:
+- **Block Explorer**: Visit the [bridge contract] on the explorer and check your address
+- **Direct Contract Call**: Use `cast` or any web3 tool to call `balanceOf()` on the contract
 
-<!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
-
-```sh
-yarn check_balance                             \
-    0xCHANGEMELATER \
-    <your_wallet_address>
-```
-
-You should get some output showing your wallet's balance on Creditcoin:
-
-<!-- ignore -->
-
-```bash
-📦 Token: Mintable (TEST)
-🧾 Raw Balance: 50000000000000000000
-💰 Formatted Balance: 50.0 TEST
-Decimals for token micro unit: 18
-```
+The contract address and your wallet address should show your minted TEST tokens from the bridging process.
 
 ## Conclusion
 
@@ -252,6 +241,14 @@ self-hosted smart contracts! In a production environment, the Creditcoin oracle 
 be used by teams of DApp builders who will handle data provisioning on behalf of their end users.
 Such teams will want to define and deploy their own contracts as shown in the [custom contract
 bridging] tutorial.
+
+## Deploying Your Own Contract
+
+If you want to deploy your own `SimpleMinterUSC` contract instead of using a pre-deployed one, see the [Deployment Guide](DEPLOY.md) for step-by-step instructions. This is useful for:
+
+- Testing custom contract modifications
+- Having full control over your contract instance
+- Production deployments
 
 <!-- teardown "cd .." -->
 
@@ -271,6 +268,7 @@ bridging] tutorial.
 [bridge contract]: https://explorer.usc-testnet.creditcoin.network/address/0x441726D6821B2009147F0FA96E1Ee09D412cCb38
 [ERC20 contract]: https://explorer.usc-testnet.creditcoin.network/token/0xb0fb0b182f774266b1c7183535A41D69255937a3
 [custom contract bridging]: ../custom-contracts-bridging/README.md
+[Deployment Guide]: DEPLOY.md
 [step 1.1]: #11-generate-a-new-wallet-address
 [step 2]: #2-minting-some-tokens-on-sepolia
 [step 4]: #4-submit-a-mint-query-to-the-usc-contract

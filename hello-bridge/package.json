@@ -2,8 +2,10 @@
   "license": "MIT",
   "scripts": {
     "submit_query": "tsx src/submit_query.ts",
-    "check_balance": "node src/check_balance.js",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "deploy:devnet": "forge create --broadcast --rpc-url https://rpc.usc-devnet.creditcoin.network --private-key ${PRIVATE_KEY:-} src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC",
+    "deploy:testnet": "forge create --broadcast --rpc-url https://rpc.usc-testnet.creditcoin.network --private-key ${PRIVATE_KEY:-} src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC",
+    "build": "forge build"
   },
   "devDependencies": {
     "tsx": "^4.20.3",
