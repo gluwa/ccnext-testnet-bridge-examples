@@ -5,7 +5,7 @@ import { api } from '@gluwa/cc-next-query-builder';
 import simpleMinterAbi from './contract-abis/SimpleMinterUSC.json';
 
 // TODO: Update with deployed address on testnet
-const USC_MINTER_CONTRACT_ADDRESS = '0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690';
+const USC_MINTER_CONTRACT_ADDRESS = '0x9cEfa7025C6093965230868e48d61ff6f616958C';
 
 const PROVER_API_URL = 'https://proof-gen-api.usc-devnet.creditcoin.network';
 const CREDITCOIN_RPC_URL = 'https://rpc.usc-devnet.creditcoin.network';
@@ -23,7 +23,6 @@ async function main() {
     yarn submit_query 1 0xabc123... 0xYOURPRIVATEKEY
   `);
     process.exit(1);
-
   }
 
   const [chainKey, transactionHash, ccNextPrivateKey] = args;
@@ -45,10 +44,7 @@ async function main() {
   }
 
   // 1. Estabnlish connection to prover API
-  const proofGenerator = new api.ProverAPIProofGenerator(
-    chainKeyNum,
-    PROVER_API_URL
-  );
+  const proofGenerator = new api.ProverAPIProofGenerator(chainKeyNum, PROVER_API_URL);
 
   // 2. Build proof using the generator
   const proofResult = await proofGenerator.generateProof(transactionHash);

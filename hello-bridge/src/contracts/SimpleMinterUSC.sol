@@ -184,15 +184,13 @@ contract SimpleMinterUSC is ERC20 {
 
         // Mark the query as processed
         processedQueries[txKey] = true;
-
-        // TODO: The decoding is failing for some reason, so skipping transaction content validation for now
-        
-        // We extract the transaction abi and discar the prefix
-        /*(, , bytes memory transactionAbi) = abi.decode(encodedTransaction, (uint64, uint64, bytes));
+       
+        // We extract the transaction abi and discard the prefixed block number and tx index (16 bytes)
+        bytes calldata abiBytes = encodedTransaction[16:];
 
         // Next we validate the transaction contents
-        bool valid = _validateTransactionContents(transactionAbi);
-        require(valid, "Transaction contents validation failed");*/
+        bool valid = _validateTransactionContents(abiBytes);
+        require(valid, "Transaction contents validation failed");
 
         // If the transaction validation passes, mint tokens to the sender
         _mint(msg.sender, MINT_AMOUNT);
