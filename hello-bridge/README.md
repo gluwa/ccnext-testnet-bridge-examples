@@ -6,7 +6,7 @@ bridging!** Cross-chain bridging on Creditcoin can be broken down into three bro
 1. To begin, the `ERC20` tokens to bridge are burned using a smart contract on our _source chain_
    (in this case, Sepolia).
 2. Then, we generate merkle and continuity proofs corresponding to our source chain token burn
-3. Using the proofs we generated, we call our minter contract which will internally call the Creditcoin oracle's native proof verifier
+3. Using the proofs we generated, we call our minter universal smart contract (USC) which will internally call the Creditcoin oracle's native proof verifier
 4. After that the same contract will mint the tokens on Creditcoin
 
 ## External dependencies
@@ -54,9 +54,9 @@ yarn
 This tutorial involves the use of two different blockchains.
 
 - Sepolia, which serves as our _source chain_ for the tutorial. This is where tokens are burned.
-- Creditcoin USC Devnet, which serves as our _execution chain_ for the tutorial. This is where
-  oracle queries are processed and where tokens are minted.
+- Creditcoin USC Devnet, which serves as our _execution chain_ for the tutorial. This is where our minter universal smart contract lives. Tokens are minted in that contract.
 
+// TODO: Remove this note once testnet is live
 > [!NOTE]
 > **USC Testnet is coming soon!** This tutorial currently uses USC Devnet. When Testnet becomes available, you can use it instead.
 
@@ -182,17 +182,18 @@ chain_ and is responsible for distributing the same amount of tokens on the targ
 be an issue, since nothing is preventing that company from censoring certain transactions or even
 stealing funds! Web3 was made to be _trustless_ and _decentralized_, let's make it that way 😎.
 
-Now that we've burnt funds on Sepolia, we can use that transaction to request a mint in our USC contract,
-this also includes generating the proof for the Oracle using the Creditcoin proof generator library.
+Now that we've burnt funds on Sepolia, we can use that transaction to request a mint in our USC contract.
+But before we can submit our USC call, we need to generate proofs which will be submitted to the Creditcoin 
+Oracle to verify our cross-chain data.
 
+// TODO: Remove this note once testnet is available
 > [!NOTE]
-> This tutorial uses USC Devnet (USC Testnet is coming soon). If you want to deploy your own `SimpleMinterUSC` contract, see the [Deployment Guide](DEPLOY.md) for detailed instructions.
+> This tutorial uses USC Devnet (USC Testnet is coming soon).
 
 All these steps are condensed in the `submit_query` script, which is run as follows:
 
 ```sh
 yarn submit_query                  \
-    3                         \
     <transaction_hash_from_step_3> \
     <your_private_key>
 ```
@@ -217,7 +218,7 @@ Tokens minted! Contract: 0x9cEfa7025C6093965230868e48d61ff6f616958C, To: 0xf24FF
 Minting completed!
 ```
 
-Sometimes it may take a bit more for the `TokensMinted` event to trigger, but should be no more than 30 seconds.
+Sometimes it may take a bit longer for the `TokensMinted` event to trigger, but should be no more than 30 seconds.
 
 Once that's done we only need to check our newly minted tokens!
 
@@ -228,16 +229,19 @@ As a final check, verify that your tokens were successfully minted on Creditcoin
 - **Block Explorer**: Visit the [bridge contract] on the explorer and check your address
 - **Direct Contract Call**: Use `cast` or any web3 tool to call `balanceOf()` on the contract
 
+<!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
+
 Cast example:
 
 ```bash
 cast call --rpc-url https://rpc.usc-devnet.creditcoin.network \
     0x9cEfa7025C6093965230868e48d61ff6f616958C \
     "balanceOf(address)" \
-    <your_wallet_address>
+    <your_wallet_address> \
+    | cast to-dec
 ```
 
-This will return your balance in wei (the smallest unit). To convert to tokens, divide by 10^18. For example, if you see `1000000000000000000000`, that's 1000 TEST tokens.
+This will return your balance in whole (TEST) token units.
 
 The contract address and your wallet address should show your minted TEST tokens from the bridging process.
 
@@ -252,14 +256,6 @@ self-hosted smart contracts! In a production environment, the Creditcoin oracle 
 be used by teams of DApp builders who will handle data provisioning on behalf of their end users.
 Such teams will want to define and deploy their own contracts as shown in the [custom contract
 bridging] tutorial.
-
-## Deploying Your Own Contract
-
-If you want to deploy your own `SimpleMinterUSC` contract instead of using a pre-deployed one, see the [Deployment Guide](DEPLOY.md) for step-by-step instructions. This is useful for:
-
-- Testing custom contract modifications
-- Having full control over your contract instance
-- Production deployments
 
 <!-- teardown "cd .." -->
 
@@ -279,7 +275,6 @@ If you want to deploy your own `SimpleMinterUSC` contract instead of using a pre
 [bridge contract]: https://explorer.usc-testnet.creditcoin.network/address/0x441726D6821B2009147F0FA96E1Ee09D412cCb38
 [ERC20 contract]: https://explorer.usc-testnet.creditcoin.network/token/0xb0fb0b182f774266b1c7183535A41D69255937a3
 [custom contract bridging]: ../custom-contracts-bridging/README.md
-[Deployment Guide]: DEPLOY.md
 [step 1.1]: #11-generate-a-new-wallet-address
 [step 2]: #2-minting-some-tokens-on-sepolia
 [step 4]: #4-submit-a-mint-query-to-the-usc-contract

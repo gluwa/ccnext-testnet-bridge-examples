@@ -59,7 +59,7 @@ export PRIVATE_KEY=<your_private_key>
 > [!CAUTION]
 > Never commit your private key to version control. Use environment variables or a secure secret management system.
 
-### 3. Deploy to USC Devnet
+### 3a. Deploy to USC Devnet
 
 Deploy the contract to USC Devnet:
 
@@ -71,7 +71,7 @@ forge create \
     src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
 ```
 
-### 4. Deploy to USC Testnet (Coming Soon)
+### 3b. Deploy to USC Testnet (Coming Soon)
 
 > [!NOTE]
 > USC Testnet is not yet available. Use USC Devnet for testing and development.
@@ -86,7 +86,7 @@ forge create \
     src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
 ```
 
-### 5. Save the Contract Address
+### 4. Save the Contract Address
 
 After successful deployment, you'll see output like:
 

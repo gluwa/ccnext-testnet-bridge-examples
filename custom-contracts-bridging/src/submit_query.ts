@@ -11,10 +11,10 @@ async function main() {
   // Setup
   const args = process.argv.slice(2);
 
-  if (args.length !== 4) {
+  if (args.length !== 3) {
     console.error(`
   Usage:
-    yarn submit_query <Sepolia_Chain_Key> <Transaction_Hash> <Creditcoin_Private_Key> <Minter_Contract_Address>
+    yarn submit_query <Transaction_Hash> <Creditcoin_Private_Key> <Minter_Contract_Address>
 
   Example:
     yarn submit_query 1 0xabc123... 0xYOURPRIVATEKEY 0xMinterContractAddress
@@ -22,13 +22,10 @@ async function main() {
     process.exit(1);
   }
 
-  const [chainKey, transactionHash, ccNextPrivateKey, minterAddress] = args;
+  const [transactionHash, ccNextPrivateKey, minterAddress] = args;
 
-  // Validate Chain Key
-  const chainKeyNum = parseInt(chainKey, 10);
-  if (isNaN(chainKeyNum) || chainKeyNum <= 0) {
-    throw new Error('Invalid chain key provided');
-  }
+  // TODO: Change this to 1 once testnet is released
+  const chainKey = 3;
 
   // Validate Transaction Hash
   if (!transactionHash.startsWith('0x') || transactionHash.length !== 66) {
@@ -47,7 +44,7 @@ async function main() {
 
   // 1. Estabnlish connection to prover API
   const proofGenerator = new api.ProverAPIProofGenerator(
-    chainKeyNum,
+    chainKey,
     PROVER_API_URL
   );
 

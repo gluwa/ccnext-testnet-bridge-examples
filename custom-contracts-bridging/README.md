@@ -70,7 +70,7 @@ forge create                                                     \
     --broadcast                                                  \
     --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
     --private-key <your_private_key> \
-    TestERC20
+    src/contracts/TestERC20.sol:TestERC20
 ```
 
 This should display some output containing the address of your test `ERC20` contract:
@@ -83,31 +83,19 @@ Deployed to: 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
 
 Save the contract address. You will be needing it in the next step.
 
-## 3. Deploy Your Own Custom Bridging Contracts
+## 3. Deploy Your Own Custom Bridging Contract
 
-In the next few steps we will be deploying our own bridging contracts based off the
-`CCNext-smart-contracts` repository. This repository contains the template for the smart contract
-we will be deploying on Creditcoin USC Testnet:
-
-- `SimpleMinterUSC.sol`
+In the next two steps we will be deploying our own bridging contract called `SimpleMinterUSC.sol`
 
 Universal smart contracts (USCs) such as `SimpleMinterUSC` are intended to be deployed by DApp
-builders. Here, our USC is used only for bridging tokens. A USC retrieves cross-chain data from
-oracle query results. It then interprets that data into typed values, and uses the typed cross-chain
-data to call further DApp business logic.
+builders. Here, our USC is used only for bridging tokens. A USC exposes functions which 
+internally make use of the Creditcoin Oracle to verify cross-chain data. It then interprets 
+those data and uses them to trigger DApp business logic.
 
 For instance, our `SimpleMinterUSC` looks for fields like `from`, `to`, and `amount` in the
-oracle proof we submit to it. With those fields, the contract can verify whether or not a token
-burn took place, how many tokens it needs to mint on Creditcoin, and which address it should mint
-them to.
-
-Start by cloning the `CCNext-smart-contracts` repository:
-
-```sh
-git clone https://github.com/gluwa/CCNext-smart-contracts.git
-cd CCNext-smart-contracts
-git checkout CHANGEMELATER
-```
+cross-chain data we submit to it. With those fields, the contract can verify whether or not a 
+token burn took place, how many tokens it needs to mint on Creditcoin, and which address it 
+should mint them to.
 
 ### 3.1 Modify The Bridge Smart Contract
 
@@ -118,9 +106,8 @@ of tokens which were burned on our _source chain_.
 > This is for demonstration purposes only, as bridging this way dilutes the value of our `TEST`
 > token each time we bridge it.
 
-In your freshly cloned `CCNext-smart-contracts` repository, start by opening the file
-`contracts/SimpleMinterUSC.sol`. Next, navigate to the following line inside of the
-`mintFromQuery` function:
+Start by opening the file `contracts/SimpleMinterUSC.sol`. Next, navigate to the following line 
+inside of the `mintFromQuery` function:
 
 ```sol
 _mint(msg.sender, MINT_AMOUNT);
@@ -135,67 +122,38 @@ _mint(msg.sender, MINT_AMOUNT * 2);
 
 ### 3.2 Deploy Your Modified Contract
 
-To deploy your modified bridging contracts, start by creating a `.env` file at the top-level of the
-`CCNext-smart-contracts` repository. Run the following command to setup your `.env`:
+//TODO: Change this instruction after testnet release
+Since the latest USC testnet is not yet released, we will be deploying to USC Devnet. 
+
+Finally, deploy your contracts using the following commands:
 
 ```bash
-echo OWNER_PRIVATE_KEY=<your_private_key> > .env
+forge build
 ```
 
-Next, compile your bridging smart contracts:
-
-```bash
-npm install && npx hardhat compile
-```
-
-<!-- ignore -->
-
-> [!CAUTION]
-> If you get an error like:
->
-> ```bash
-> * Invalid account: #0 for network: cc3_usc_testnet - private key too short, expected 32 bytes
-> ```
->
-> That means you forgot to set your `.env`!
-
-Finally, deploy your contracts using the following command:
-
-<!-- extract erc20_mintable_address_from_step_3_2 "ERC20 deployed to: (0[xX][a-fA-F0-9]{40})" -->
 <!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
-<!-- extract universal_bridge_proxy_address_from_step_3_2 "UniversalBridgeProxy deployed to: (0[xX][a-fA-F0-9]{40})" -->
-
+<!-- extract usc_address_from_step_3_2 "Deployed to: (0[xX][a-fA-F0-9]{40})" -->
 ```bash
-npx hardhat deploy                          \
-    --network cc3_usc_testnet               \
-    --proceedsaccount <your_wallet_address> \
-    --erc20name Test                        \
-    --erc20symbol TEST                      \
-    --chainkey 1                       \
-    --timeout 300                           \
-    --lockupduration 86400                  \
-    --approvalthreshold 2                   \
-    --maxinstantmint 100                    \
-    --admin <your_wallet_address>
+forge create \
+    --broadcast \
+    --rpc-url https://rpc.usc-devnet.creditcoin.network \
+    --private-key <your_private_key> \
+    src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
 ```
-
-> [!TIP]
-> This can take a bit of time ☕
 
 You should get some output with the address of the contract you just deployed:
 
 <!-- ignore -->
 
 ```bash
-SimpleMinterUSC deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
+Deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
 ```
 
-Save the address of the contract. You will be needing it in [step 5]. Remember to exit the
-`CCNext-smart-contracts` repository and return to the `custom-contracts-bridging` folder:
+Save the address of the contract. You will be needing it in [step 5].
 
-```bash
-cd ..
-```
+Option: If you run into any trouble with deployment using these steps, try using
+the [Deployment Guide](DEPLOY.md) instead. Make sure you use step 3a and ignore 
+3b, which targets testnet.
 
 ## 4. Burning the tokens you want to bridge
 
@@ -234,8 +192,7 @@ this also includes generating the proof for the Oracle using the Creditcoin proo
 
 ```sh
 yarn submit_query                  \
-    102033                         \
-    <transaction_hash_from_step_3> \
+    <transaction_hash_from_step_4> \
     <your_private_key>
 ```
 
@@ -263,29 +220,26 @@ Sometimes it may take a bit more for the `TokensMinted` event to trigger, but sh
 
 Once that's done we only need to check our newly minted tokens!
 
-## 6. Check Balance in USC Testnet ERC20 Contract
+## 5. Verify Your Bridged Tokens
 
-As a final check, we can take a look at the balance of your account on Creditcoin to confirm that
-the bridging process was successful. This will use the `ERC20Mintable` contract which you deployed
-in [step 3.2].
+As a final check, verify that your tokens were successfully minted on Creditcoin Testnet. You can check your balance using:
 
-Run the following command to query the contract:
+- **Block Explorer**: Visit the [bridge contract] on the explorer and check your address
+- **Direct Contract Call**: Use `cast` or any web3 tool to call `balanceOf()` on the contract
 
-```sh
-yarn check_balance                        \
-    <erc20_mintable_address_from_step_3_2> \
-    <your_wallet_address>
-```
+<!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
 
-You should get some output showing your wallet's balance on Creditcoin:
-
-<!-- ignore -->
+Cast example:
 
 ```bash
-📦 Token: Mintable (TEST)
-🧾 Raw Balance: 100000000000000000000
-💰 Formatted Balance: 100.0 TEST
+cast call --rpc-url https://rpc.usc-devnet.creditcoin.network \
+    <universal_bridge_proxy_address_from_step_3_2> \
+    "balanceOf(address)" \
+    <your_wallet_address> \
+    | cast to-dec
 ```
+
+This will return your balance in whole (TEST) token units.
 
 Notice how you now have _twice_ the amount of tokens you originally burned on Sepolia!
 
@@ -314,3 +268,4 @@ for more information!
 [step 3.2]: #32-deploy-your-modified-contract
 [step 5]: #5-submit-a-mint-query-to-the-usc-contract
 [bridge offchain worker]: ../bridge-offchain-worker/README.md
+[Deployment Guide]: DEPLOY.md

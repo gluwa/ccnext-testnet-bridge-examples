@@ -14,24 +14,20 @@ async function main() {
   // Setup
   const args = process.argv.slice(2);
 
-  if (args.length !== 3) {
+  if (args.length !== 2) {
     console.error(`
   Usage:
-    yarn submit_query <Sepolia_Chain_Key> <Transaction_Hash> <Creditcoin_Private_Key>
+    yarn submit_query <Transaction_Hash> <Creditcoin_Private_Key>
 
   Example:
-    yarn submit_query 1 0xabc123... 0xYOURPRIVATEKEY
+    yarn submit_query 0xabc123... 0xYOURPRIVATEKEY
   `);
     process.exit(1);
   }
 
-  const [chainKey, transactionHash, ccNextPrivateKey] = args;
-
-  // Validate Chain Key
-  const chainKeyNum = parseInt(chainKey, 10);
-  if (isNaN(chainKeyNum) || chainKeyNum <= 0) {
-    throw new Error('Invalid chain key provided');
-  }
+  const [transactionHash, ccNextPrivateKey] = args;
+  // TODO: Change this to 1 once this script is targeting testnet
+  const chainKey = 3;
 
   // Validate Transaction Hash
   if (!transactionHash.startsWith('0x') || transactionHash.length !== 66) {
@@ -43,11 +39,11 @@ async function main() {
     throw new Error('Invalid private key provided');
   }
 
-  // 1. Estabnlish connection to prover API
-  const proofGenerator = new api.ProverAPIProofGenerator(chainKeyNum, PROVER_API_URL);
+  // 1. Estabnlish connection to proof generation API Server
+  const proofGenServer = new api.ProverAPIProofGenerator(chainKey, PROVER_API_URL);
 
   // 2. Build proof using the generator
-  const proofResult = await proofGenerator.generateProof(transactionHash);
+  const proofResult = await proofGenServer.generateProof(transactionHash);
   if (!proofResult.success) {
     throw new Error(`Failed to generate proof: ${proofResult.error}`);
   }
