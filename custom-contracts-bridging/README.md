@@ -131,7 +131,6 @@ Finally, deploy your contracts using the following commands:
 forge build
 ```
 
-<!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
 <!-- extract usc_address_from_step_3_2 "Deployed to: (0[xX][a-fA-F0-9]{40})" -->
 ```bash
 forge create \
@@ -151,7 +150,8 @@ Deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
 
 Save the address of the contract. You will be needing it in [step 5].
 
-Option: If you run into any trouble with deployment using these steps, try using
+> [!WARNING]
+> If you run into any trouble with deployment using these steps, try using
 the [Deployment Guide](DEPLOY.md) instead. Make sure you use step 3a and ignore 
 3b, which targets testnet.
 
@@ -193,7 +193,8 @@ this also includes generating the proof for the Oracle using the Creditcoin proo
 ```sh
 yarn submit_query                  \
     <transaction_hash_from_step_4> \
-    <your_private_key>
+    <your_private_key>             \
+    <usc_address_from_step_3_2>
 ```
 
 > [!TIP]
@@ -233,7 +234,7 @@ Cast example:
 
 ```bash
 cast call --rpc-url https://rpc.usc-devnet.creditcoin.network \
-    <universal_bridge_proxy_address_from_step_3_2> \
+    <usc_address_from_step_3_2> \
     "balanceOf(address)" \
     <your_wallet_address> \
     | cast to-dec

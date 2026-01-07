@@ -54,7 +54,7 @@ yarn
 This tutorial involves the use of two different blockchains.
 
 - Sepolia, which serves as our _source chain_ for the tutorial. This is where tokens are burned.
-- Creditcoin USC Devnet, which serves as our _execution chain_ for the tutorial. This is where our minter universal smart contract lives. Tokens are minted in that contract.
+- Creditcoin USC Devnet, which serves as our _execution chain_ for the tutorial. This is where our minter universal smart contract lives. Tokens are minted by that contract.
 
 // TODO: Remove this note once testnet is live
 > [!NOTE]
