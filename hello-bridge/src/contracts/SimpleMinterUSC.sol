@@ -16,14 +16,9 @@ interface INativeQueryVerifier {
         MerkleProofEntry[] siblings;
     }
 
-    struct ContinuityBlock {
-        bytes32 merkleRoot;
-        bytes32 digest;
-    }
-
     struct ContinuityProof {
         bytes32 lowerEndpointDigest;
-        ContinuityBlock[] blocks;
+        bytes32[] roots;
     }
 
     function verify(
@@ -113,13 +108,13 @@ contract SimpleMinterUSC is ERC20 {
         bytes32 merkleRoot,
         INativeQueryVerifier.MerkleProofEntry[] calldata siblings,
         bytes32 lowerEndpointDigest,
-        INativeQueryVerifier.ContinuityBlock[] calldata continuityBlocks
+        bytes32[] calldata continuityRoots
     ) internal view returns (bool verified) {
         INativeQueryVerifier.MerkleProof memory merkleProof =
             INativeQueryVerifier.MerkleProof({root: merkleRoot, siblings: siblings});
 
         INativeQueryVerifier.ContinuityProof memory continuityProof =
-            INativeQueryVerifier.ContinuityProof({lowerEndpointDigest: lowerEndpointDigest, blocks: continuityBlocks});
+            INativeQueryVerifier.ContinuityProof({lowerEndpointDigest: lowerEndpointDigest, roots: continuityRoots});
 
         // Verify inclusion proof
         verified = VERIFIER.verify(chainKey, blockHeight, encodedTransaction, merkleProof, continuityProof);
@@ -158,7 +153,7 @@ contract SimpleMinterUSC is ERC20 {
         bytes32 merkleRoot,
         INativeQueryVerifier.MerkleProofEntry[] calldata siblings,
         bytes32 lowerEndpointDigest,
-        INativeQueryVerifier.ContinuityBlock[] calldata continuityBlocks
+        bytes32[] calldata continuityRoots
     ) external returns (bool success) {
         // Calculate transaction index from merkle proof path
         uint256 transactionIndex = _calculateTransactionIndex(siblings);
@@ -178,18 +173,15 @@ contract SimpleMinterUSC is ERC20 {
 
         // First we verify the proof
         bool verified = _verifyProof(
-            chainKey, blockHeight, encodedTransaction, merkleRoot, siblings, lowerEndpointDigest, continuityBlocks
+            chainKey, blockHeight, encodedTransaction, merkleRoot, siblings, lowerEndpointDigest, continuityRoots
         );
         require(verified, "Verification failed");
 
         // Mark the query as processed
         processedQueries[txKey] = true;
-       
-        // We extract the transaction abi and discard the prefixed block number and tx index (16 bytes)
-        bytes calldata abiBytes = encodedTransaction[16:];
 
         // Next we validate the transaction contents
-        bool valid = _validateTransactionContents(abiBytes);
+        bool valid = _validateTransactionContents(encodedTransaction);
         require(valid, "Transaction contents validation failed");
 
         // If the transaction validation passes, mint tokens to the sender

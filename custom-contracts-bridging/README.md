@@ -120,16 +120,38 @@ the `MINT_AMOUNT` of tokens it should on Creditcoin. The resulting line should l
 _mint(msg.sender, MINT_AMOUNT * 2);
 ```
 
-### 3.2 Deploy Your Modified Contract
+### 3.2 Deploy Your Decoder Library and Modified Contract
 
 //TODO: Change this instruction after testnet release
 Since the latest USC testnet is not yet released, we will be deploying to USC Devnet. 
 
-Finally, deploy your contracts using the following commands:
+First we need to deploy our EvmV1Decoder library so that we can reference it in our 
+`SimpleMinterUSC`. We do so like this:
 
 ```bash
 forge build
 ```
+
+<!--extract decoder_library_address "Deployed to: (0[xX][a-fA-F0-9]{40})" -->
+```bash
+forge create \
+  --broadcast \
+  --rpc-url https://rpc.usc-devnet.creditcoin.network \
+  --private-key <your_private_key> \
+  src/contracts/EvmV1Decoder.sol:EvmV1Decoder
+```
+
+You should get some output with the address of the library you just deployed:
+
+<!-- ignore -->
+
+```bash
+Deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
+```
+
+Save the address of the contract. You will be needing it for the second half of this step.
+
+Now you can deploy your `SimpleMinterUSC` using the following command:
 
 <!-- extract usc_address_from_step_3_2 "Deployed to: (0[xX][a-fA-F0-9]{40})" -->
 ```bash
@@ -137,6 +159,7 @@ forge create \
     --broadcast \
     --rpc-url https://rpc.usc-devnet.creditcoin.network \
     --private-key <your_private_key> \
+    --libraries src/contracts/EvmV1Decoder.sol:EvmV1Decoder:<decoder_library_address> \
     src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
 ```
 
