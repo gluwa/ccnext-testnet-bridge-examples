@@ -1,6 +1,6 @@
 import { Contract, ethers, InterfaceAbi } from 'ethers';
 
-import { api } from '@gluwa/cc-next-query-builder';
+import { api, chainInfo } from '@gluwa/cc-next-query-builder';
 
 import simpleMinterAbi from './contract-abis/SimpleMinterUSC.json';
 
@@ -80,6 +80,11 @@ async function main() {
     const lowerEndpointDigest = proofData.continuityProof.lowerEndpointDigest;
     const continuityRoots = proofData.continuityProof.roots;
 
+    // Wait for attestation to be available
+    const chainInfoProvider = new chainInfo.PrecompileChainInfoProvider(new ethers.JsonRpcProvider(CREDITCOIN_RPC_URL));
+    // Use longer timeout (5 minutes) to handle cases where attestation takes longer
+    await chainInfoProvider.waitUntilHeightAttested(chainKey, height, 5_000, 300_000);
+
     const response = await minterContract.mintFromQuery(
       chainKey,
       height,
@@ -109,12 +114,21 @@ async function main() {
 
 function isRetryableProverError(err: unknown): boolean {
   if (axios.isAxiosError(err)) {
-    return err.response?.status === 503;
+    return err.response?.status === 404;
   }
 
   // Sometimes the library wraps the Axios error
   if (err instanceof Error) {
-    return err.message.includes("status code 503");
+    const message = err.message.toLowerCase();
+    // Check for various 404 error patterns
+    return message.includes("404") ||
+      message.includes("status code 404") ||
+      message.includes("not found");
+  }
+
+  // Also check if error has a cause that is an Axios error
+  if (err && typeof err === 'object' && 'cause' in err) {
+    return isRetryableProverError((err as { cause: unknown }).cause);
   }
 
   return false;
@@ -136,15 +150,31 @@ async function generateProofWithRetry(
       const result = await proofGenServer.generateProof(txHash);
 
       if (!result.success) {
-        throw result.error;
+        // Ensure we throw an Error instance for consistent handling
+        const errorValue = result.error as unknown;
+        const error = errorValue instanceof Error
+          ? errorValue
+          : new Error(String(result.error));
+        throw error;
       }
 
       return result;
     } catch (err) {
       lastError = err;
 
+      // Debug logging on first attempt
+      if (attempt === 1) {
+        console.error('Error details:', {
+          type: typeof err,
+          isError: err instanceof Error,
+          isAxiosError: axios.isAxiosError(err),
+          message: err instanceof Error ? err.message : String(err),
+          isRetryable: isRetryableProverError(err),
+        });
+      }
+
       if (!isRetryableProverError(err)) {
-        // Non-503 → real failure, don’t retry
+        // Non-404 → real failure, don’t retry
         throw err;
       }
 
