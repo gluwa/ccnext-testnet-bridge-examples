@@ -133,6 +133,7 @@ forge build
 ```
 
 <!--extract decoder_library_address "Deployed to: (0[xX][a-fA-F0-9]{40})" -->
+<!-- ignore -->
 ```bash
 forge create \
   --broadcast \
@@ -154,6 +155,7 @@ Save the address of the contract. You will be needing it for the second half of 
 Now you can deploy your `SimpleMinterUSC` using the following command:
 
 <!-- extract usc_address_from_step_3_2 "Deployed to: (0[xX][a-fA-F0-9]{40})" -->
+<!-- ignore -->
 ```bash
 forge create \
     --broadcast \

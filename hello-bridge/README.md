@@ -234,11 +234,11 @@ As a final check, verify that your tokens were successfully minted on Creditcoin
 Cast example:
 
 ```bash
-cast call --rpc-url https://rpc.usc-devnet.creditcoin.network \
+output=$(cast call --rpc-url https://rpc.usc-devnet.creditcoin.network \
     0x9cEfa7025C6093965230868e48d61ff6f616958C \
     "balanceOf(address)" \
-    <your_wallet_address> \
-    | cast to-dec
+    <your_wallet_address> 2>/dev/null | xargs); \
+if [ -n "$output" ] && [ "$output" != "0x" ]; then echo "$output" | cast to-dec; else echo "0"; fi
 ```
 
 This will return your balance in whole (TEST) token units.
