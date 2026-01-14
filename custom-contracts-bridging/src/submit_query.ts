@@ -1,8 +1,8 @@
 import { Contract, ethers, InterfaceAbi } from 'ethers';
 
-import { api } from '@gluwa/cc-next-query-builder';
-
 import simpleMinterAbi from './contract-abis/SimpleMinterUSC.json';
+
+import { generateProofFor, submitProofAndAwait } from '../../helpers/src/index.ts';
 
 const PROVER_API_URL = 'https://proof-gen-api.usc-devnet.creditcoin.network';
 const CREDITCOIN_RPC_URL = 'https://rpc.usc-devnet.creditcoin.network';
@@ -11,21 +11,25 @@ async function main() {
   // Setup
   const args = process.argv.slice(2);
 
-  if (args.length !== 3) {
+  if (args.length !== 4) {
     console.error(`
   Usage:
-    yarn submit_query <Transaction_Hash> <Creditcoin_Private_Key> <Minter_Contract_Address>
+    yarn submit_query <Source_Chain_Rpc_Url> <Transaction_Hash> <Creditcoin_Private_Key> <Minter_Contract_Address>
 
   Example:
-    yarn submit_query 1 0xabc123... 0xYOURPRIVATEKEY 0xMinterContractAddress
+    yarn submit_query https://sepolia.example.rpc 1 0xabc123... 0xYOURPRIVATEKEY 0xMinterContractAddress
   `);
     process.exit(1);
   }
 
-  const [transactionHash, ccNextPrivateKey, minterAddress] = args;
+  const [sourceChainRpcUrl, transactionHash, ccNextPrivateKey, minterAddress] = args;
 
   // TODO: Change this to 1 once testnet is released
   const chainKey = 3;
+
+  if (!sourceChainRpcUrl.startsWith('http')) {
+    throw new Error('Invalid source chain RPC URL provided');
+  }
 
   // Validate Transaction Hash
   if (!transactionHash.startsWith('0x') || transactionHash.length !== 66) {
@@ -42,67 +46,25 @@ async function main() {
     throw new Error('Invalid minter contract address provided');
   }
 
-  // 1. Estabnlish connection to prover API
-  const proofGenerator = new api.ProverAPIProofGenerator(
-    chainKey,
-    PROVER_API_URL
-  );
+  // 1. Initialize RPC providers
+  const ccProvider = new ethers.JsonRpcProvider(CREDITCOIN_RPC_URL);
+  const sourceChainProvider = new ethers.JsonRpcProvider(sourceChainRpcUrl);
 
-  // 2. Build proof using the generator
-  const proofResult = await proofGenerator.generateProof(transactionHash);
-  if (!proofResult.success) {
+  // 2. Validate transaction and generate proof once the block is attested
+  const proofResult = await generateProofFor(transactionHash, chainKey, PROVER_API_URL, ccProvider, sourceChainProvider);
+
+  // 3. Using previously generated proof, submit to USC minter and await for the minted event
+  if (proofResult.success) {
+    // Establish link with the USC contract
+    const wallet = new ethers.Wallet(ccNextPrivateKey, ccProvider);
+    const contractABI = simpleMinterAbi as unknown as InterfaceAbi;
+    const minterContract = new Contract(minterAddress, contractABI, wallet);
+
+    const proofData = proofResult.data!;
+    await submitProofAndAwait(minterContract, proofData);
+  } else {
     throw new Error(`Failed to generate proof: ${proofResult.error}`);
   }
-
-  // 3. Establish link with the USC contract
-  const ccProvider = new ethers.JsonRpcProvider(CREDITCOIN_RPC_URL);
-  const wallet = new ethers.Wallet(ccNextPrivateKey, ccProvider);
-  const contractABI = simpleMinterAbi as unknown as InterfaceAbi;
-  const minterContract = new Contract(minterAddress, contractABI, wallet);
-
-  let eventTriggered = false;
-
-  // Prepare to listen to the TokensMinted event
-  minterContract.on('TokensMinted', (contract, to, amount, queryId) => {
-    console.log(`Tokens minted! Contract: ${contract}, To: ${to}, Amount: ${amount.toString()}, QueryId: ${queryId}`);
-
-    eventTriggered = true;
-  });
-
-  // 4. Submit the proof to the USC contract to mint tokens
-  try {
-    const proofData = proofResult.data!;
-    const chainKey = proofData.chainKey;
-    const height = proofData.headerNumber;
-    const encodedTransaction = proofData.txBytes;
-    const merkleRoot = proofData.merkleProof.root;
-    const siblings = proofData.merkleProof.siblings;
-    const lowerEndpointDigest = proofData.continuityProof.lowerEndpointDigest;
-    const continuityBlocks = proofData.continuityProof.blocks;
-
-    const response = await minterContract.mintFromQuery(
-      chainKey,
-      height,
-      encodedTransaction,
-      merkleRoot,
-      siblings,
-      lowerEndpointDigest,
-      continuityBlocks,
-    );
-    console.log('Transaction submitted: ', response.hash);
-  } catch (error) {
-    console.error('Error submitting transaction: ', error);
-
-    process.exit(1);
-  }
-
-  // 5. Wait for the TokensMinted event
-  while (!eventTriggered) {
-    console.log('Waiting for TokensMinted event...');
-    await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait for 5 seconds
-  }
-
-  console.log('Minting completed!');
 
   process.exit(0);
 }

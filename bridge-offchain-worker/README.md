@@ -36,7 +36,18 @@ locally:
 > nix develop
 > ```
 
-Start by heading to the `bridge-offchain-worker` folder:
+Start by heading first of all to the `helpers` folder:
+
+```bash
+cd helpers
+```
+
+And download the required packages with `yarn`:
+```sh
+yarn
+```
+
+Then go back and head to the `bridge-offchain-worker` folder:
 
 ```bash
 cd bridge-offchain-worker
@@ -148,22 +159,17 @@ At this point, you should see the worker picking up the event.
 <!-- ignore -->
 
 ```bash
-Detected burn of 1000 tokens from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 at 0x49537972ceb6bb8308252474e14847253c4bdf74e87c2ab53cb8e29eea9f5719
-Transaction found in block 596: 0xa2f465f09f0cbb95bd202e9fe303c48d1badceadfac3a577e28b726658321287 at index 0
-Proof generation failed: Failed to build continuity proof: Cannot build continuity proof for height 596 without both lower and upper bounds. Retrying in 30 seconds...
+Detected burn of 1000 tokens from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 at 0xb5f8f1000432f92521021642a915999407c61ed1a9f13c2e6c37f6ac9b6eb6f0
+Transaction 0xb5f8f1000432f92521021642a915999407c61ed1a9f13c2e6c37f6ac9b6eb6f0 found in block 418
+Waiting for block attestation on Creditcoin...
 ```
-
-> [!TIP]
-> Notice how the logs show an error failing to build the continuity proof. Don't be alarmed! This is due to the
-> fact that the Creditcoin chain still hasn' t attested to the block in which the transaction took place.
-> The worker will keep retrying this until the proof will is succesfully built and submitted!
 
 Eventually, you should see a message like this one:
 
 <!-- ignore -->
 
 ```bash
-Tokens minted! Contract: 0x0165878A594ca255338adfa4d48449f69242Eb8F, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0x115e4c9437f48e8ae9795e7c828f56b6a738000aa06ac08e769375c5dc4f7bcc
+Tokens minted! Contract: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0x3bfcf46c80011ef4280b7212e4fa11e5be314b12c9ddd56a74e83c2964b3e9be
 ```
 
 That's it! All it took was a single transaction on your end to initiate the bridging process,

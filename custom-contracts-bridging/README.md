@@ -27,10 +27,21 @@ locally:
 > nix develop
 > ```
 
-Start by heading to the `custom-contracts-bridging` folder:
+Start by heading first of all to the `helpers` folder:
 
 ```bash
-cd custom-contracts-bridging
+cd helpers
+```
+
+And download the required packages with `yarn`:
+```sh
+yarn
+```
+
+Then go back and head to the `custom-contracts-bridging` folder:
+
+```bash
+cd ../custom-contracts-bridging
 ```
 
 You will need to set up the right version of foundry with `foundryup`:
@@ -217,28 +228,27 @@ this also includes generating the proof for the Oracle using the Creditcoin proo
 
 ```sh
 yarn submit_query                  \
+    https://sepolia.infura.io/v3/<your_infura_api_key>  \
     <transaction_hash_from_step_4> \
     <your_private_key>             \
     <usc_address_from_step_3_2>
 ```
-
-> [!TIP]
-> If you submit a query within the first minute of conducting your token burn, it's possible that your query will fail. This is 
-> because the Creditcoin Oracle takes up to a minute to attest to new blocks on a source chain. If your query fails 
-> for this reason, wait a few seconds and try re-submitting it.
 
 On a succesfull query, you should see some messages like the following from the script:
 
 <!-- ignore -->
 
 ```sh
-Transaction found in block 32: 0xb95b3b0ae14eb81eccd6203cc6479be46c0c578a440ac86c23e2de2411aed31f at index 0
-Found attestation bounds for height 32: lower=10, upper=130
-Built 100 continuity blocks for height 32
-Transaction submitted:  0xf134fc29c12b22bb542da0393df527b40e1b772e71d87631b886bc8d14d594dd
+Transaction 0x87c97c776a678941b5941ec0cb602a4467ff4a35f77264208575f137cb05b2a7 found in block 254
+Waiting for block 254 attestation on Creditcoin...
+Latest attested height for chain key 2: 240
+Block 254 attested! Generating proof...
+Proof generation successful!
+Proof submitted:  0xd96bc0545714fcce088d5484f9daa009eaa10c7426ffda54366bcb982a3d3381
 Waiting for TokensMinted event...
 Waiting for TokensMinted event...
-Tokens minted! Contract: 0x0165878A594ca255338adfa4d48449f69242Eb8F, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0x115e4c9437f48e8ae9795e7c828f56b6a738000aa06ac08e769375c5dc4f7bcc
+Waiting for TokensMinted event...
+Tokens minted! Contract: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0xcb77283a28cc0ff227193664bfed87d63124aa753a45cae0a49e31021102f8c7
 Minting completed!
 ```
 

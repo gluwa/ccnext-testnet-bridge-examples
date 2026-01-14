@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
 import { Contract, ContractEventPayload, ethers, InterfaceAbi } from 'ethers';
 
-import { api } from '@gluwa/cc-next-query-builder';
-
 import burnerAbi from './contract-abis/TestERC20Abi.json';
 import simpleMinterAbi from './contract-abis/SimpleMinterUSC.json';
+
+import { generateProofFor, submitProof } from '../../helpers/src/index.ts';
 
 const PROVER_API_URL = 'https://proof-gen-api.usc-devnet.creditcoin.network';
 
@@ -52,13 +52,7 @@ const main = async () => {
     );
   }
 
-  // 1. Estabnlish connection to prover API
-  const proofGenerator = new api.ProverAPIProofGenerator(
-    sourceChainKey,
-    PROVER_API_URL
-  );
-
-  // 2. Instantiate source chain burner contract
+  // 1. Instantiate source chain burner contract
   const ethProvider = new ethers.JsonRpcProvider(sourceChainRpcUrl);
   const burnerContract = new Contract(
     sourceChainContractAddress,
@@ -66,7 +60,7 @@ const main = async () => {
     ethProvider
   );
 
-  // 3. Instantiate minter contract on Creditcoin USC chain
+  // 2. Instantiate minter contract on Creditcoin USC chain
   const ccProvider = new ethers.JsonRpcProvider(ccNextRpcUrl);
   const wallet = new ethers.Wallet(ccNextWalletPrivateKey, ccProvider);
   const minterContract = new Contract(
@@ -75,12 +69,12 @@ const main = async () => {
     wallet
   );
 
-  // 4. Listen to Minter events on USC chain
+  // 3. Listen to Minter events on USC chain
   const minterHandle = minterContract.on('TokensMinted', (contract, to, amount, queryId) => {
     console.log(`Tokens minted! Contract: ${contract}, To: ${to}, Amount: ${amount.toString()}, QueryId: ${queryId}`);
   });
 
-  // 5. Listen to Burn events on source chain
+  // 4. Listen to Burn events on source chain
   const burnerHandle = burnerContract.on('TokensBurned', async (from, amount, payload: ContractEventPayload) => {
     // We validate that the event is from the wallet address we're monitoring and the contract we deployed
     const contractAddress = payload.log.address;
@@ -93,52 +87,22 @@ const main = async () => {
     // Here you would generate the proof and submit the query to Creditcoin USC chain
     // using the proofGenerator and minterContract instances created above
 
-    let proof = await proofGenerator.generateProof(txHash);
+    // Generate proof for the burn transaction
+    const proofResult = await generateProofFor(txHash, sourceChainKey, PROVER_API_URL, ccProvider, ethProvider);
 
-    // Retry logic for proof generation
-    let attempts = 10
-
-    while (!proof.success && attempts > 0) {
-      console.log(`Proof generation failed: ${proof.error}. Retrying in 30 seconds...`);
-      await new Promise(resolve => setTimeout(resolve, 30000)); // Wait before retrying
-
-      const newProof = await proofGenerator.generateProof(txHash);
-      if (newProof.success) {
-        proof = newProof;
+    if (proofResult.success) {
+      const proofData = proofResult.data!;
+      try {
+        const response = await submitProof(minterContract, proofData);
+        console.log('Proof submitted: ', response.hash);
+      } catch (error) {
+        console.error('Error submitting proof: ', error);
       }
-
-      attempts--;
+    } else {
+      console.error(`Failed to generate proof: ${proofResult.error}`);
     }
 
-    if (!proof.success) {
-      console.error(`Failed to generate proof after multiple attempts: ${proof.error}`);
-      return;
-    }
-
-    try {
-      const proofData = proof.data!;
-      const chainKey = proofData.chainKey;
-      const height = proofData.headerNumber;
-      const encodedTransaction = proofData.txBytes;
-      const merkleRoot = proofData.merkleProof.root;
-      const siblings = proofData.merkleProof.siblings;
-      const lowerEndpointDigest = proofData.continuityProof.lowerEndpointDigest;
-      const continuityBlocks = proofData.continuityProof.blocks;
-
-      const response = await minterContract.mintFromQuery(
-        chainKey,
-        height,
-        encodedTransaction,
-        merkleRoot,
-        siblings,
-        lowerEndpointDigest,
-        continuityBlocks,
-      );
-      console.log('Transaction submitted: ', response.hash);
-    } catch (error) {
-      console.error('Error submitting transaction: ', error);
-      return;
-    }
+    return;
   });
 
   console.log('Worker started! Listening for burn events...');
