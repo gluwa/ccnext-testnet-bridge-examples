@@ -8,50 +8,10 @@ Now that you have performed your first _trustless bridge transaction_, let's kee
 step: this tutorial teaches you how to set up your own custom bridging logic by deploying your own
 smart contracts!
 
-## External dependencies
-
-To continue with this tutorial, you will first need to have the following dependencies available
-locally:
-
-- [yarn]
-- [foundry]
-
-<!-- ignore -->
-
-> [!TIP]
-> This project provides a `flake.nix` you can use to download all the dependencies you will need for
-> this tutorial inside of a sandboxed environment. Just keep in mind you will have to
-> **[enable flakes]** for this to work. To start you development environment, simply run:
->
-> ```bash
-> nix develop
-> ```
-
-Start by heading to the `custom-contracts-bridging` folder:
-
-```bash
-cd custom-contracts-bridging
-```
-
-You will need to set up the right version of foundry with `foundryup`:
-
-<!-- ignore -->
-
-```bash
-foundryup --version v1.2.3 # Skip this command if you are using nix!
-
-```
-
-And download the required packages with `yarn`:
-
-```sh
-yarn
-```
-
 ## 1. Setup
 
 This is the same as in [Hello Bridge]. If you have not already done so, follow the installation
-steps in the [setup] section there.
+steps in the [setup] section there before continuing.
 
 ## 2. Deploy A Test `ERC20` Contract on Sepolia
 
@@ -59,23 +19,23 @@ Let's start by deploying our own `ERC20` contract on Sepolia. The contract conta
 tracking the balances of a coin called `TEST`. The contract also automatically funds its creator's
 address with 1000 `TEST` coins, so we won't have to mint `TEST` tokens manually.
 
-Run the following command to deploy the contract:
-
-<!-- env your_infura_api_key USC_DOCS_INFURA_KEY -->
-<!-- env your_private_key USC_DOCS_TESTING_PK -->
-<!-- extract test_erc20_contract_address_from_step_2 "Deployed to: (0[xX][a-fA-F0-9]{40})" -->
+Make sure to first load your `.env` file with:
 
 ```sh
-forge create                                                     \
-    --broadcast                                                  \
-    --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
-    --private-key <your_private_key> \
-    src/contracts/TestERC20.sol:TestERC20
+source .env
+```
+
+After, run the following command to deploy the contract:
+
+```sh
+forge create                \
+    --broadcast              \
+    --rpc-url $SOURCE_CHAIN_RPC_URL \
+    --private-key $CREDITCOIN_WALLET_PRIVATE_KEY \
+    contracts/sol/TestERC20.sol:TestERC20
 ```
 
 This should display some output containing the address of your test `ERC20` contract:
-
-<!-- ignore -->
 
 ```bash
 Deployed to: 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
@@ -83,18 +43,30 @@ Deployed to: 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
 
 Save the contract address. You will be needing it in the next step.
 
+Additionally update the `.env` file at the root of the repository with the address, like so:
+
+```env
+SOURCE_CHAIN_CUSTOM_CONTRACT_ADDRESS=<test_erc20_contract_address_from_step_2>
+```
+
+Once again, reload your `.env` file with:
+
+```sh
+source .env
+```
+
 ## 3. Deploy Your Own Custom Bridging Contract
 
 In the next two steps we will be deploying our own bridging contract called `SimpleMinterUSC.sol`
 
 Universal smart contracts (USCs) such as `SimpleMinterUSC` are intended to be deployed by DApp
-builders. Here, our USC is used only for bridging tokens. A USC exposes functions which 
-internally make use of the Creditcoin Oracle to verify cross-chain data. It then interprets 
+builders. Here, our USC is used only for bridging tokens. A USC exposes functions which
+internally make use of the Creditcoin Oracle to verify cross-chain data. It then interprets
 those data and uses them to trigger DApp business logic.
 
 For instance, our `SimpleMinterUSC` looks for fields like `from`, `to`, and `amount` in the
-cross-chain data we submit to it. With those fields, the contract can verify whether or not a 
-token burn took place, how many tokens it needs to mint on Creditcoin, and which address it 
+cross-chain data we submit to it. With those fields, the contract can verify whether or not a
+token burn took place, how many tokens it needs to mint on Creditcoin, and which address it
 should mint them to.
 
 ### 3.1 Modify The Bridge Smart Contract
@@ -106,7 +78,7 @@ of tokens which were burned on our _source chain_.
 > This is for demonstration purposes only, as bridging this way dilutes the value of our `TEST`
 > token each time we bridge it.
 
-Start by opening the file `contracts/SimpleMinterUSC.sol`. Next, navigate to the following line 
+Start by opening the file `contracts/sol/SimpleMinterUSC.sol`. Next, navigate to the following line
 inside of the `mintFromQuery` function:
 
 ```sol
@@ -122,24 +94,15 @@ _mint(msg.sender, MINT_AMOUNT * 2);
 
 ### 3.2 Deploy Your Decoder Library and Modified Contract
 
-//TODO: Change this instruction after testnet release
-Since the latest USC testnet is not yet released, we will be deploying to USC Devnet. 
-
-First we need to deploy our EvmV1Decoder library so that we can reference it in our 
+First we need to deploy our `EvmV1Decoder` library so that we can reference it in our
 `SimpleMinterUSC`. We do so like this:
 
 ```bash
-forge build
-```
-
-<!--extract decoder_library_address "Deployed to: (0[xX][a-fA-F0-9]{40})" -->
-<!-- ignore -->
-```bash
 forge create \
   --broadcast \
-  --rpc-url https://rpc.usc-devnet.creditcoin.network \
-  --private-key <your_private_key> \
-  src/contracts/EvmV1Decoder.sol:EvmV1Decoder
+  --rpc-url $CREDITCOIN_RPC_URL \
+  --private-key $CREDITCOIN_WALLET_PRIVATE_KEY \
+  contracts/sol/EvmV1Decoder.sol:EvmV1Decoder
 ```
 
 You should get some output with the address of the library you just deployed:
@@ -147,22 +110,20 @@ You should get some output with the address of the library you just deployed:
 <!-- ignore -->
 
 ```bash
-Deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
+Deployed to: 0x73684e10cE6d6E344BfdD4F92a79e0D6Cd931b52
 ```
 
 Save the address of the contract. You will be needing it for the second half of this step.
 
 Now you can deploy your `SimpleMinterUSC` using the following command:
 
-<!-- extract usc_address_from_step_3_2 "Deployed to: (0[xX][a-fA-F0-9]{40})" -->
-<!-- ignore -->
 ```bash
 forge create \
     --broadcast \
-    --rpc-url https://rpc.usc-devnet.creditcoin.network \
-    --private-key <your_private_key> \
-    --libraries src/contracts/EvmV1Decoder.sol:EvmV1Decoder:<decoder_library_address> \
-    src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
+    --rpc-url $CREDITCOIN_RPC_URL \
+    --private-key $CREDITCOIN_WALLET_PRIVATE_KEY \
+    --libraries contracts/sol/EvmV1Decoder.sol:EvmV1Decoder:<decoder_library_address> \
+    contracts/sol/SimpleMinterUSC.sol:SimpleMinterUSC
 ```
 
 You should get some output with the address of the contract you just deployed:
@@ -173,12 +134,27 @@ You should get some output with the address of the contract you just deployed:
 Deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
 ```
 
-Save the address of the contract. You will be needing it in [step 5].
+### 3.3 Update environment with your USC contract address
+
+Save the address of the contract. And modify the following entry in the `.env` file found at the root of the
+repository:
+
+<!-- ignore -->
+
+```env
+USC_CUSTOM_MINTER_CONTRACT_ADDRESS=<usc_address_from_step_3_2>
+```
+
+Once again, reload your `.env` file with:
+
+```sh
+source .env
+```
 
 > [!WARNING]
 > If you run into any trouble with deployment using these steps, try using
-the [Deployment Guide](DEPLOY.md) instead. Make sure you use step 3a and ignore 
-3b, which targets testnet.
+> the [Deployment Guide] instead. Make sure you use step 3a and ignore
+> 3b, which targets testnet.
 
 ## 4. Burning the tokens you want to bridge
 
@@ -189,20 +165,16 @@ transferring them to an address for which the private key is unknown, making the
 
 Run the following command to initiate the burn:
 
-<!-- extract transaction_hash_from_step_4 "transactionHash\s*(0[xX][a-fA-F0-9]{64})" -->
-
 ```bash
-cast send                                                        \
-    --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
-    <test_erc20_contract_address_from_step_2>                    \
+cast send   \
+    --rpc-url $SOURCE_CHAIN_RPC_URL \
+    $SOURCE_CHAIN_CUSTOM_CONTRACT_ADDRESS                    \
     "burn(uint256)" 50000000000000000000                         \
-    --private-key <your_private_key>
+    --private-key $CREDITCOIN_WALLET_PRIVATE_KEY
 ```
 
 This should display some output stating that your transaction was a success, along with a
 transaction hash:
-
-<!-- ignore -->
 
 ```bash
 transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
@@ -212,33 +184,28 @@ Save the transaction hash. You will be needing it in the next step.
 
 ## 5. Submit a mint query to the USC contract
 
-Now that we've burnt funds on Sepolia, we can use that transaction to request a mint in our custom USC contract, 
+Now that we've burnt funds on Sepolia, we can use that transaction to request a mint in our custom USC contract,
 this also includes generating the proof for the Oracle using the Creditcoin proof generator library.
 
 ```sh
-yarn submit_query                  \
-    <transaction_hash_from_step_4> \
-    <your_private_key>             \
-    <usc_address_from_step_3_2>
+yarn submit_custom <transaction_hash_from_step_4>
 ```
-
-> [!TIP]
-> If you submit a query within the first minute of conducting your token burn, it's possible that your query will fail. This is 
-> because the Creditcoin Oracle takes up to a minute to attest to new blocks on a source chain. If your query fails 
-> for this reason, wait a few seconds and try re-submitting it.
 
 On a succesfull query, you should see some messages like the following from the script:
 
-<!-- ignore -->
-
 ```sh
-Transaction found in block 32: 0xb95b3b0ae14eb81eccd6203cc6479be46c0c578a440ac86c23e2de2411aed31f at index 0
-Found attestation bounds for height 32: lower=10, upper=130
-Built 100 continuity blocks for height 32
-Transaction submitted:  0xf134fc29c12b22bb542da0393df527b40e1b772e71d87631b886bc8d14d594dd
+Transaction 0x87c97c776a678941b5941ec0cb602a4467ff4a35f77264208575f137cb05b2a7 found in block 254
+Waiting for block 254 attestation on Creditcoin...
+Latest attested height for chain key 2: 240
+Block 254 attested! Generating proof...
+Proof generation successful!
+⏳ Estimating gas...
+   Estimated gas: 357667, Gas limit with buffer: 482850
+Proof submitted:  0xd96bc0545714fcce088d5484f9daa009eaa10c7426ffda54366bcb982a3d3381
 Waiting for TokensMinted event...
 Waiting for TokensMinted event...
-Tokens minted! Contract: 0x0165878A594ca255338adfa4d48449f69242Eb8F, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0x115e4c9437f48e8ae9795e7c828f56b6a738000aa06ac08e769375c5dc4f7bcc
+Waiting for TokensMinted event...
+Tokens minted! Contract: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0xcb77283a28cc0ff227193664bfed87d63124aa753a45cae0a49e31021102f8c7
 Minting completed!
 ```
 
@@ -246,28 +213,29 @@ Sometimes it may take a bit more for the `TokensMinted` event to trigger, but sh
 
 Once that's done we only need to check our newly minted tokens!
 
-## 5. Verify Your Bridged Tokens
+## 6. Verify Your Bridged Tokens
 
 As a final check, verify that your tokens were successfully minted on Creditcoin Testnet. You can check your balance using:
 
-- **Block Explorer**: Visit the [bridge contract] on the explorer and check your address
-- **Direct Contract Call**: Use `cast` or any web3 tool to call `balanceOf()` on the contract
-
-<!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
-
-Cast example:
-
 ```bash
-cast call --rpc-url https://rpc.usc-devnet.creditcoin.network \
-    <usc_address_from_step_3_2> \
-    "balanceOf(address)" \
-    <your_wallet_address> \
-    | cast to-dec
+WALLET_ADDRESS=$(cast wallet address --private-key $CREDITCOIN_WALLET_PRIVATE_KEY)
+yarn check_balance $USC_CUSTOM_MINTER_CONTRACT_ADDRESS $WALLET_ADDRESS
 ```
 
 This will return your balance in whole (TEST) token units.
 
 Notice how you now have _twice_ the amount of tokens you originally burned on Sepolia!
+
+It should show something like this:
+
+<!-- ignore -->
+
+```bash
+📦 Token: Mintable (TEST)
+🧾 Raw Balance: 2000
+💰 Formatted Balance: 0.000000000000002 TEST
+Decimals for token micro unit: 18
+```
 
 ## Conclusion
 
@@ -283,15 +251,10 @@ In practice, DApp builders will want to conduct all cross-chain queries via an o
 order to ensure robustness and streamline UX. Checkout the [bridge offchain worker] tutorial next
 for more information!
 
-<!-- teardown "cd .." -->
-
 [Hello Bridge]: ../hello-bridge/README.md
 [setup]: ../hello-bridge/README.md#1-setup
-[yarn]: https://yarnpkg.com/getting-started/install
-[foundry]: https://getfoundry.sh/
-[enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
 [step 2]: #2-deploy-a-test-erc20-contract-on-sepolia
 [step 3.2]: #32-deploy-your-modified-contract
 [step 5]: #5-submit-a-mint-query-to-the-usc-contract
 [bridge offchain worker]: ../bridge-offchain-worker/README.md
-[Deployment Guide]: DEPLOY.md
+[Deployment Guide]: ../contracts/DEPLOY.md

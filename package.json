@@ -1,10 +1,13 @@
 {
   "license": "MIT",
+  "name": "usc-testnet-bridge-examples",
+  "version": "0.1.0",
   "scripts": {
-    "submit_query": "tsx src/submit_query.ts",
+    "submit_hello": "tsx hello-bridge/submit_query.ts",
+    "submit_custom": "tsx custom-contracts-bridging/submit_query.ts",
+    "start_worker": "tsx bridge-offchain-worker/worker.ts",
+    "check_balance": "node check_balance.js",
     "format": "prettier --write .",
-    "deploy:devnet": "forge create --broadcast --rpc-url https://rpc.usc-devnet.creditcoin.network --private-key ${PRIVATE_KEY:-} src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC",
-    "deploy:testnet": "forge create --broadcast --rpc-url https://rpc.usc-testnet.creditcoin.network --private-key ${PRIVATE_KEY:-} src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC",
     "build": "forge build"
   },
   "devDependencies": {

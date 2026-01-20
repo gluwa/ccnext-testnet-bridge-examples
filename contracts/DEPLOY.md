@@ -2,9 +2,6 @@
 
 This guide explains how to deploy the `SimpleMinterUSC` contract to Creditcoin USC networks. The contract serves as a bridge minter that verifies cross-chain proofs and mints tokens on Creditcoin.
 
-> [!NOTE]
-> **USC Testnet is coming soon!** Currently, only USC Devnet is available for deployment. Use Devnet for testing and development.
-
 ## Prerequisites
 
 1. **Foundry installed**: Make sure you have Foundry installed. If not, install it:
@@ -18,23 +15,6 @@ This guide explains how to deploy the `SimpleMinterUSC` contract to Creditcoin U
    - Request test tokens from the [Creditcoin Discord faucet]
 
 3. **Private key**: Have your wallet's private key ready (make sure it's a test wallet with no real funds).
-
-## Quick Start
-
-The easiest way to deploy is using the yarn scripts:
-
-```bash
-# Set your private key
-export PRIVATE_KEY=<your_private_key>
-
-# Deploy to Devnet
-yarn deploy:devnet
-
-# Deploy to Testnet (Coming Soon)
-# yarn deploy:testnet
-```
-
-After deployment, save the contract address - you'll need it to interact with the contract.
 
 ## Step-by-Step Deployment
 
@@ -50,40 +30,45 @@ You should see output indicating successful compilation. The compiled artifacts 
 
 ### 2. Set Your Private Key
 
-Set your private key as an environment variable for security:
+Set your private in the `.env` file as an environment variable and then load the file into your environment with:
 
 ```bash
-export PRIVATE_KEY=<your_private_key>
+source .env
 ```
 
 > [!CAUTION]
 > Never commit your private key to version control. Use environment variables or a secure secret management system.
 
-### 3a. Deploy to USC Devnet
+### 3. Deploy to USC Testnet
 
-Deploy the contract to USC Devnet:
+First we need to deploy our `EvmV1Decoder` library so that we can reference it in our
+`SimpleMinterUSC`. We do so like this:
 
 ```bash
 forge create \
-    --broadcast \
-    --rpc-url https://rpc.usc-devnet.creditcoin.network \
-    --private-key $PRIVATE_KEY \
-    src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
+  --broadcast \
+  --rpc-url $CREDITCOIN_RPC_URL \
+  --private-key $CREDITCOIN_WALLET_PRIVATE_KEY \
+  contracts/sol/EvmV1Decoder.sol:EvmV1Decoder
 ```
 
-### 3b. Deploy to USC Testnet (Coming Soon)
+You should get some output with the address of the library you just deployed:
 
-> [!NOTE]
-> USC Testnet is not yet available. Use USC Devnet for testing and development.
+```bash
+Deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
+```
 
-When USC Testnet becomes available, deploy using:
+Save the address of the contract. You will be needing it for the second half of this step.
+
+Now you can deploy your `SimpleMinterUSC` using the following command:
 
 ```bash
 forge create \
     --broadcast \
-    --rpc-url https://rpc.usc-testnet.creditcoin.network \
-    --private-key $PRIVATE_KEY \
-    src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
+    --rpc-url $CREDITCOIN_RPC_URL \
+    --private-key $CREDITCOIN_WALLET_PRIVATE_KEY \
+    --libraries contracts/sol/EvmV1Decoder.sol:EvmV1Decoder:<decoder_library_address> \
+    contracts/sol/SimpleMinterUSC.sol:SimpleMinterUSC
 ```
 
 ### 4. Save the Contract Address
@@ -102,10 +87,7 @@ Deployed to: 0x7d8726B05e4A48850E819639549B50beCB893506
 
 ## Verify Deployment
 
-After deployment, verify the contract was deployed correctly by checking the contract on the block explorer:
-
-- **Devnet**: https://explorer.usc-devnet.creditcoin.network
-- **Testnet** (Coming Soon): https://explorer.usc-testnet.creditcoin.network
+After deployment, verify the contract was deployed correctly by checking the contract on the block explorer at https://explorer.usc-testnet2.creditcoin.network
 
 Search for your contract address to see deployment details and transaction history.
 
@@ -120,24 +102,16 @@ Search for your contract address to see deployment details and transaction histo
 
 ## Network Information
 
-### USC Devnet
-
-- **RPC URL**: `https://rpc.usc-devnet.creditcoin.network`
-- **Explorer**: https://explorer.usc-devnet.creditcoin.network
+- **RPC URL**: `https://rpc.usc-testnet2.creditcoin.network`
+- **Explorer**: https://explorer.usc-testnet2.creditcoin.network
 - **Purpose**: Development and testing
-
-### USC Testnet (Coming Soon)
-
-- **Status**: Not yet available - use USC Devnet for testing
-- **RPC URL**: `https://rpc.usc-testnet.creditcoin.network` (will be available soon)
-- **Explorer**: https://explorer.usc-testnet.creditcoin.network (will be available soon)
-- **Purpose**: Public testing environment
 
 ## Troubleshooting
 
 ### Error: "already known" or "nonce already used"
 
 This error typically means a transaction with that nonce was already submitted to the network. This can happen when:
+
 - A previous transaction with the same nonce is pending
 - An underfunded transaction is stuck in the mempool
 
@@ -151,33 +125,40 @@ If the transaction is stuck in the mempool due to insufficient gas fees, retry w
 # Retry deployment with higher gas price
 forge create \
     --broadcast \
-    --rpc-url https://rpc.usc-devnet.creditcoin.network \
-    --private-key $PRIVATE_KEY \
+    --rpc-url $CREDITCOIN_RPC_URL \
+    --private-key $CREDITCOIN_WALLET_PRIVATE_KEY \
     --gas-price <higher_gas_price> \
-    src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
+    contracts/sol/SimpleMinterUSC.sol:SimpleMinterUSC
 ```
 
 **Solution 2: Wait and retry** (recommended)
 
+Usually waiting for around 10s-30s and trying to deploy again will work, if you already managed to deploy the decoder you only need to
+retry redeploying the `SimpleUSCMinter` contract:
+
 ```bash
-# Wait 10-30 seconds for the previous transaction to confirm
-# Then run the deployment command again
-yarn deploy:devnet
+forge create \
+    --broadcast \
+    --rpc-url $CREDITCOIN_RPC_URL \
+    --private-key $CREDITCOIN_WALLET_PRIVATE_KEY \
+    --libraries contracts/sol/EvmV1Decoder.sol:EvmV1Decoder:<decoder_library_address> \
+    contracts/sol/SimpleMinterUSC.sol:SimpleMinterUSC
 ```
 
 **Solution 3: Check current nonce and use next**
 
 ```bash
 # Get your current nonce
-cast nonce <your_address> --rpc-url https://rpc.usc-devnet.creditcoin.network
+cast nonce <your_address> --rpc-url $CREDITCOIN_RPC_URL
 
 # Deploy with the next nonce (replace X with current_nonce + 1)
 forge create \
     --broadcast \
-    --rpc-url https://rpc.usc-devnet.creditcoin.network \
-    --private-key $PRIVATE_KEY \
+    --rpc-url $CREDITCOIN_RPC_URL \
+    --private-key $CREDITCOIN_WALLET_PRIVATE_KEY \
     --nonce X \
-    src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
+    --libraries contracts/sol/EvmV1Decoder.sol:EvmV1Decoder:<decoder_library_address> \
+    contracts/sol/SimpleMinterUSC.sol:SimpleMinterUSC
 ```
 
 **Solution 4: Check if contract was already deployed**
@@ -229,15 +210,16 @@ If you're experiencing persistent nonce issues, you can manually manage nonces:
 
 ```bash
 # Get current nonce
-CURRENT_NONCE=$(cast nonce <your_address> --rpc-url <rpc_url>)
+CURRENT_NONCE=$(cast nonce <your_address> --rpc-url $CREDITCOIN_RPC_URL)
 
 # Deploy with explicit nonce
 forge create \
     --broadcast \
-    --rpc-url <rpc_url> \
-    --private-key $PRIVATE_KEY \
+    --rpc-url $CREDITCOIN_RPC_URL \
+    --private-key $CREDITCOIN_WALLET_PRIVATE_KEY \
     --nonce $((CURRENT_NONCE + 1)) \
-    src/contracts/SimpleMinterUSC.sol:SimpleMinterUSC
+    --libraries contracts/sol/EvmV1Decoder.sol:EvmV1Decoder:<decoder_library_address> \
+    contracts/sol/SimpleMinterUSC.sol:SimpleMinterUSC
 ```
 
 ## Next Steps
@@ -247,9 +229,9 @@ After deploying your contract:
 1. **Save the contract address** - you'll need it for all interactions
 2. **Update your scripts** - replace any hardcoded contract addresses with your new address
 3. **Verify the deployment** - check the block explorer to confirm the contract was deployed
-4. **Submit queries** - use `yarn submit_query` with your contract address
+4. **Submit queries** - use `yarn submit_query_2` with your contract address
 
-For more information on using the deployed contract, see the main [README.md](README.md).
+For more information on using the deployed contract, see the [README.md](../custom-contracts-bridging/README.md) for the Custom Contract Bridging example.
 
 ## Additional Resources
 

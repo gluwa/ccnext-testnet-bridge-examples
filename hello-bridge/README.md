@@ -9,56 +9,12 @@ bridging!** Cross-chain bridging on Creditcoin can be broken down into three bro
 3. Using the proofs we generated, we call our minter universal smart contract (USC) which will internally call the Creditcoin oracle's native proof verifier
 4. After that the same contract will mint the tokens on Creditcoin
 
-## External dependencies
-
-To continue with this tutorial, you will first need to have the following dependencies available
-locally:
-
-- [yarn]
-- [foundry]
-
-<!-- ignore -->
-
-> [!TIP]
-> This project provides a `flake.nix` you can use to download all the dependencies you will need for
-> this tutorial inside of a sandboxed environment. Just keep in mind you will have to
-> **[enable flakes]** for this to work. To start you development environment, simply run:
->
-> ```bash
-> nix develop
-> ```
-
-Start by heading to the `hello-bridge` folder:
-
-```bash
-cd hello-bridge
-```
-
-You will need to set up the right version of foundry with `foundryup`:
-
-<!-- ignore -->
-
-```bash
-foundryup --version v1.2.3 # Skip this command if you are using nix!
-
-```
-
-And download the required packages with `yarn`:
-
-```sh
-yarn
-```
-
 ## 1. Setup
 
 This tutorial involves the use of two different blockchains.
 
 - Sepolia, which serves as our _source chain_ for the tutorial. This is where tokens are burned.
-- Creditcoin USC Devnet, which serves as our _execution chain_ for the tutorial. This is where our minter universal smart contract lives. Tokens are minted by that contract.
-
-// TODO: Remove this note once testnet is live
-> [!NOTE]
-> **USC Testnet is coming soon!** This tutorial currently uses USC Devnet. When Testnet becomes available, you can use it instead.
+- Creditcoin USC Testnet, which serves as our _execution chain_ for the tutorial. This is where our minter universal smart contract lives. Tokens are minted by that contract.
 
 In order to use both blockchains we need to create a wallet and fund it with the native tokens of
 both networks.
@@ -67,7 +23,7 @@ both networks.
 
 In order to safely sign transactions for this tutorial, we want to generate a fresh EVM wallet address.
 Since all EVM networks use the same address and transaction signature scheme we can use the address we
-create on both Sepolia and Creditcoin USC Devnet.
+create on both Sepolia and Creditcoin USC Testnet.
 
 > [!CAUTION]
 > In this tutorial, we will be using your wallet's private key to allow some test scripts to act on
@@ -82,11 +38,21 @@ cast wallet new
 
 Save the resulting wallet address and private key for future use. They should look like:
 
-<!-- ignore -->
-
 ```bash
 Address:     0xBE7959cA1b19e159D8C0649860793dDcd125a2D5
 Private key: 0xb9c179ed56514accb60c23a862194fa2a6db8bdeb815d16e2c21aa4d7dc2845d
+```
+
+Save this private key on the `.env` file in the root of the repository:
+
+```env
+CREDITCOIN_WALLET_PRIVATE_KEY=<your_private_key>
+```
+
+And load into your terminal session with:
+
+```sh
+source .env
 ```
 
 ### 1.2 Get some test funds (`Sepolia`)
@@ -97,21 +63,19 @@ faucet here.
 
 ### 1.3 Get some test funds (`Creditcoin`)
 
-You will also need to fund your account on the Creditcoin Devnet, otherwise our oracle query
+You will also need to fund your account on the Creditcoin Testnet, otherwise our oracle query
 submission will fail due to lack of funds. Head to the [🚰 creditcoin discord faucet] to request
 some test tokens there.
 
-Your request for tokens in the Discord faucet should look like this. Substitute in your devnet
+Your request for tokens in the Discord faucet should look like this. Substitute in your testnet
 account address from [step 1.1]:
-
-<!-- ignore -->
 
 ```bash
 /faucet address: 0xBE7959cA1b19e159D8C0649860793dDcd125a2D5
 ```
 
 Note, that currently the faucet yields 100 test CTC every 24 hours. This balance is sufficient
-to submit 9 oracle queries, since devnet oracle fees are artificially high to prevent DOS.
+to submit 9 oracle queries, since testnet oracle fees are artificially high to prevent DOS.
 
 Now that your wallet is ready to make transactions on both networks, you will be needing a way
 to interact with it from the command line.
@@ -125,6 +89,18 @@ Follow the onscreen instructions to create your account and generate your first 
 you are requesting a Sepolia API key. Copy it: you will be needing it in the following steps. You
 are now ready to go with the rest of the tutorial!
 
+Once you have your key edit the following variable in the `.env` file located at the root of this repository.
+
+```env
+SOURCE_CHAIN_RPC_URL="https://sepolia.infura.io/v3/<your_infura_api_key>"
+```
+
+And load into your terminal session with:
+
+```sh
+source .env
+```
+
 ## 2. Minting some tokens on Sepolia
 
 More tokens? But I thought I had all the tokens I needed! Well, kind of. For our example we
@@ -137,14 +113,11 @@ But your new Sepolia account doesn't have these tokens yet!
 For your convenience, we have [already deployed] a test `ERC20` contract to Sepolia which you can
 use to mint some dummy ERC20 tokens. Run the following command:
 
-<!-- env your_infura_api_key USC_DOCS_INFURA_KEY -->
-<!-- env your_private_key USC_DOCS_TESTING_PK -->
-
 ```bash
-cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
-    0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
-    "mint(uint256)" 50000000000000000000                               \
-    --private-key <your_private_key>
+cast send --rpc-url $SOURCE_CHAIN_RPC_URL \
+    $SOURCE_CHAIN_CONTRACT_ADDRESS  \
+    "mint(uint256)" 50000000000000000000        \
+    --private-key $CREDITCOIN_WALLET_PRIVATE_KEY
 ```
 
 ## 3. Burning the tokens you want to bridge
@@ -154,19 +127,15 @@ burn tokens by transferring them to an address for which the private key is unkn
 inaccessible. This way, when creating the same amount of tokens on Creditcoin at the end of the
 bridging process, we won't be creating any artificial value. Run the following command:
 
-<!-- extract transaction_hash_from_step_3 "transactionHash\s*(0[xX][a-fA-F0-9]{64})" -->
-
 ```sh
-cast send --rpc-url https://sepolia.infura.io/v3/<your_infura_api_key> \
-    0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8                         \
-    "burn(uint256)" 50000000000000000000                               \
-    --private-key <your_private_key>
+cast send --rpc-url $SOURCE_CHAIN_RPC_URL \
+    $SOURCE_CHAIN_CONTRACT_ADDRESS  \
+    "burn(uint256)" 50000000000000000000        \
+    --private-key $CREDITCOIN_WALLET_PRIVATE_KEY
 ```
 
 This should display some output stating that your transaction was a success, along with a
 transaction hash:
-
-<!-- ignore -->
 
 ```bash
 transactionHash         0xbc1aefc42f7bc5897e7693e815831729dc401877df182b137ab3bf06edeaf0e1
@@ -183,67 +152,60 @@ be an issue, since nothing is preventing that company from censoring certain tra
 stealing funds! Web3 was made to be _trustless_ and _decentralized_, let's make it that way 😎.
 
 Now that we've burnt funds on Sepolia, we can use that transaction to request a mint in our USC contract.
-But before we can submit our USC call, we need to generate proofs which will be submitted to the Creditcoin 
+But before we can submit our USC call, we need to generate proofs which will be submitted to the Creditcoin
 Oracle to verify our cross-chain data.
 
-// TODO: Remove this note once testnet is available
-> [!NOTE]
-> This tutorial uses USC Devnet (USC Testnet is coming soon).
-
-All these steps are condensed in the `submit_query` script, which is run as follows:
+All these steps are condensed in the `submit_hello` script, which is run as follows:
 
 ```sh
-yarn submit_query                  \
-    <transaction_hash_from_step_3> \
-    <your_private_key>
+yarn submit_hello <transaction_hash_from_step_3>
 ```
-
-> [!TIP]
-> If you submit a query within the first minute of conducting your token burn, it's possible that your query will fail. This is
-> because the Creditcoin Oracle takes up to a minute to attest to new blocks on a source chain. If your query fails
-> for this reason, wait a few seconds and try re-submitting it.
 
 On a succesfull query, you should see some messages like the following from the script:
 
-<!-- ignore -->
-
 ```sh
-Transaction found in block 32: 0xb95b3b0ae14eb81eccd6203cc6479be46c0c578a440ac86c23e2de2411aed31f at index 0
-Found attestation bounds for height 32: lower=10, upper=130
-Built 100 continuity blocks for height 32
-Transaction submitted:  0xf134fc29c12b22bb542da0393df527b40e1b772e71d87631b886bc8d14d594dd
+Transaction 0x87c97c776a678941b5941ec0cb602a4467ff4a35f77264208575f137cb05b2a7 found in block 254
+Waiting for block 254 attestation on Creditcoin...
+Latest attested height for chain key 2: 240
+Block 254 attested! Generating proof...
+Proof generation successful!
+⏳ Estimating gas...
+   Estimated gas: 357667, Gas limit with buffer: 482850
+Proof submitted:  0xd96bc0545714fcce088d5484f9daa009eaa10c7426ffda54366bcb982a3d3381
 Waiting for TokensMinted event...
 Waiting for TokensMinted event...
-Tokens minted! Contract: 0x9cEfa7025C6093965230868e48d61ff6f616958C, To: 0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac, Amount: 1000, QueryId: 0x20b75e448fbe82f278a054c401f5aacc0fb04e011d9dffdce314087ab2e582b5
+Waiting for TokensMinted event...
+Tokens minted! Contract: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512, To: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1000, QueryId: 0xcb77283a28cc0ff227193664bfed87d63124aa753a45cae0a49e31021102f8c7
 Minting completed!
 ```
 
-Sometimes it may take a bit longer for the `TokensMinted` event to trigger, but should be no more than 30 seconds.
+Sometimes it may take a bit longer for the `TokensMinted` event to trigger, but should be no more than a couple of minutes.
 
 Once that's done we only need to check our newly minted tokens!
 
 ## 5. Verify Your Bridged Tokens
 
-As a final check, verify that your tokens were successfully minted on Creditcoin Devnet. You can check your balance using:
-
-- **Block Explorer**: Visit the [bridge contract] on the explorer and check your address
-- **Direct Contract Call**: Use `cast` or any web3 tool to call `balanceOf()` on the contract
-
-<!-- env your_wallet_address USC_DOCS_TESTING_ADDRESS -->
-
-Cast example:
+As a final check, verify that your tokens were successfully minted on Creditcoin Testnet. You can check your balance using:
 
 ```bash
-output=$(cast call --rpc-url https://rpc.usc-devnet.creditcoin.network \
-    0x9cEfa7025C6093965230868e48d61ff6f616958C \
-    "balanceOf(address)" \
-    <your_wallet_address> 2>/dev/null | xargs); \
-if [ -n "$output" ] && [ "$output" != "0x" ]; then echo "$output" | cast to-dec; else echo "0"; fi
+WALLET_ADDRESS=$(cast wallet address --private-key $CREDITCOIN_WALLET_PRIVATE_KEY)
+yarn check_balance $USC_MINTER_CONTRACT_ADDRESS $WALLET_ADDRESS
 ```
 
 This will return your balance in whole (TEST) token units.
 
 The contract address and your wallet address should show your minted TEST tokens from the bridging process.
+
+It should show something like this:
+
+<!-- ignore -->
+
+```bash
+📦 Token: Mintable (TEST)
+🧾 Raw Balance: 1000
+💰 Formatted Balance: 0.000000000000001 TEST
+Decimals for token micro unit: 18
+```
 
 ## Conclusion
 
@@ -257,23 +219,11 @@ be used by teams of DApp builders who will handle data provisioning on behalf of
 Such teams will want to define and deploy their own contracts as shown in the [custom contract
 bridging] tutorial.
 
-<!-- teardown "cd .." -->
-
-[enable flakes]: https://nixos.wiki/wiki/flakes#Enable_flakes_temporarily
-[yarn]: https://yarnpkg.com/getting-started/install
-[foundry]: https://getfoundry.sh/
 [🚰 testnet faucet]: https://cloud.google.com/application/web3/faucet/ethereum/sepolia
 [🚰 creditcoin discord faucet]: https://discord.com/channels/762302877518528522/1414985542235459707
-
 <!-- markdown-link-check-disable -->
-
 [Infura]: https://developer.metamask.io/register
-
-<!-- markdown-link-check-enable -->
-
 [already deployed]: https://sepolia.etherscan.io/address/0x15166Ba9d24aBfa477C0c88dD1E6321297214eC8
-[bridge contract]: https://explorer.usc-testnet.creditcoin.network/address/0x441726D6821B2009147F0FA96E1Ee09D412cCb38
-[ERC20 contract]: https://explorer.usc-testnet.creditcoin.network/token/0xb0fb0b182f774266b1c7183535A41D69255937a3
 [custom contract bridging]: ../custom-contracts-bridging/README.md
 [step 1.1]: #11-generate-a-new-wallet-address
 [step 2]: #2-minting-some-tokens-on-sepolia
