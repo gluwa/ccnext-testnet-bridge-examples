@@ -1,0 +1,74 @@
+---
+name: Exercise examples
+
+"on":
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions: read-all
+
+jobs:
+  setup:
+    outputs:
+      release_tag: ${{ steps.devnet-env.outputs.release_tag }}
+      creditcoin_name: ${{ steps.devnet-env.outputs.creditcoin_name }}
+      attestor_name: ${{ steps.devnet-env.outputs.attestor_name }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout gluwa/creditcoin3-next repository
+        uses: actions/checkout@v6
+        with:
+          repository: gluwa/creditcoin3-next
+          ref: poc_external_attestation_network
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Devnet ENV
+        id: devnet-env
+        run: |
+          # shellcheck disable=SC2129
+          RELEASE_TAG=$(.github/extract-release-tag.sh "devnet")
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "creditcoin_name=creditcoin-$RELEASE_TAG-$(uname -m)-unknown-linux-gnu.zip" >> "$GITHUB_OUTPUT"
+          echo "attestor_name=attestor-binaries-$RELEASE_TAG-$(uname -m)-unknown-linux-gnu.zip" >> "$GITHUB_OUTPUT"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  hello-bridge:
+    runs-on: ubuntu-24.04
+    needs: setup
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download creditcoin3-node from release ${{ needs.setup.outputs.release_tag }}
+        uses: i3h/download-release-asset@v1
+        with:
+          owner: ${{ github.repository_owner }}
+          repo: creditcoin3-next
+          tag: ${{ needs.setup.outputs.release_tag }}
+          file: ${{ needs.setup.outputs.creditcoin_name }}
+          path: target/release/
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download attestor binaries from release ${{ needs.setup.outputs.release_tag }}
+        uses: i3h/download-release-asset@v1
+        with:
+          owner: ${{ github.repository_owner }}
+          repo: creditcoin3-next
+          tag: ${{ needs.setup.outputs.release_tag }}
+          file: ${{ needs.setup.outputs.attesstor_name }}
+          path: target/release/
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Unzip & Restore executable permissions
+        working-directory: target/release
+        run: |
+          unzip ./*.zip
+
+          chmod a+x ./creditcoin3-node
+          chmod a+x ./attestor*
+
+          ls -l
