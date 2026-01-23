@@ -1,18 +1,20 @@
 import dotenv from 'dotenv';
-import { Contract, ethers, InterfaceAbi, EventLog } from 'ethers';
+import { Contract, ethers, InterfaceAbi } from 'ethers';
 
 import burnerAbi from '../contracts/abi/TestERC20Abi.json';
 import simpleMinterAbi from '../contracts/abi/SimpleMinterUSC.json';
-import { generateProofFor, getGasLimit, submitProof } from '../utils';
+import {
+  generateProofFor,
+  computeGasLimitForMinter,
+  submitProofToMinter,
+  pollEvents,
+  MAX_PROCESSED_TXS,
+  POLLING_INTERVAL_MS,
+  isValidContractAddress,
+  isValidPrivateKey,
+} from '../utils';
 
 dotenv.config({ override: true });
-
-// Polling interval in milliseconds (adjust as needed)
-const POLLING_INTERVAL_MS = 5000;
-// Backoff delay when polling encounters an error
-const ERROR_BACKOFF_MS = 10000;
-// Maximum number of processed transactions to track before clearing
-const MAX_PROCESSED_TXS = 1000;
 
 // Graceful shutdown flag
 let isShuttingDown = false;
@@ -26,36 +28,6 @@ process.on('SIGTERM', () => {
   console.log('\nReceived SIGTERM, shutting down gracefully...');
   isShuttingDown = true;
 });
-
-// Helper function to poll for events using queryFilter (avoids filter expiration issues)
-async function pollEvents(
-  contract: Contract,
-  eventName: string,
-  fromBlock: number,
-  handler: (event: EventLog) => Promise<void> | void
-): Promise<number> {
-  try {
-    const currentBlock = await contract.runner?.provider?.getBlockNumber();
-    if (!currentBlock || currentBlock < fromBlock) {
-      return fromBlock;
-    }
-
-    const events = await contract.queryFilter(eventName, fromBlock, currentBlock);
-    for (const event of events) {
-      if (event instanceof EventLog) {
-        await handler(event);
-      }
-    }
-
-    // Return next block to query from
-    return currentBlock + 1;
-  } catch (error) {
-    console.error(`Error polling ${eventName} events:`, error);
-    // Add backoff delay on error to avoid hammering the RPC
-    await new Promise((resolve) => setTimeout(resolve, ERROR_BACKOFF_MS));
-    return fromBlock; // Retry from same block on error
-  }
-}
 
 const main = async () => {
   console.log('Starting...');
@@ -77,11 +49,11 @@ const main = async () => {
   const ccNextRpcUrl = process.env.CREDITCOIN_RPC_URL;
   const ccNextWalletPrivateKey = process.env.CREDITCOIN_WALLET_PRIVATE_KEY;
 
-  if (!sourceChainContractAddress) {
+  if (!isValidContractAddress(sourceChainContractAddress)) {
     throw new Error('SOURCE_CHAIN_CUSTOM_CONTRACT_ADDRESS environment variable is not configured or invalid');
   }
 
-  if (!uscMinterContractAddress) {
+  if (!isValidContractAddress(uscMinterContractAddress)) {
     throw new Error('USC_CUSTOM_MINTER_CONTRACT_ADDRESS environment variable is not configured or invalid');
   }
 
@@ -93,18 +65,18 @@ const main = async () => {
     throw new Error('CREDITCOIN_RPC_URL environment variable is not configured or invalid');
   }
 
-  if (!ccNextWalletPrivateKey) {
+  if (!isValidPrivateKey(ccNextWalletPrivateKey)) {
     throw new Error('CREDITCOIN_WALLET_PRIVATE_KEY environment variable is not configured or invalid');
   }
 
   // 1. Create connection to source chain burner contract
   const ethProvider = new ethers.JsonRpcProvider(sourceChainRpcUrl);
-  const burnerContract = new Contract(sourceChainContractAddress, burnerAbi as unknown as InterfaceAbi, ethProvider);
+  const burnerContract = new Contract(sourceChainContractAddress!, burnerAbi as unknown as InterfaceAbi, ethProvider);
 
   // 2. Create connection to minter contract on Creditcoin USC chain
   const ccProvider = new ethers.JsonRpcProvider(ccNextRpcUrl);
-  const wallet = new ethers.Wallet(ccNextWalletPrivateKey, ccProvider);
-  const minterContract = new Contract(uscMinterContractAddress, simpleMinterAbi as unknown as InterfaceAbi, wallet);
+  const wallet = new ethers.Wallet(ccNextWalletPrivateKey!, ccProvider);
+  const minterContract = new Contract(uscMinterContractAddress!, simpleMinterAbi as unknown as InterfaceAbi, wallet);
 
   // Get starting block numbers
   let burnerFromBlock = await ethProvider.getBlockNumber();
@@ -151,8 +123,8 @@ const main = async () => {
         if (proofResult.success) {
           const proofData = proofResult.data!;
           try {
-            const gasLimit = await getGasLimit(ccProvider, minterContract, proofData, wallet.address);
-            const response = await submitProof(minterContract, proofData, gasLimit);
+            const gasLimit = await computeGasLimitForMinter(ccProvider, minterContract, proofData, wallet.address);
+            const response = await submitProofToMinter(minterContract, proofData, gasLimit);
             console.log('Proof submitted: ', response.hash);
           } catch (error) {
             console.error('Error submitting proof: ', error);

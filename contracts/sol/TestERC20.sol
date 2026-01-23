@@ -23,4 +23,11 @@ contract TestERC20 is ERC20 {
         emit TokensBurned(msg.sender, amount);
         return true;
     }
+
+    /// @notice Mint new tokens to a specified address.
+    /// @param amount The amount of tokens to mint
+    function mint(uint256 amount) external returns (bool) {
+        _mint(msg.sender, amount);
+        return true;
+    }
 }

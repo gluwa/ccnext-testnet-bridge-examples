@@ -15,15 +15,11 @@ Before attempting any of the tutorials, make sure the following are installed an
 After that install the required dependencies to run the examples, to do so simply run the
 following command in the root of this repo:
 
-<!-- ignore -->
-
 ```sh
 yarn
 ```
 
 You will also need to set up the right version of foundry with `foundryup`:
-
-<!-- ignore -->
 
 ```bash
 foundryup --version v1.2.3 # Skip this command if you are using nix!
@@ -31,8 +27,6 @@ foundryup --version v1.2.3 # Skip this command if you are using nix!
 ```
 
 Finally, source the `.env` file to load your configuration globally for all examples:
-
-<!-- ignore -->
 
 ```bash
 source .env
@@ -48,6 +42,7 @@ through them in the following order:
 1. 📚 [Hello Bridge]
 2. 📚 [Custom Contracts Bridging]
 3. 📚 [Bridge Offchain Worker]
+4. 📚 [Loan Flow]
 
 ## Content
 
@@ -70,6 +65,13 @@ up custom logic across each chain you are deploying to.
 Streamline UX by automating away most transactions in the bridging process. [Bridge Offchain Worker]
 shows you how offchain workers can be used to simplify the user flow of your cross-chain DApp.
 
+### Loan Flow
+
+Building on top of what we learned with the [Bridge Offchain Worker] we take it a step further by
+implementing a loaning system using both a USC contract, a source chain helper and an offchain worker
+to seamlesly coordinate between the two, and of course making use of our Oracle proving capabilities to
+add the final touches of trust into the process.
+
 ## External Resources
 
 - 📚 [USC Architecture Overview]
@@ -81,6 +83,7 @@ shows you how offchain workers can be used to simplify the user flow of your cro
 [Hello Bridge]: ./hello-bridge/README.md
 [Custom Contracts Bridging]: ./custom-contracts-bridging/README.md
 [Bridge Offchain Worker]: ./bridge-offchain-worker/README.md
+[Loan Flow]: ./loan-flow/README.md
 [USC Architecture Overview]: https://docs.creditcoin.org/usc/overview/usc-architecture-overview
 [DApp Builder Infrastructure]: https://docs.creditcoin.org/usc/dapp-builder-infrastructure/
 [Creditcoin Oracle Subsystem]: https://docs.creditcoin.org/usc/creditcoin-oracle-subsystems/

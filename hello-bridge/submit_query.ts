@@ -2,7 +2,13 @@ import dotenv from 'dotenv';
 import { Contract, ethers, InterfaceAbi } from 'ethers';
 
 import simpleMinterAbi from '../contracts/abi/SimpleMinterUSC.json';
-import { generateProofFor, submitProofAndAwait, getGasLimit } from '../utils';
+import {
+  generateProofFor,
+  submitProofToMinterAndAwait,
+  computeGasLimitForMinter,
+  isValidPrivateKey,
+  isValidContractAddress,
+} from '../utils';
 
 dotenv.config({ override: true });
 
@@ -13,10 +19,10 @@ async function main() {
   if (args.length !== 1) {
     console.error(`
   Usage:
-    yarn submit_hello <Transaction_Hash>
+    yarn hello_bridge:submit_query <Transaction_Hash>
 
   Example:
-    yarn submit_hello 0x87c97c776a678941b5941ec0cb602a4467ff4a35f77264208575f137cb05b2a7
+    yarn hello_bridge:submit_query 0x87c97c776a678941b5941ec0cb602a4467ff4a35f77264208575f137cb05b2a7
   `);
     process.exit(1);
   }
@@ -30,7 +36,7 @@ async function main() {
 
   // Validate Private Key
   const ccNextPrivateKey = process.env.CREDITCOIN_WALLET_PRIVATE_KEY;
-  if (!ccNextPrivateKey || !ccNextPrivateKey.startsWith('0x') || ccNextPrivateKey.length !== 66) {
+  if (!isValidPrivateKey(ccNextPrivateKey)) {
     throw new Error('CREDITCOIN_WALLET_PRIVATE_KEY environment variable is not configured or invalid');
   }
 
@@ -50,7 +56,7 @@ async function main() {
   }
 
   const uscMinterContractAddress = process.env.USC_MINTER_CONTRACT_ADDRESS;
-  if (!uscMinterContractAddress) {
+  if (!isValidContractAddress(uscMinterContractAddress)) {
     throw new Error('USC_MINTER_CONTRACT_ADDRESS is not configured or invalid');
   }
 
@@ -75,13 +81,13 @@ async function main() {
   // 3. Using previously generated proof, submit to USC minter and await for the minted event
   if (proofResult.success) {
     // Establish link with the USC contract
-    const wallet = new ethers.Wallet(ccNextPrivateKey, ccProvider);
+    const wallet = new ethers.Wallet(ccNextPrivateKey!, ccProvider);
     const contractABI = simpleMinterAbi as unknown as InterfaceAbi;
-    const minterContract = new Contract(uscMinterContractAddress, contractABI, wallet);
+    const minterContract = new Contract(uscMinterContractAddress!, contractABI, wallet);
 
     const proofData = proofResult.data!;
-    const gasLimit = await getGasLimit(ccProvider, minterContract, proofData, wallet.address);
-    await submitProofAndAwait(minterContract, proofData, gasLimit);
+    const gasLimit = await computeGasLimitForMinter(ccProvider, minterContract, proofData, wallet.address);
+    await submitProofToMinterAndAwait(minterContract, proofData, gasLimit);
   } else {
     throw new Error(`Failed to generate proof: ${proofResult.error}`);
   }
