@@ -17,6 +17,7 @@
     "eslint": "eslint -c .eslintrc.js --ignore-pattern .eslintrc.js --ignore-pattern check_balance.js --max-warnings 0 --ext .ts --ext .js .",
     "format": "prettier --write .",
     "build": "forge build",
+    "test:contracts": "forge test -vvv",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
