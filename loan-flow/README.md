@@ -27,7 +27,7 @@ Our system will have three contracts:
 
 - An ERC20 contract deployed on Sepolia, which will be the contract where the lending and borrowing will happen
 - A loan manager USC contract deployed on Creditcoin, this will be where loan will be registered and their state updated from the worker
-- An auxiliary loan contract deployed on Sepolia, this is where both funding and repayment will happen
+- An auxiliary loan contract deployed on Sepolia, this is where both funding and repayment events are emitted
 
 Make sure to first load your `.env` file with:
 
@@ -120,7 +120,16 @@ BORROWER_WALLET_PRIVATE_KEY="<your_borrower_private_key>"
 
 > [!CAUTION]
 > Make sure both accounts have enough ETH on Sepolia otherwise they won't
-> be able to execute the funding/repaying calls.
+> be able to execute the funding/repaying calls. You can request some 
+> Sepolia ETH tokens using a [🚰 testnet faucet]. We link to the Google 
+> sepolia faucet here.
+
+Now that we've populated our .env file with all necessary variables, let's 
+load those variables into our terminal.
+
+```sh
+source .env
+```
 
 ## 1.3 Funding accounts
 
@@ -146,6 +155,7 @@ cast send --rpc-url $SOURCE_CHAIN_RPC_URL \
 If only it was that easy in the real world huh? Anyways you can check both accounts balance like so:
 
 ```bash
+WALLET_ADDRESS=$(cast wallet address --private-key $LENDER_WALLET_PRIVATE_KEY)
 yarn utils:check_balance $SOURCE_CHAIN_ERC20_CONTRACT_ADDRESS $WALLET_ADDRESS $SOURCE_CHAIN_RPC_URL
 ```
 
@@ -290,7 +300,7 @@ You may have noticed that we haven't actually fully funded the loan, as evidence
 Let's try finish the funding:
 
 ```sh
-yarn loan_flow:fund_loan 5 500
+yarn loan_flow:fund_loan <loanId> 500
 ```
 
 Now the worker seems to have noticed something:
@@ -322,7 +332,7 @@ Now the borrower can begin repaying its due!
 Much like funding, repaying is as easy as calling:
 
 ```sh
-yarn loan_flow:repay_loan 5 1000
+yarn loan_flow:repay_loan <loanId> 1000
 ```
 
 Which shows the following:
@@ -357,7 +367,7 @@ Wait a minute... what do you mean partially repaid!? The loan was for 1000 token
 Hmm... oh! The interest! I forgot about that!
 
 ```sh
-yarn loan_flow:repay_loan 5 50
+yarn loan_flow:repay_loan <loanId> 50
 ```
 
 Now let's see...
@@ -426,10 +436,12 @@ You've learned:
 1. How to interact with the Creditcoin Oracle
 2. How to deploy your own custom Universal Smart Contracts
 3. How to run an offchain worker to support smooth cross-chain user experience
-4. How to run a loan flow example using the Oracle to obtain proof of the actions performed cross-chain
+4. How to run a more complex loan flow example which uses the Oracle to inform successive cross-chain state transitions
 
 If you haven't already, take a look at the [USC Gitbook] for more information.
 
 [Bridge Offchain Worker]: ../bridge-offchain-worker/README.md
 [Hello Bridge]: ../hello-bridge/README.md#11-generate-a-new-wallet-address
 [USC Gitbook]: https://docs.creditcoin.org/usc
+
+[🚰 testnet faucet]: https://cloud.google.com/application/web3/faucet/ethereum/sepolia
