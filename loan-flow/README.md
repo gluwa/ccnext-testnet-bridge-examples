@@ -284,6 +284,11 @@ Now the loan is registered in both Creditcoin and the source chain, but the amou
 To do it, use the following command:
 
 ```sh
+yarn loan_flow:fund_loan <loanId> <paymentamount>
+```
+In our example, this will be:
+
+```sh
 yarn loan_flow:fund_loan 5 500
 ```
 
@@ -300,7 +305,7 @@ You may have noticed that we haven't actually fully funded the loan, as evidence
 Let's try finish the funding:
 
 ```sh
-yarn loan_flow:fund_loan <loanId> 500
+yarn loan_flow:fund_loan 5 500
 ```
 
 Now the worker seems to have noticed something:
