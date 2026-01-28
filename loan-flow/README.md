@@ -284,7 +284,7 @@ Now the loan is registered in both Creditcoin and the source chain, but the amou
 To do it, use the following command:
 
 ```sh
-yarn loan_flow:fund_loan 5 500
+yarn loan_flow:fund_loan <loanId> 500
 ```
 
 You should see something like that:

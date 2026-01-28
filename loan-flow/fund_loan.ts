@@ -37,8 +37,6 @@ const main = async () => {
   // Environment Variables
   const sourceChainRpcUrl = process.env.SOURCE_CHAIN_RPC_URL;
 
-  const ccNextWalletPrivateKey = process.env.CREDITCOIN_WALLET_PRIVATE_KEY;
-
   const lenderPrivateKey = process.env.LENDER_WALLET_PRIVATE_KEY;
   const borrowerPrivateKey = process.env.BORROWER_WALLET_PRIVATE_KEY;
 
@@ -49,9 +47,6 @@ const main = async () => {
     throw new Error('SOURCE_CHAIN_RPC_URL environment variable is not configured or invalid');
   }
 
-  if (!isValidPrivateKey(ccNextWalletPrivateKey)) {
-    throw new Error('CREDITCOIN_WALLET_PRIVATE_KEY environment variable is not configured or invalid');
-  }
   if (!isValidPrivateKey(lenderPrivateKey)) {
     throw new Error('LENDER_WALLET_PRIVATE_KEY environment variable is not configured or invalid');
   }
@@ -68,13 +63,12 @@ const main = async () => {
 
   // 1. Connect to source chain loan contract and ERC20 contract
   const sourceChainProvider = new ethers.JsonRpcProvider(sourceChainRpcUrl);
-  const sourceChainWallet = new ethers.Wallet(ccNextWalletPrivateKey!, sourceChainProvider);
+  const lenderWallet = new ethers.Wallet(lenderPrivateKey!, sourceChainProvider);
   const sourceChainLoanContract = new Contract(
     sourceChainLoanContractAddress!,
     loanHelperAbi as unknown as InterfaceAbi,
-    sourceChainWallet
+    lenderWallet
   );
-  const lenderWallet = new ethers.Wallet(lenderPrivateKey!, sourceChainProvider);
   const borrowerWallet = new ethers.Wallet(borrowerPrivateKey!, sourceChainProvider);
   const sourceChainERC20Contract = new Contract(
     sourceChainERC20ContractAddress!,
